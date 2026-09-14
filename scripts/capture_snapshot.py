@@ -114,9 +114,8 @@ class Capture:
             query=query,
             data_mode=response.headers.get("x-autotwin-data-mode"),
         )
-        print(
-            f"  GET  {path}{'?' + '&'.join(f'{k}={v}' for k, v in (query or {}).items()) if query else ''}"
-        )
+        rendered = "&".join(f"{k}={v}" for k, v in (query or {}).items())
+        print(f"  GET  {path}{'?' + rendered if rendered else ''}")
         return payload
 
     def post(self, path: str, body: dict[str, Any], key_fields: tuple[str, ...]) -> Any:
@@ -172,7 +171,7 @@ class Capture:
         print("charging")
         self.get("/charging/stations", {"page": 1, "page_size": 50})
         # One GeoJSON file: the fast-only variant is the same 20 000-feature cap and the client
-        # derives it from properties.is_fast_charger, so shipping it twice would be 6 MB for nothing.
+        # derives it from properties.is_fast_charger; shipping it twice would be 6 MB for nothing.
         self.get("/charging/stations/geojson")
         self.get("/charging/statistics")
         for slug in CORRIDORS:
@@ -217,7 +216,8 @@ class Capture:
         )
         self.manifest["charging_station_shards"] = shard_index
         print(
-            f"  {len(rows):,} of {full_count:,} station rows (fast charging) in {len(shards)} shards"
+            f"  {len(rows):,} of {full_count:,} station rows (fast charging) "
+            f"in {len(shards)} shards"
         )
 
         # Details for the first pages of the default listing, so the drawer works on click.
