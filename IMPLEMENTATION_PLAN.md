@@ -114,13 +114,13 @@ fan-out, because every other module compiles against it.
 
 | Check | Result |
 |---|---|
-| `uv run pytest` | **1 082 passed**, 0 xfailed |
-| `uv run pytest -m "not integration and not kafka"` (CI selection) | 1 025 passed, 56 deselected |
+| `uv run pytest` | **1 096 passed**, 0 xfailed (incl. 14 MCP, 7 of them integration) |
+| `uv run pytest -m "not integration and not kafka"` (CI selection) | 1 032 passed, 63 deselected |
 | `uv run ruff check .` / `ruff format --check .` | clean, 174 files |
-| `uv run mypy` (strict) | **no issues in 114 source files** |
+| `uv run mypy` (strict) | **no issues in 117 source files** |
 | `pnpm test:run` | **322 passed** |
 | `pnpm lint` / `pnpm typecheck` / `pnpm build` | clean (2 React-Compiler notices on TanStack Table) |
-| `pnpm exec playwright test smoke` | **20 passed** incl. the full Frankfurt→Stuttgart flow |
+| `pnpm exec playwright test smoke` | **20 passed** incl. the full Frankfurt→Stuttgart flow; 17 also pass against the static export with no backend |
 | `dbt build` | 9 marts, 1 incremental model, 440+ tests |
 | Live ingestion | 116 440 charging stations · 219 821 points · 1 703 traffic events |
 
