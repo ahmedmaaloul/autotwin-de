@@ -85,15 +85,19 @@ Flink. Each is documented in `docs/adr/` as *considered and rejected for this sc
 - [x] pytest / vitest / Playwright suites, GitHub Actions CI
 - [x] README, README.de, ARCHITECTURE, ADRs
 
-### M10 — Optional copilot — **not implemented**
-- [ ] `OllamaLLMProvider` + tool-calling over platform data
+### M10 — AI access: delivered as an MCP server, not a chat endpoint
+- [x] `services/mcp` — `autotwin_mcp` exposes eight tools over stdio to any MCP client
+      (Claude Desktop, Cursor, Zed): route analysis, charging plan, corridor coverage,
+      underserved corridors, station search, data quality, routes, vehicle profiles
+- [x] Tool results reuse the API's own service functions; geometry omitted unless asked
+- [x] 14 tests, 7 of them integration against PostGIS
+- [x] `POST /api/v1/copilot/ask` kept as an honest 503 pointing at the MCP server
 
-`POST /api/v1/copilot/ask` exists and returns a clean `503 configuration_missing` whenever
-`AUTOTWIN_LLM_ENABLED=false`, which is always, because no provider is wired up. The endpoint
-is a documented placeholder, not a working feature — see the final report. Everything the
-copilot would have verbalised is already produced deterministically by
-`autotwin_ml.insights` and rendered by `EnergyImpactCard`, which is the more defensible
-implementation and the reason this milestone was left last.
+The brief's optional copilot was a model behind an HTTP endpoint. A tool server is the better
+design for the same goal: the model can only *phrase* platform output, never compute a kWh
+figure; it costs nothing to run because the platform hosts no model; and it is a smaller,
+testable surface. The deterministic "why" a chat wrapper would have verbalised already exists
+in `autotwin_ml.insights`.
 
 ---
 

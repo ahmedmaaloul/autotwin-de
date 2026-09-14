@@ -133,6 +133,13 @@ Versorgungslücken ergeben sich als Fensterfunktion über den Streckenoffsets. A
 Server-Sent Events in den Browser strömen; Fahrzeugpositionen werden zwischen den Telemetriedaten
 interpoliert.
 
+**Ein MCP-Server statt eines Chatbots** — die Analysen der Plattform als Werkzeuge für jeden
+Model-Context-Protocol-Client (Claude Desktop, Cursor, Zed): `analyze_route`,
+`plan_charging_stops`, `corridor_coverage`, `underserved_corridors`,
+`search_charging_stations`, `data_quality`. Das Modell bringt der Client mit; jede Zahl stammt
+aus demselben Code, den auch die API ausliefert — nichts wird erfunden, und kein Schlüssel liegt
+im Repository. Siehe [`services/mcp/`](services/mcp/README.md).
+
 **Datenqualität als eigenständige Ansicht** — empfangene, übernommene, verworfene und doppelte
 Datensätze je Abruf, die ausgelösten Prüfregeln, Aktualität, Lizenz und Namensnennung.
 

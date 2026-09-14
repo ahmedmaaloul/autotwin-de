@@ -136,6 +136,12 @@ because a number like *"largest gap 84 km"* is meaningless without them.
 **Live digital twin** — hundreds of simulated EVs streaming through Redpanda into PostGIS and
 out to the browser over Server-Sent Events, with marker positions interpolated between ticks.
 
+**An MCP server, not a chatbot** — the platform's analysis exposed as tools for any Model
+Context Protocol client (Claude Desktop, Cursor, Zed): `analyze_route`, `plan_charging_stops`,
+`corridor_coverage`, `underserved_corridors`, `search_charging_stations`, `data_quality`. The
+client brings the model; every number comes from the same code the API serves, so nothing is
+invented — and no key lives in the repository. See [`services/mcp/`](services/mcp/README.md).
+
 **Data quality as a first-class surface** — rows received / accepted / rejected / duplicate per
 ingestion run, the validation rules that fired, freshness, licence and attribution, all readable
 in the UI.

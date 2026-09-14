@@ -1,5 +1,11 @@
 """``POST /api/v1/copilot/ask`` — optional natural-language questions about the twin.
 
+**Superseded by the MCP server** (``services/mcp``, ``uv run python -m autotwin_mcp``): the
+supported way to ask a model about the twin is to connect an MCP client, which calls the
+platform's tools and answers from real output. This endpoint remains as an honest 503 so
+that the documented API surface (BUILD_SPEC §7) does not silently lose a route.
+
+
 This endpoint answers **503 `configuration_missing`** in this build, and that is the correct
 implementation rather than a placeholder.
 
@@ -99,7 +105,8 @@ class CopilotAnswer(ApiModel):
     response_model=CopilotAnswer,
     summary="Ask the copilot (optional feature)",
     description=(
-        "Answers a question about the twin using a **local** LLM.\n\n"
+        "Superseded by the MCP server in `services/mcp`: connect an MCP client to ask a model "
+        "about the twin.\n\n"
         "Disabled in this deployment: returns **503** with code `configuration_missing` and a "
         "message naming what is missing. It never returns a fabricated answer — a plausible "
         "paragraph with nothing behind it would undermine every honest figure this API "

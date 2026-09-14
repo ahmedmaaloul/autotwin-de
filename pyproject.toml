@@ -13,6 +13,7 @@ dependencies = [
     "autotwin-simulator",
     "autotwin-streaming",
     "autotwin-ml",
+    "autotwin-mcp",
 ]
 
 [dependency-groups]
@@ -39,6 +40,7 @@ members = [
     "services/simulator",
     "services/streaming",
     "services/ml",
+    "services/mcp",
 ]
 
 [tool.uv.sources]
@@ -49,6 +51,7 @@ autotwin-ingestion = { workspace = true }
 autotwin-simulator = { workspace = true }
 autotwin-streaming = { workspace = true }
 autotwin-ml = { workspace = true }
+autotwin-mcp = { workspace = true }
 
 # --------------------------------------------------------------------------
 # Lint / format
@@ -91,6 +94,7 @@ ignore = [
 known-first-party = [
     "autotwin_contracts", "autotwin_core", "autotwin_api",
     "autotwin_ingestion", "autotwin_simulator", "autotwin_streaming", "autotwin_ml",
+    "autotwin_mcp",
 ]
 
 [tool.ruff.format]
@@ -115,11 +119,12 @@ exclude = ["alembic/versions/", "\\.venv/", "apps/", "build/", "dist/"]
 mypy_path = [
     "packages/contracts/src", "packages/core/src", "services/api/src",
     "services/ingestion/src", "services/simulator/src", "services/streaming/src",
-    "services/ml/src", "tests",
+    "services/ml/src", "services/mcp/src", "tests",
 ]
 packages = [
     "autotwin_contracts", "autotwin_core", "autotwin_api",
     "autotwin_ingestion", "autotwin_simulator", "autotwin_streaming", "autotwin_ml",
+    "autotwin_mcp",
 ]
 
 [[tool.mypy.overrides]]
