@@ -1,0 +1,443 @@
+# AutoTwin DE — local platform.
+#
+#   docker compose up -d                       infrastructure only (the default, and the one
+#                                              you want: Postgres + Redpanda + Console)
+#   docker compose --profile full up -d        the whole platform in containers
+#   docker compose --profile routing up -d     local OSRM (run `make osrm-prepare` first)
+#   docker compose --profile observability up -d   Prometheus + Grafana
+#   docker compose --profile airflow up -d     scheduled ingestion
+#
+# The default `up` deliberately starts infrastructure ONLY. The fast inner loop is stateful
+# services in Docker and application code on the host — `make up && make dev` — because a
+# rebuilt image on every edit costs about forty seconds and uvicorn's reloader costs about
+# one. The `full` profile exists so the same compose file can also demonstrate the deployed
+# topology, and so CI can smoke-test the images.
+#
+# Ports are fixed by BUILD_SPEC §5 and must not drift:
+#   web 3000 · API 8000 · Postgres 5433 · Redpanda 19092 · Redpanda admin 9644
+#   Redpanda Console 8088 · OSRM 5001 · Prometheus 9090 · Grafana 3001 · Airflow 8082
+name: autotwin
+
+# ===========================================================================
+# Shared fragments
+# ===========================================================================
+
+# Unbounded json-file logs are the classic way a laptop runs out of disk after a weekend
+# simulation. 30 MB per service is enough to debug and small enough to forget about.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+# In-network addresses. These override whatever .env says, because .env is written for the
+# host loopback (localhost:5433 / localhost:19092) and `environment:` beats `env_file:`.
+x-backend-env: &backend-env
+  AUTOTWIN_ENV: docker
+  AUTOTWIN_LOG_FORMAT: json
+  AUTOTWIN_DATABASE_URL: postgresql+psycopg://autotwin:autotwin@postgres:5432/autotwin
+  AUTOTWIN_KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+  AUTOTWIN_DATA_DIR: /app/data
+  AUTOTWIN_ML_MODEL_DIR: /app/models
+
+# The three Python entry points share one image and differ only by command.
+x-backend: &backend
+  build:
+    context: .
+    dockerfile: infra/docker/api.Dockerfile
+  image: autotwin/backend:dev
+  profiles: ["full"]
+  env_file:
+    - path: .env
+      required: false
+  environment: *backend-env
+  volumes:
+    - ./data:/app/data
+    - ./models:/app/models
+  restart: unless-stopped
+  logging: *logging
+
+x-airflow: &airflow
+  image: apache/airflow:2.10.4-python3.12
+  profiles: ["airflow"]
+  # Airflow writes logs into a bind mount; running as the host uid keeps those files owned
+  # by the developer on Linux. Group 0 is what the image's own directories are owned by.
+  user: "${AIRFLOW_UID:-50000}:0"
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    # Airflow 2.x still speaks psycopg2, which is what the image ships; the application side
+    # uses psycopg 3. Separate database on the same server — one container, two schemas'
+    # worth of isolation, no second Postgres to keep patched.
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://autotwin:autotwin@postgres:5432/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__PARALLELISM: "8"
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: "4"
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+    AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.session
+    # AIRFLOW__CORE__FERNET_KEY is deliberately unset. A key committed to a public repository
+    # is not a key; this profile is local-only, and Connections are recreated by the DAGs.
+    TZ: Europe/Berlin
+  volumes:
+    - ./orchestration/airflow/dags:/opt/airflow/dags
+    - ./orchestration/airflow/logs:/opt/airflow/logs
+    - ./orchestration/airflow/plugins:/opt/airflow/plugins
+  restart: unless-stopped
+  logging: *logging
+
+# ===========================================================================
+# Services
+# ===========================================================================
+services:
+  # -------------------------------------------------------------------------
+  # PostgreSQL 16 + PostGIS 3.4 — the system of record (BUILD_SPEC §3)
+  # -------------------------------------------------------------------------
+  postgres:
+    # Default is the official PostGIS image, which publishes amd64 only. On Apple Silicon it
+    # runs under emulation — correct, but noticeably slower on the corridor-gap queries.
+    # Set POSTGRES_IMAGE=imresamu/postgis:16-3.5 in .env for a native arm64 build
+    # (community-maintained, same upstream sources). See README → Apple Silicon.
+    image: ${POSTGRES_IMAGE:-postgis/postgis:16-3.4}
+    container_name: autotwin-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: autotwin
+      POSTGRES_PASSWORD: autotwin
+      POSTGRES_DB: autotwin
+    # Tuned for a laptop running analytical queries, not for a production OLTP server.
+    #   shared_buffers   512MB  corridor scans over charging_stations stay resident
+    #   work_mem          32MB  per sort/hash node; the gap analysis sorts offsets per route
+    #   maintenance_work_mem     GiST index builds on geography columns are the slow part
+    #   max_connections    100  far above what pool_size=10 per service needs; low enough
+    #                           that 100 × work_mem cannot exhaust a 16 GB machine
+    #   jit=off           the planner's JIT costs more than it saves on sub-second queries
+    #                     and adds seconds of variance to the ones it does compile
+    #   random_page_cost=1.1     everything here is on SSD, so index scans should not be
+    #                            penalised as if they were seeks
+    command:
+      - postgres
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - work_mem=32MB
+      - -c
+      - maintenance_work_mem=256MB
+      - -c
+      - effective_cache_size=2GB
+      - -c
+      - max_connections=100
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - jit=off
+      - -c
+      - timezone=UTC
+      - -c
+      - log_min_duration_statement=1000
+    ports:
+      - "5433:5432"
+    volumes:
+      - autotwin_pgdata:/var/lib/postgresql/data
+      # Bind-mounting the directory shadows the postgis image's own init scripts, which is
+      # why 01-init-postgis.sql creates the extensions explicitly. See that file.
+      - ./infra/docker/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autotwin -d autotwin"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    logging: *logging
+
+  # -------------------------------------------------------------------------
+  # Redpanda — Kafka API without the JVM (ADR 002)
+  # -------------------------------------------------------------------------
+  redpanda:
+    image: redpandadata/redpanda:v24.2.18
+    container_name: autotwin-redpanda
+    restart: unless-stopped
+    # Two listeners, because the same broker is addressed from two networks and Kafka
+    # clients follow the *advertised* address after the initial bootstrap. `internal` is
+    # what other containers use (redpanda:9092); `external` is what the host uses
+    # (localhost:19092) when the API and simulator run under uv. Getting this wrong is the
+    # classic "connects, then times out on produce" Kafka failure.
+    command:
+      - redpanda
+      - start
+      - --mode=dev-container
+      - --smp=1
+      - --memory=1G
+      - --overprovisioned
+      - --default-log-level=warn
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
+      - --rpc-addr=redpanda:33145
+      - --advertise-rpc-addr=redpanda:33145
+      - --schema-registry-addr=internal://0.0.0.0:8081,external://0.0.0.0:18081
+    ports:
+      - "19092:19092"
+      - "9644:9644"
+    volumes:
+      - autotwin_redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      # `cluster health` reports the controller and every partition, so this only goes green
+      # once the broker can actually serve produce/fetch — unlike a port check.
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    logging: *logging
+
+  redpanda-console:
+    image: redpandadata/console:v2.7.2
+    container_name: autotwin-redpanda-console
+    restart: unless-stopped
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      REDPANDA_ADMINAPI_ENABLED: "true"
+      REDPANDA_ADMINAPI_URLS: http://redpanda:9644
+    ports:
+      - "8088:8080"
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    logging: *logging
+
+  # One-shot topic provisioning. Kept as a service rather than a Makefile step so that the
+  # topics exist with the right retention no matter how the stack was started.
+  create-topics:
+    image: redpandadata/redpanda:v24.2.18
+    container_name: autotwin-create-topics
+    restart: "no"
+    entrypoint: ["/bin/sh"]
+    command: ["/scripts/create-topics.sh"]
+    environment:
+      REDPANDA_BROKERS: redpanda:9092
+    volumes:
+      - ./infra/scripts:/scripts:ro
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    logging: *logging
+
+  # -------------------------------------------------------------------------
+  # Application — profile `full`
+  # -------------------------------------------------------------------------
+  api:
+    <<: *backend
+    container_name: autotwin-api
+    command:
+      - uvicorn
+      - autotwin_api.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request as u, sys; sys.exit(0 if u.urlopen('http://127.0.0.1:8000/health', timeout=3).status == 200 else 1)
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+
+  simulator:
+    <<: *backend
+    container_name: autotwin-simulator
+    command: ["python", "-m", "autotwin_simulator.cli", "run"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      create-topics:
+        condition: service_completed_successfully
+
+  stream-consumer:
+    <<: *backend
+    container_name: autotwin-stream-consumer
+    command: ["python", "-m", "autotwin_streaming.cli", "consume"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      create-topics:
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+    image: autotwin/web:dev
+    container_name: autotwin-web
+    profiles: ["full"]
+    environment:
+      # Server-side proxy target for /api/backend/* (apps/web/next.config.ts).
+      AUTOTWIN_API_URL: http://api:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+
+  # -------------------------------------------------------------------------
+  # OSRM — profile `routing`
+  # -------------------------------------------------------------------------
+  # Requires a prepared graph. Run `make osrm-prepare` FIRST: it downloads the Geofabrik
+  # extracts for Hessen and Baden-Württemberg (the Frankfurt–Stuttgart flagship corridor
+  # crosses both), merges them and runs osrm-extract/partition/customize into ./data/osrm.
+  # Without that step this container exits immediately with "file not found".
+  #
+  # Point the backend at it with AUTOTWIN_OSRM_BASE_URL=http://osrm:5000 (in compose) or
+  # http://localhost:5001 (on the host); the default is the public demo server.
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:v5.27.1
+    container_name: autotwin-osrm
+    profiles: ["routing"]
+    restart: unless-stopped
+    command:
+      - osrm-routed
+      - --algorithm=mld
+      - --max-matching-size=5000
+      - --max-table-size=8000
+      - /data/hessen-bw.osrm
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./data/osrm:/data
+    logging: *logging
+
+  # -------------------------------------------------------------------------
+  # Observability — profile `observability`
+  # -------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: autotwin-prometheus
+    profiles: ["observability"]
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - autotwin_prometheus_data:/prometheus
+    # Lets Prometheus scrape the API when it runs on the host under `make api`, which is the
+    # normal development topology. Docker Desktop resolves this name already; the mapping is
+    # here for Linux, where it otherwise does not exist.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging: *logging
+
+  grafana:
+    image: grafana/grafana:11.5.0
+    container_name: autotwin-grafana
+    profiles: ["observability"]
+    restart: unless-stopped
+    environment:
+      # Local-only credentials for a local-only profile. Anonymous viewing is on so a demo
+      # never opens on a login screen; editing still requires the admin account.
+      GF_SECURITY_ADMIN_USER: autotwin
+      GF_SECURITY_ADMIN_PASSWORD: autotwin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SERVER_ROOT_URL: http://localhost:3001
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./infra/docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - autotwin_grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    logging: *logging
+
+  # -------------------------------------------------------------------------
+  # Airflow — profile `airflow` (ADR: orchestration must never gate `make dev`)
+  # -------------------------------------------------------------------------
+  airflow-init:
+    <<: *airflow
+    container_name: autotwin-airflow-init
+    restart: "no"
+    # `db migrate` is idempotent; `users create` fails harmlessly once the user exists, so
+    # the whole one-shot can be re-run after every `make airflow-up`.
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -e
+        airflow db migrate
+        airflow users create \
+          --username autotwin --password autotwin \
+          --firstname AutoTwin --lastname Local \
+          --role Admin --email dev@autotwin.local || true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  airflow-webserver:
+    <<: *airflow
+    container_name: autotwin-airflow-webserver
+    command: ["webserver"]
+    ports:
+      - "8082:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 45s
+
+  airflow-scheduler:
+    <<: *airflow
+    container_name: autotwin-airflow-scheduler
+    command: ["scheduler"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8974/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 45s
+
+# ===========================================================================
+# Volumes — named explicitly so `name: autotwin` does not prefix them, which keeps
+# `docker volume ls` readable and the names stable if the project is ever renamed.
+# ===========================================================================
+volumes:
+  autotwin_pgdata:
+    name: autotwin_pgdata
+  autotwin_redpanda_data:
+    name: autotwin_redpanda_data
+  autotwin_prometheus_data:
+    name: autotwin_prometheus_data
+  autotwin_grafana_data:
+    name: autotwin_grafana_data
+
+networks:
+  default:
+    name: autotwin

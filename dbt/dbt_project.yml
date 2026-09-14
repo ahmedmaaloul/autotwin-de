@@ -1,0 +1,120 @@
+# AutoTwin DE — analytical layer (BUILD_SPEC §16).
+#
+# The operational database (BUILD_SPEC §3) is the system of record; dbt never writes to it.
+# It reads `public.*` and materialises three layers into its own schemas so that an analytical
+# rebuild can never corrupt the transactional tables the API and the simulator depend on.
+
+name: autotwin
+version: 1.0.0
+config-version: 2
+
+profile: autotwin
+
+# dbt 1.8 is the first release with the decoupled adapter interface that dbt-postgres uses here
+# and the first that ships `dbt parse` as a connection-free compile check (which CI relies on).
+require-dbt-version: [">=1.8.0", "<2.0.0"]
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+# No `analysis-paths` / `snapshot-paths`: this project has neither analyses nor snapshots, and
+# declaring directories that do not exist only invites someone to wonder what belongs in them.
+# dbt's defaults apply if either is ever added.
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Analytical knobs. Everything a reader might want to challenge ("why 5 km? why 50 kW?") is a
+# var with a documented default rather than a number buried in a model.
+vars:
+  # Corridor width used when deciding whether a charging station "serves" a route.
+  # 5 km ≈ a 5-8 minute detour at motorway-junction spacing; the same default the API uses for
+  # `buffer_km` on /api/v1/charging/coverage (BUILD_SPEC §7.2).
+  corridor_buffer_m: 5000
+
+  # BUILD_SPEC §2 / autotwin_contracts.records.FAST_CHARGER_THRESHOLD_KW.
+  fast_charger_min_kw: 50
+  # BUILD_SPEC §2 ChargingCategory.ultra_fast.
+  ultra_fast_min_kw: 150
+
+  # Coverage scoring targets. AFIR (EU 2023/1804) requires >= 150 kW pools every 60 km on the
+  # TEN-T core network; 50 km is the stricter internal planning target used for the score.
+  target_max_gap_km: 50
+  target_fast_stations_per_100km: 2
+
+  # How close a traffic event has to be to a route segment before it is attributed to it.
+  # 2 km absorbs the coordinate imprecision of the Autobahn feed (events are reported at the
+  # nearest kilometre marker, not at the true extent) without bleeding onto parallel roads.
+  traffic_match_buffer_m: 2000
+
+  # Vehicle profile used as the yardstick for route-level energy intensity when no concrete
+  # vehicle is given. `compact_ev` is the most common German EV segment (BUILD_SPEC §9).
+  reference_vehicle_code: compact_ev
+
+  # Metric CRS for along-route projection. ETRS89 / UTM zone 32N is the official German
+  # national grid and is what every along-line distance in this project is measured in.
+  germany_metric_srid: 25832
+
+  # How far behind the newest loaded row `fct_vehicle_telemetry` re-reads on an incremental
+  # run. The Kafka consumer is at-least-once and commits offsets after the database write
+  # (BUILD_SPEC §8), so a recovered batch can land with a `recorded_at` behind rows that are
+  # already in the table. 30 minutes is far longer than any observed consumer lag and costs
+  # only a re-read of rows that `delete+insert` would replace with themselves.
+  telemetry_lookback_minutes: 30
+
+  # Tolerance used when comparing the streaming consumer's running trip totals against the
+  # same quantities recomputed from telemetry (`tests/assert_trip_energy_reconciles.sql`).
+  # Absolute term for short trips, relative term for long ones; a trip must breach both.
+  trip_energy_tolerance_kwh: 0.5
+  trip_energy_tolerance_percent: 5.0
+
+models:
+  autotwin:
+    +persist_docs:
+      relation: true
+      columns: true
+
+    staging:
+      # Views: staging is a renaming/typing contract, not a copy of the operational tables.
+      # Materialising it would double the storage of `telemetry` for no analytical gain.
+      +materialized: view
+      +schema: staging
+      +tags: ["staging"]
+
+    intermediate:
+      # Ephemeral: these models exist to name a join, not to be queried. Inlining them as CTEs
+      # keeps the mart SQL readable without leaving intermediate relations lying around.
+      +materialized: ephemeral
+      +tags: ["intermediate"]
+
+    marts:
+      # Tables: marts are read by the API and the dashboard on every page load.
+      +materialized: table
+      +schema: marts
+      +tags: ["marts"]
+      # Only meaningful for incremental models (fct_vehicle_telemetry). `fail` is deliberate:
+      # a column appearing or disappearing upstream must stop the run rather than silently
+      # produce a fact table whose history has holes in it.
+      +on_schema_change: fail
+
+seeds:
+  autotwin:
+    +schema: reference
+    +tags: ["reference"]
+    bundesland_reference:
+      +column_types:
+        bundesland: varchar(2)
+        label_de: text
+        area_km2: double precision
+
+# `data_tests` rather than `tests`: the project-level key was renamed in dbt 1.8.
+data_tests:
+  autotwin:
+    # Failing rows are written to `analytics_test_failures.<test_name>` instead of being
+    # counted and thrown away. A data-quality project that cannot show you the offending row
+    # is not a data-quality project.
+    +store_failures: true
+    +schema: test_failures
+    +severity: error

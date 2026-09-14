@@ -1,0 +1,74 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+
+# ---- Node / Next.js ----
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+.pnpm-store/
+playwright-report/
+test-results/
+blob-report/
+.vercel/
+
+# ---- Environment & secrets ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---- Data lake: keep the structure, never the payload ----
+data/raw/**
+data/bronze/**
+data/silver/**
+data/gold/**
+# Provider HTTP cache: hash-named responses, regenerated on demand.
+data/cache/**
+!data/**/.gitkeep
+!data/**/README.md
+*.parquet
+*.duckdb
+*.duckdb.wal
+*.osm.pbf
+*.osrm*
+
+# ---- Fixtures ARE committed (demo mode must work offline) ----
+!packages/core/src/autotwin_core/fixtures/**
+!services/ingestion/src/autotwin_ingestion/fixtures/**
+
+# ---- ML artefacts ----
+models/*.joblib
+models/*.ubj
+models/*.pkl
+!models/.gitkeep
+!models/*.json
+
+# ---- Docker / infra volumes ----
+.volumes/
+infra/docker/volumes/
+orchestration/airflow/logs/
+orchestration/airflow/plugins/__pycache__/
+
+# ---- OS / editors ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json

@@ -1,0 +1,146 @@
+[project]
+name = "autotwin-de"
+version = "0.1.0"
+description = "AutoTwin DE — Intelligent Digital Twin for German Electric Mobility"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "autotwin-contracts",
+    "autotwin-core",
+    "autotwin-api",
+    "autotwin-ingestion",
+    "autotwin-simulator",
+    "autotwin-streaming",
+    "autotwin-ml",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "httpx>=0.28",
+    "respx>=0.22",
+    "ruff>=0.8",
+    "mypy>=1.14",
+    "types-requests>=2.32",
+    "types-shapely>=2.0",
+    "types-psycopg2>=2.9",
+    "freezegun>=1.5",
+]
+
+[tool.uv.workspace]
+members = [
+    "packages/contracts",
+    "packages/core",
+    "services/api",
+    "services/ingestion",
+    "services/simulator",
+    "services/streaming",
+    "services/ml",
+]
+
+[tool.uv.sources]
+autotwin-contracts = { workspace = true }
+autotwin-core = { workspace = true }
+autotwin-api = { workspace = true }
+autotwin-ingestion = { workspace = true }
+autotwin-simulator = { workspace = true }
+autotwin-streaming = { workspace = true }
+autotwin-ml = { workspace = true }
+
+# --------------------------------------------------------------------------
+# Lint / format
+# --------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["alembic/versions", ".venv", "data", "apps"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",    # pycodestyle
+    "F",         # pyflakes
+    "I",         # isort
+    "B",         # flake8-bugbear
+    "UP",        # pyupgrade
+    "C4",        # comprehensions
+    "SIM",       # simplify
+    "RUF",       # ruff-specific
+    "ASYNC",     # async correctness
+    "S",         # bandit (security)
+    "TID",       # tidy imports
+    "PTH",       # use pathlib
+    "N",         # pep8-naming
+    "ANN",       # annotations
+]
+ignore = [
+    "ANN401",  # allow typing.Any where genuinely dynamic
+    "S101",    # assert is fine (tests, invariants)
+    "B008",    # FastAPI Depends() in defaults is the documented idiom
+    "N818",    # our error names end in Error already where it matters
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ANN", "S105", "S106", "S311"]
+"**/fixtures/**" = ["E501"]
+"scripts/**" = ["S603", "S607"]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "autotwin_contracts", "autotwin_core", "autotwin_api",
+    "autotwin_ingestion", "autotwin_simulator", "autotwin_streaming", "autotwin_ml",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# --------------------------------------------------------------------------
+# Types
+# --------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+strict = true
+warn_unused_ignores = true
+warn_return_any = true
+disallow_untyped_defs = true
+no_implicit_reexport = true
+namespace_packages = true
+explicit_package_bases = true
+exclude = ["alembic/versions/", "\\.venv/", "apps/", "build/", "dist/"]
+# src-layout workspace: point mypy at the module roots and name the packages explicitly,
+# otherwise it discovers each file twice (once by path, once by installed module name).
+mypy_path = [
+    "packages/contracts/src", "packages/core/src", "services/api/src",
+    "services/ingestion/src", "services/simulator/src", "services/streaming/src",
+    "services/ml/src", "tests",
+]
+packages = [
+    "autotwin_contracts", "autotwin_core", "autotwin_api",
+    "autotwin_ingestion", "autotwin_simulator", "autotwin_streaming", "autotwin_ml",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "shap.*", "xgboost.*", "sklearn.*", "duckdb.*", "polars.*",
+    "geoalchemy2.*", "confluent_kafka.*", "aiokafka.*", "joblib.*",
+    "matplotlib.*", "pandas.*",
+]
+ignore_missing_imports = true
+
+# --------------------------------------------------------------------------
+# Tests
+# --------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-q --strict-markers --strict-config"
+markers = [
+    "integration: requires a live PostgreSQL/PostGIS database",
+    "kafka: requires a live Redpanda/Kafka broker",
+    "slow: long-running (ML training, large fixtures)",
+]
+filterwarnings = ["error::DeprecationWarning:autotwin_.*"]

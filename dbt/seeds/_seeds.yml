@@ -1,0 +1,44 @@
+version: 2
+
+seeds:
+  - name: bundesland_reference
+    description: >
+      The sixteen German federal states with their official German name and surface area.
+
+      This is the only reference data the analytical layer owns, and it exists for two reasons.
+      First, `mart_charging_infrastructure` normalises station counts by area (stations per
+      1000 km²), which is the number that makes Bayern and Bremen comparable — an absolute
+      count only ever says "Bayern is big". Second, it is the *spine* of that mart: building it
+      from the seed rather than from `group by bundesland` guarantees exactly sixteen rows, so a
+      state with no charging stations appears with a zero instead of silently vanishing from
+      the comparison.
+
+      Areas are the Statistisches Bundesamt (Destatis) "Bodenfläche nach Art der tatsächlichen
+      Nutzung" figures, rounded to whole km²; they sum to 357 587 km², Germany's total. They
+      change by a few km² between census years and are not a time series.
+
+      Charging stations whose `bundesland` could not be resolved from the register's spelling
+      are *excluded* from the mart, because there is no honest state to attribute them to. That
+      is a data-quality finding and belongs in `/api/v1/data/quality`, not in a silent
+      "unknown" bucket that a reader would mistake for a seventeenth state.
+    columns:
+      - name: bundesland
+        description: "ISO 3166-2:DE code without the `DE-` prefix — the join key used everywhere in the project."
+        data_tests:
+          - unique
+          - not_null
+          - accepted_values:
+              values: ["BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"]
+      - name: label_de
+        description: "Official German name, matching `Bundesland.label_de` in `autotwin_contracts.enums`."
+        data_tests:
+          - unique
+          - not_null
+      - name: area_km2
+        description: "Surface area in square kilometres (Destatis)."
+        data_tests:
+          - not_null
+          - accepted_range:
+              # Bremen is the smallest at 420 km², Bayern the largest at 70 542 km².
+              min_value: 400
+              max_value: 71000

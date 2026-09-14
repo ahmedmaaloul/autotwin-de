@@ -1,0 +1,36 @@
+# AutoTwin DE — Prometheus scrape configuration (compose profile `observability`).
+#
+# The API is scraped at two addresses on purpose. The default developer loop runs the API on
+# the host with `make api`, so `host.docker.internal:8000` is the one that is usually up; the
+# `full` compose profile runs it as the `api` container instead. Whichever is not running is
+# simply reported `up == 0`, which is information rather than noise: the dashboard shows at a
+# glance which topology is active.
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    project: autotwin
+    environment: local
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: autotwin-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["api:8000"]
+        labels:
+          deployment: compose
+      - targets: ["host.docker.internal:8000"]
+        labels:
+          deployment: host
+
+  # Redpanda exposes both its own internals and the Kafka-protocol metrics (consumer lag,
+  # partition throughput) on the admin API port.
+  - job_name: redpanda
+    metrics_path: /public_metrics
+    static_configs:
+      - targets: ["redpanda:9644"]

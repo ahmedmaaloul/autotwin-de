@@ -1,0 +1,217 @@
+version: 2
+
+sources:
+  - name: autotwin_raw
+    description: >
+      The operational tables of AutoTwin DE (BUILD_SPEC §3.2), written by `autotwin_ingestion`,
+      `autotwin_simulator` and `autotwin_streaming` and read by the API. dbt only ever reads
+      from this schema — the analytical layer must never be able to corrupt the system of
+      record. Every externally-sourced table carries the provenance block of BUILD_SPEC §3.1
+      (`source`, `source_identifier`, `source_url`, `source_timestamp`, `data_origin`,
+      `ingestion_run_id`, `ingested_at`), and staging propagates it unchanged so that no mart
+      can lose track of whether a number was measured or simulated.
+    # No `database:` override — the operational schema always lives in the database dbt is
+    # pointed at, and hardcoding a name would break the `ci` target.
+    schema: public
+    loader: autotwin_ingestion
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    tables:
+      - name: charging_stations
+        description: >
+          One physical charging site from the Bundesnetzagentur Ladesäulenregister. The
+          register is republished monthly under a rotating filename and the previous month is
+          deleted, so `ingested_at` — not `source_timestamp` — is the only reliable freshness
+          signal (docs/data/sources.md §1).
+        loaded_at_field: ingested_at
+        freshness:
+          # The file is monthly; the pipeline is expected to run at least weekly so that a
+          # missed publication is noticed inside the month rather than after it.
+          warn_after: { count: 7, period: day }
+          error_after: { count: 35, period: day }
+        columns:
+          - name: external_id
+            description: >
+              Stable natural key synthesised by the adapter (`bnetza:<hash of address+location>`).
+              The register itself has no stable site id; this hash is what makes re-ingesting
+              the same file an idempotent upsert instead of a duplication.
+          - name: location
+            description: "`geography(Point,4326)` — PostGIS returns metres from ST_Distance on it."
+          - name: max_power_kw
+            description: "Strongest single connector in kW. Drives `charging_category` and `is_fast_charger`."
+          - name: total_power_kw
+            description: "Installed grid connection power of the whole site in kW, not the sum of connectors."
+          - name: charging_points_count
+            description: "Connector count as declared by the source, which can disagree with the number of `charging_points` rows."
+          - name: raw
+            description: "Trimmed original source record, kept for auditability of a German-language source."
+
+      - name: charging_points
+        description: >
+          The individual connectors of a site. It is one of the seven tables BUILD_SPEC §3.1
+          puts the provenance block on, so a connector states its own attribution even though
+          the ingestion pipeline copies it from the parent site — which is what lets a rolled-up
+          power figure name its source without re-joining the station.
+        columns:
+          - name: ordinal
+            description: "1-based position of the connector within its station, in source order."
+          - name: power_kw
+            description: >
+              Rated power of this one connector. The register publishes it as free text that can
+              hold several values (`"11; 3,7"`), so the adapter splits it and writes one row per
+              value — which is why the connector count here can exceed `charging_points_count`.
+          - name: public_key
+            description: "Public key of the charging point as published in the register; kept for traceability."
+
+      - name: weather_observations
+        description: >
+          DWD 10-minute "now" observations (docs/data/sources.md §2). `-999` means missing in
+          the source and is converted to NULL by the adapter; staging nulls it a second time as
+          a backstop, because a single surviving sentinel silently destroys any mean.
+        loaded_at_field: observed_at
+        freshness:
+          # A 10-minute product that is two hours old means the DWD fetch is failing over to
+          # cache; twelve hours means the energy model is running on stale temperatures.
+          warn_after: { count: 2, period: hour }
+          error_after: { count: 12, period: hour }
+        columns:
+          - name: observed_at
+            description: "`MESS_DATUM` from DWD, which is already UTC (never local time)."
+          - name: weather_station_id
+            description: "FK to `weather_stations`; NULL for an observation interpolated to a point rather than measured at a station."
+          - name: condition
+            description: "Coarse WeatherCondition derived from the measured parameters, not reported by DWD directly."
+
+      - name: weather_stations
+        description: >
+          The DWD station catalogue. No staging model reads it — BUILD_SPEC §16 fixes the
+          staging layer to eight models — but it is declared here so that the foreign key on
+          `stg_weather_observations.weather_station_id` can be tested against something real
+          rather than assumed.
+        columns:
+          - name: dwd_station_id
+            description: >
+              The DWD id as text. It is space-padded in the data files (`         44`) and
+              zero-padded to five digits in filenames (`00044`); the adapter normalises both.
+
+      - name: traffic_events
+        description: >
+          Roadworks, closures and warnings from the Autobahn GmbH API (docs/data/sources.md §3).
+          `is_blocked` is derived from `impact.symbols`, not from the feed's own `isBlocked`
+          field, which is the string `"false"` in every single item ever observed.
+        loaded_at_field: ingested_at
+        freshness:
+          # The feed changes continuously; six hours without an ingestion means the traffic
+          # penalty in every route analysis is being computed from yesterday's disruptions.
+          warn_after: { count: 6, period: hour }
+          error_after: { count: 24, period: hour }
+        columns:
+          - name: external_id
+            description: "Identifier from the Autobahn feed; NULL for sources that publish none."
+          - name: road_name
+            description: "e.g. `A5`. The feed lists roads with trailing whitespace, which staging strips."
+          - name: direction
+            description: "Direction of travel, e.g. `Nürnberg -> München`. The feed prefixes it with a space."
+          - name: starts_at
+            description: >
+              Absent in the source whenever `display_type == SHORT_TERM_ROADWORKS`, so a NULL
+              here means "already in force", not "unknown".
+          - name: geometry
+            description: "`geometry(LineString,4326)` extent of the event; present on nearly every Autobahn item."
+          - name: delay_minutes
+            description: "Estimated delay in minutes where the source states one; mostly NULL."
+
+      - name: telemetry
+        description: >
+          High-volume simulated vehicle telemetry, written by the Kafka consumer or directly by
+          the simulator. **Every row is simulated** (BUILD_SPEC §3.2: no provenance mixin, only
+          `data_origin`, which is always `simulated`). Append-only and tolerant of duplicates,
+          because the consumer commits offsets after the write and is therefore at-least-once.
+        loaded_at_field: recorded_at
+        freshness:
+          # Telemetry is a live stream while a simulation runs. These thresholds describe a
+          # *running* simulator; when no simulation is active the source is legitimately stale
+          # and `dbt source freshness` is expected to warn — see dbt/README.md.
+          warn_after: { count: 15, period: minute }
+          error_after: { count: 60, period: minute }
+        columns:
+          - name: id
+            description: "`bigserial`, not a UUID — this is the only table in the schema where row volume beats key aesthetics."
+          - name: vehicle_id
+            description: "The *human* vehicle id (`ATW-0042`) as text, not the `vehicles.id` UUID."
+          - name: trip_id
+            description: "The human trip id as text; NULL between trips while a vehicle is idle."
+          - name: cumulative_energy_kwh
+            description: "Monotonically increasing energy drawn since the start of the trip; resets at trip boundaries."
+          - name: odometer_m
+            description: "Monotonically increasing distance in metres; the basis for every derived distance."
+
+      - name: trips
+        description: >
+          One simulated journey of one vehicle. The aggregates on this table are maintained by
+          the streaming consumer as telemetry arrives; `int_trip_energy` recomputes them from
+          the raw points so that `fct_trips` can show both and flag any divergence.
+        columns:
+          - name: id
+            description: "UUID primary key. Staging exposes it as `trip_uuid` because `trip_id` is the business key."
+          - name: trip_id
+            description: "Human trip identifier, unique, and the key telemetry rows carry."
+          - name: vehicle_id
+            description: "FK to `vehicles.id` (a UUID) — *not* the human vehicle id that telemetry carries."
+          - name: energy_kwh
+            description: "Energy consumed as maintained by the consumer; 0 until the first telemetry batch lands."
+
+      - name: routes
+        description: >
+          A planned corridor: geometry, distance and duration as returned by OSRM
+          (docs/data/sources.md §4). `is_demo` marks the seeded corridors that the dashboard and
+          `mart_charging_coverage` are built around.
+        columns:
+          - name: slug
+            description: "Stable human key, e.g. `frankfurt-stuttgart`; the API accepts it in place of the UUID."
+          - name: geometry
+            description: "`geometry(LineString,4326)` — cheap to render and to simplify; cast to `::geography` for metres."
+          - name: distance_m
+            description: "Driving distance from the routing engine, which is longer than the geodesic length of the geometry."
+
+      - name: route_segments
+        description: >
+          A route cut into analysis chunks, one row per chunk, carrying the per-segment inputs
+          (road class, speed, temperature, traffic) and the energy prediction the API produced.
+          Derived data by construction — there is no external source to attribute it to, which
+          is why the table has no provenance block.
+        columns:
+          - name: ordinal
+            description: "0- or 1-based position along the route; unique per route and contiguous by construction."
+          - name: start_offset_m
+            description: "Distance from the route origin to the start of this segment, in metres."
+          - name: predicted_kwh
+            description: "Energy predicted for this segment by the active model (BUILD_SPEC §10)."
+          - name: energy_intensity
+            description: "EnergyIntensity bucket of `predicted_kwh_per_100km` against the analysed vehicle's nominal figure."
+
+      - name: vehicles
+        description: >
+          Simulated vehicle instances. Always `data_origin = simulated`. Consumed directly by
+          `fct_trips` (to resolve a trip's vehicle model) rather than through a staging model,
+          because BUILD_SPEC §16 fixes the staging layer to eight models.
+        columns:
+          - name: vehicle_id
+            description: "Human vehicle identifier, e.g. `ATW-0042`; this is what telemetry rows carry."
+          - name: vehicle_model_id
+            description: "FK to `vehicle_models.id`."
+
+      - name: vehicle_models
+        description: >
+          The five generic EV profiles seeded by migration `0002` (BUILD_SPEC §9). Public,
+          class-level order-of-magnitude figures — deliberately not reverse-engineered OEM data.
+          `dim_charging_station` aside, this is the only dimension with no ingestion behind it,
+          so it is read straight from the source by `dim_vehicle_model`.
+        columns:
+          - name: code
+            description: "Stable profile key: `compact_ev`, `sedan_ev`, `performance_ev`, `suv_ev`, `van_ev`."
+          - name: nominal_consumption_kwh_100km
+            description: "The reference consumption every EnergyIntensity bucket is measured against."

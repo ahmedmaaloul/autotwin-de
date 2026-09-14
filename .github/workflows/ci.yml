@@ -1,0 +1,133 @@
+# AutoTwin DE — continuous integration.
+#
+# Two independent jobs, one per stack, on the free ubuntu-latest runner. Nothing here needs a
+# secret, a registry login or a paid plan: a fork can run the whole pipeline unchanged.
+#
+# Integration tests (`integration`, `kafka`) are deselected rather than serviced with compose:
+# they need PostGIS and a broker, they are covered locally by `make test`, and a five-minute
+# service-container startup on every push buys very little confidence that the unit suite and
+# `next build` do not already give.
+#
+# The local equivalent of this file is `make ci`; the two are kept in the same order on
+# purpose, so a red pipeline can be reproduced with one command.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# A force-push supersedes the run it interrupted; keeping both alive only queues the runner.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Read-only: this workflow builds and tests, it never writes to the repository.
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "22"
+
+jobs:
+  backend:
+    name: Backend (ruff, mypy, pytest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          # Must match the uv pinned in infra/docker/api.Dockerfile, so CI and the image
+          # resolve from the same lockfile format.
+          version: "0.9.17"
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+
+      - name: Set up Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install the workspace
+        run: uv sync --all-extras --dev
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      # mypy is given installed packages, not paths: with a src/ layout a path-based run
+      # infers module names such as `packages.core.src.autotwin_core` and then reports every
+      # module twice. Mirrors MYPY_TARGETS in the Makefile.
+      - name: Type check
+        run: |
+          uv run mypy \
+            -p autotwin_contracts -p autotwin_core -p autotwin_api \
+            -p autotwin_ingestion -p autotwin_simulator -p autotwin_streaming \
+            -p autotwin_ml
+
+      - name: Test
+        run: uv run pytest -m "not integration and not kafka"
+
+  frontend:
+    name: Frontend (eslint, tsc, vitest, next build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      # The pnpm version comes from the `packageManager` field; apps/web is the only Node
+      # package in the repository, so the action has to be told where to look for it.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: apps/web/package.json
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test --run
+
+      # `next build` is a test: it type-checks server components, resolves every route and
+      # produces the standalone bundle that infra/docker/web.Dockerfile ships.
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    if: always()
+    steps:
+      # One required status check for branch protection, instead of one per job — adding a
+      # third job later then does not mean editing the protection rules.
+      - name: Verify both stacks passed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: |
+          echo "backend=${{ needs.backend.result }} frontend=${{ needs.frontend.result }}"
+          exit 1
+      - name: Summary
+        run: echo "backend and frontend are green."

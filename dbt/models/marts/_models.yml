@@ -1,0 +1,1012 @@
+version: 2
+
+models:
+  # =========================================================================================
+  # Dimensions
+  # =========================================================================================
+  - name: dim_charging_station
+    description: >
+      Conformed charging-site dimension: one row per physical site with the register's two
+      contradictory power descriptions reconciled into one, the German state name resolved from
+      the seed, and the provenance block intact. Official data
+      (`data_origin = official`) from the Bundesnetzagentur Ladesäulenregister, CC BY 4.0.
+    data_tests:
+      # BUILD_SPEC §2 sets two different power thresholds on purpose, and they must not be
+      # conflated: `ChargingCategory.fast` begins at **22 kW**, while `is_fast_charger` begins at
+      # **50 kW**. A 22-49 kW site is therefore categorised `fast` and is *not* a fast charger —
+      # correct, and the single most confusable pair of definitions in this schema. What holds is
+      # implication in one direction only, which is what these two tests assert.
+      - expression_is_true:
+          expression: "not is_fast_charger or effective_charging_category in ('fast', 'ultra_fast')"
+      - expression_is_true:
+          expression: "not is_ultra_fast_charger or effective_charging_category = 'ultra_fast'"
+      - expression_is_true:
+          expression: "not is_ultra_fast_charger or is_fast_charger"
+    columns:
+      - name: station_id
+        description: "UUID primary key of the site; the conformed key every fact joins on."
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_charging_stations')
+              field: station_id
+      - name: external_id
+        description: "Natural key from the register (`bnetza:<hash>`)."
+        data_tests:
+          - unique
+          - not_null
+      - name: bundesland
+        description: "ISO 3166-2:DE code. NULL where the register's spelling could not be resolved."
+        data_tests:
+          - accepted_values:
+              values: ["BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"]
+      - name: bundesland_label_de
+        description: "Official German state name from `bundesland_reference`; NULL exactly where `bundesland` is."
+      - name: latitude
+        description: "WGS 84 latitude in decimal degrees."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 47.2, max_value: 55.1 }
+      - name: longitude
+        description: "WGS 84 longitude in decimal degrees."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 5.8, max_value: 15.1 }
+      - name: location_geography
+        description: >
+          `geography(Point,4326)`. Carried because the spatial marts and the GeoJSON endpoint
+          need it and rebuilding a point from two floats loses the SRID.
+      - name: charging_category
+        description: "Power class as the ingestion pipeline stored it."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["normal", "fast", "ultra_fast"]
+      - name: effective_charging_category
+        description: >
+          The same rule applied to the reconciled power. Differs from `charging_category`
+          exactly where the register's site-level rating disagrees with its own connector list.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["normal", "fast", "ultra_fast"]
+      - name: has_category_disagreement
+        description: >
+          True where the stored and reconciled categories differ. A count of these is a
+          data-quality headline about the source, not a defect in this model.
+        data_tests:
+          - not_null
+      - name: effective_max_power_kw
+        description: "Strongest connector at the site after reconciliation, in kW."
+        data_tests:
+          - accepted_range:
+              # A 1 MW site does not exist in the register; above that a unit was mis-parsed.
+              min_value: 0
+              max_value: 1000
+              inclusive: false
+      - name: power_basis
+        description: "Which description the reconciled power rests on: `both`, `connectors`, `site` or `none`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["both", "connectors", "site", "none"]
+      - name: is_fast_charger
+        description: >
+          Reconciled power reaches **50 kW** (BUILD_SPEC §2). Not the same thing as
+          `effective_charging_category = 'fast'`, which begins at 22 kW: a 22-49 kW site is
+          categorised `fast` and is not a fast charger. `mart_charging_coverage` uses this
+          column, not the category, because a 22 kW stop is a hotel rather than a refuelling.
+        data_tests:
+          - not_null
+      - name: commissioned_year
+        description: "Year the site went into service; the axis of the growth series."
+        data_tests:
+          - accepted_range: { min_value: 1990, max_value: 2100 }
+      - name: source_system
+        description: "Provenance: `bundesnetzagentur`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+      - name: data_origin
+        description: "Provenance: `official`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+
+  - name: dim_route
+    description: >
+      Conformed corridor dimension: one row per route with its segmentation summarised onto it.
+      Geometry is © OpenStreetMap contributors (ODbL), routed by OSRM. Carries the routing
+      engine's driving distance and the measured geometry length as two separate columns,
+      because every offset in `mart_charging_coverage` is measured along the second one.
+    columns:
+      - name: route_id
+        description: "UUID primary key of the route."
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_routes')
+              field: route_id
+      - name: route_slug
+        description: "Stable human key such as `frankfurt-stuttgart`; the API accepts it in place of the UUID."
+        data_tests:
+          - unique
+      - name: distance_km
+        description: "Driving distance from the routing engine."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1, max_value: 2000 }
+      - name: geometry_length_km
+        description: >
+          Length of the route line measured in ETRS89 / UTM 32N. A few per mille shorter than
+          `distance_km`: a polyline is a chord approximation of the road it represents.
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0, max_value: 2000, inclusive: false }
+      - name: free_flow_avg_speed_kmh
+        description: "Distance over the routing engine's duration; NULL for a zero-duration route."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 200 }
+      - name: segment_count
+        description: "Number of analysis chunks; 0 for a route that has not been analysed yet."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: segmentation_coverage_percent
+        description: >
+          Segment lengths as a share of the route's driving distance. Should sit at 100. A route
+          at 80 has lost segments, and every energy total built on it is short by the difference
+          without anything erroring — which is why the number is published rather than assumed.
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 120 }
+      - name: motorway_distance_share_percent
+        description: "Share of the segmented distance on a motorway."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: is_demo
+        description: "Whether this is one of the seeded demo corridors; the filter for the corridor analysis."
+        data_tests:
+          - not_null
+      - name: source_system
+        description: "Provenance: `osrm` for a routed corridor."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+      - name: data_origin
+        description: "Provenance: `official` for OSRM geometry, `derived` where AutoTwin built the corridor."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+
+  - name: dim_vehicle_model
+    description: >
+      The five generic EV profiles of BUILD_SPEC §9 with their derived constants. Public,
+      class-level order-of-magnitude figures for a vehicle *class* — deliberately not
+      reverse-engineered OEM data, which `is_generic` records on every row.
+    data_tests:
+      - expression_is_true:
+          # Usable capacity is the nameplate minus the buffer the vehicle reserves. Exceeding
+          # the nameplate would mean a range calculation is allowed to spend energy that does
+          # not exist.
+          expression: "usable_capacity_kwh <= battery_capacity_kwh"
+      - expression_is_true:
+          expression: "max_dc_power_kw >= max_ac_power_kw"
+    columns:
+      - name: vehicle_model_id
+        description: "UUID primary key of the profile."
+        data_tests:
+          - unique
+          - not_null
+      - name: vehicle_model_code
+        description: "Stable profile key: `compact_ev`, `sedan_ev`, `performance_ev`, `suv_ev`, `van_ev`."
+        data_tests:
+          - unique
+          - not_null
+          - accepted_values:
+              values: ["compact_ev", "sedan_ev", "performance_ev", "suv_ev", "van_ev"]
+      - name: vehicle_class
+        description: "Body class of the profile."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["compact", "sedan", "performance", "suv", "van"]
+      - name: nominal_consumption_kwh_100km
+        description: "The reference consumption every EnergyIntensity bucket is measured against."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 10, max_value: 40 }
+      - name: usable_capacity_kwh
+        description: "Energy a range calculation is allowed to spend."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 10, max_value: 200 }
+      - name: drag_area_m2
+        description: "`cd · A`, feature 17 of BUILD_SPEC §10.2 and the aero term of the physical model."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0.3, max_value: 2.0 }
+      - name: nominal_range_km
+        description: >
+          Usable energy over nominal consumption. A catalogue figure under catalogue conditions
+          and therefore an upper bound — every mart that reports real consumption reports it
+          against this, never instead of it.
+        data_tests:
+          - accepted_range: { min_value: 100, max_value: 800 }
+      - name: min_dc_charge_10_to_80_min
+        description: >
+          10 → 80 % at the vehicle's peak DC rate, ignoring the taper of BUILD_SPEC §10.3. A
+          floor on charging time, never a substitute for running the curve.
+      - name: data_origin
+        description: "Provenance: `derived` — curated public figures, not a source-system record."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["derived"]
+
+  # =========================================================================================
+  # Facts
+  # =========================================================================================
+  - name: fct_vehicle_telemetry
+    description: >
+      **SIMULATED.** One row per telemetry tick per vehicle, with the vehicle model resolved and
+      the row-level derivations the analytics endpoints need. Nothing in this table was measured
+      on a real vehicle (BUILD_SPEC §0.2, §3.2); `data_origin` is tested to contain nothing but
+      `simulated` so that a chart built on it cannot be mistaken for fleet reality.
+      Incremental with a `telemetry_lookback_minutes` window and `delete+insert` on the primary
+      key, because the Kafka consumer is at-least-once and a recovered batch can land behind
+      rows that are already loaded.
+    columns:
+      - name: telemetry_id
+        description: "`bigserial` primary key from the operational table."
+        data_tests:
+          - unique
+          - not_null
+      - name: vehicle_id
+        description: "Human vehicle identifier (`ATW-0042`), the key telemetry travels under."
+        data_tests:
+          - not_null
+      - name: vehicle_uuid
+        description: >
+          `vehicles.id`. NULL where telemetry arrived before its vehicle row was committed —
+          a real, transient state of an at-least-once pipeline, not a defect.
+      - name: vehicle_model_id
+        description: "Resolved vehicle profile; NULL when `vehicle_uuid` is."
+        data_tests:
+          - relationships:
+              to: ref('dim_vehicle_model')
+              field: vehicle_model_id
+      - name: trip_id
+        description: "Human trip identifier; NULL while a vehicle is idle between trips."
+      - name: route_id
+        description: "Corridor being driven; NULL for a free-roaming vehicle."
+        data_tests:
+          - relationships:
+              to: ref('dim_route')
+              field: route_id
+      - name: recorded_at
+        description: "Simulated observation time in UTC."
+        data_tests:
+          - not_null
+      - name: battery_soc_percent
+        description: "State of charge in per cent of usable capacity."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: speed_kmh
+        description: "Instantaneous speed."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 320 }
+      - name: is_over_speed_limit
+        description: >
+          More than 5 km/h above the posted limit. NULL where the segment has no limit — which
+          on a German motorway is the normal case, not a gap in the data.
+      - name: road_class
+        description: "Functional class of the road."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["motorway", "trunk", "primary", "secondary", "tertiary", "residential", "service", "unknown"]
+      - name: road_class_ordinal
+        description: "Monotone rank 0-6, the `road_class_ordinal` feature of BUILD_SPEC §10.2."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0, max_value: 6 }
+      - name: hvac_load_kw_estimate
+        description: >
+          Climate load implied by the outside temperature, reconstructed from the BUILD_SPEC
+          §10.1 anchors. An attribution aid, not a measured channel.
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 3.5 }
+      - name: energy_intensity
+        description: "This tick's consumption bucketed against the vehicle's nominal figure."
+        data_tests:
+          - accepted_values:
+              values: ["low", "medium", "high", "critical"]
+      - name: remaining_energy_kwh
+        description: "Usable capacity times state of charge; NULL where the vehicle model is unresolved."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 200 }
+      - name: vehicle_state
+        description: "Lifecycle state at the moment of the tick."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["idle", "driving", "charging", "stopped", "completed"]
+      - name: data_origin
+        description: "Provenance: `simulated`, always. See the model description."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["simulated"]
+
+  - name: fct_trips
+    description: >
+      **SIMULATED.** One row per journey, carrying both accounts of its energy: the streaming
+      consumer's running totals (`reported_*`) and the same quantities recomputed from raw
+      telemetry (`measured_*`). They are produced by different code paths in different
+      transactions and can drift; publishing both plus the delta turns that drift into a number
+      anyone can look at. Downstream analytics should use the `measured_*` figures — they are
+      reproducible from points that are still in the database.
+    data_tests:
+      - expression_is_true:
+          expression: "ended_at is null or ended_at >= started_at"
+      - expression_is_true:
+          # A finished trip with telemetry must have a measured distance. A NULL here means the
+          # join to `int_trip_energy` silently lost the trip.
+          expression: >
+            telemetry_point_count = 0 or measured_distance_m is not null
+    columns:
+      - name: trip_uuid
+        description: "UUID primary key of the trip row."
+        data_tests:
+          - unique
+          - not_null
+      - name: trip_id
+        description: "Human trip identifier — the business key, and what telemetry carries."
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_trips')
+              field: trip_id
+      - name: vehicle_id
+        description: "Human vehicle identifier; NULL only if the vehicle row is missing."
+      - name: vehicle_model_id
+        description: "Resolved vehicle profile."
+        data_tests:
+          - relationships:
+              to: ref('dim_vehicle_model')
+              field: vehicle_model_id
+      - name: route_id
+        description: "Corridor the trip followed; NULL for a free-roaming trip."
+        data_tests:
+          - relationships:
+              to: ref('dim_route')
+              field: route_id
+      - name: started_at
+        description: "Trip start in UTC."
+        data_tests:
+          - not_null
+      - name: is_running
+        description: "Whether the trip has not ended yet."
+        data_tests:
+          - not_null
+      - name: measured_distance_km
+        description: "Distance recomputed from odometer differences."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 2000 }
+      - name: measured_energy_kwh
+        description: "Energy recomputed from `cumulative_energy_kwh` differences."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 500 }
+      - name: measured_avg_consumption_kwh_100km
+        description: "Recomputed consumption; NULL for a trip with no distance yet."
+        data_tests:
+          - accepted_range:
+              # Wide on purpose: a bug detector, not a plausibility model.
+              min_value: 5
+              max_value: 100
+      - name: energy_divergence_kwh
+        description: >
+          `measured − reported`. Expected to be ~0. A persistently non-zero value means the
+          consumer's trip update and its telemetry insert have come apart;
+          `tests/assert_trip_energy_reconciles.sql` is what watches it.
+      - name: energy_intensity
+        description: "Trip consumption bucketed against the vehicle's nominal figure."
+        data_tests:
+          - accepted_values:
+              values: ["low", "medium", "high", "critical"]
+      - name: usable_battery_consumed_percent
+        description: >
+          Share of the vehicle's usable battery the trip consumed, from recomputed energy rather
+          than from the SOC delta — a trip that charged mid-way has a misleading SOC delta.
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 300 }
+      - name: charged_during_trip
+        description: "True where the vehicle gained charge over the journey. A fact, not an error."
+        data_tests:
+          - not_null
+      - name: anomalous_step_count
+        description: >
+          Telemetry steps where a monotone counter went backwards *inside* a trip. Expected 0;
+          non-zero means the producer reset a counter mid-trip and those steps were excluded
+          from the sums rather than clamped.
+        data_tests:
+          - not_null
+      - name: trip_state
+        description: "Lifecycle state of the trip."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["idle", "driving", "charging", "stopped", "completed"]
+      - name: data_origin
+        description: "Provenance: `simulated`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["simulated"]
+      - name: source_system
+        description: "Provenance: `simulator`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+
+  - name: fct_traffic_events
+    description: >
+      One row per traffic disruption, with its lifecycle resolved and its severity expressed as
+      the two numbers the rest of the project uses. `is_active_now` is a **build-time snapshot**
+      frozen against `evaluated_at`; the API answers live questions against `traffic_events`
+      directly. Source licence is undeclared — cached, never redistributed (DATA_LICENSES.md).
+    data_tests:
+      - expression_is_true:
+          expression: "not (is_active_now and is_expired)"
+      - expression_is_true:
+          expression: "not (is_active_now and is_upcoming)"
+      - expression_is_true:
+          expression: "ends_at is null or starts_at is null or ends_at >= starts_at"
+    columns:
+      - name: traffic_event_id
+        description: "UUID primary key of the event."
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_traffic_events')
+              field: traffic_event_id
+      - name: external_id
+        description: "Identifier from the Autobahn feed; NULL for sources that publish none."
+        data_tests:
+          - unique
+      - name: event_type
+        description: "Kind of disruption."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["roadworks", "closure", "incident", "warning", "congestion", "other"]
+      - name: severity
+        description: "Expected impact on travel time."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["low", "moderate", "high", "severe"]
+      - name: severity_ordinal
+        description: "Rank 1-4, the `traffic_severity_ordinal` feature of BUILD_SPEC §10.2."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1, max_value: 4 }
+      - name: severity_delay_factor
+        description: >
+          Multiplier on free-flow travel time from `TrafficSeverity.delay_factor`. Derived from
+          the severity *class*, never from a measurement — the sources publish a category.
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1.0, max_value: 2.0 }
+      - name: road_name
+        description: "Upper-cased road identifier such as `A5`, with the feed's trailing whitespace stripped."
+      - name: is_active_now
+        description: "In force at `evaluated_at`. A NULL `starts_at` counts as in force — see the model description."
+        data_tests:
+          - not_null
+      - name: evaluated_at
+        description: "When `is_active_now` was decided. Published so a consumer can see how stale the verdict is."
+        data_tests:
+          - not_null
+      - name: delay_minutes
+        description: "Delay as stated by the source; NULL on almost every item."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 1440 }
+      - name: has_reported_delay
+        description: "Whether `delay_minutes` is present, so an average over it can state its own coverage."
+        data_tests:
+          - not_null
+      - name: is_blocked
+        description: >
+          Derived by the adapter from `impact.symbols`, not from the feed's own `isBlocked`
+          field, which is the string `\"false\"` in every item ever observed.
+        data_tests:
+          - not_null
+      - name: source_system
+        description: "Provenance: `autobahn` or `mobilithek`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+      - name: data_origin
+        description: "Provenance: `official`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+
+  # =========================================================================================
+  # Analytical marts
+  # =========================================================================================
+  - name: mart_charging_infrastructure
+    description: >
+      Charging infrastructure per federal state — the regional comparison behind
+      `/api/v1/analytics/regions` and `/api/v1/charging/statistics`. Exactly sixteen rows,
+      because the spine is the `bundesland_reference` seed rather than a `group by`: a state
+      with no charging sites appears with zeros instead of vanishing from the comparison.
+
+      Sites whose `bundesland` could not be resolved are **excluded** — there is no honest state
+      to attribute them to — so the totals here are the *resolved* national population, which is
+      what `share_of_resolved_stations_percent` says in its name. The unresolved rows surface
+      through `/api/v1/data/quality`, where they belong.
+    data_tests:
+      - expression_is_true:
+          expression: "fast_station_count <= station_count"
+      - expression_is_true:
+          expression: "ultra_fast_station_count <= fast_station_count"
+      - expression_is_true:
+          expression: "fast_charging_point_count <= charging_point_count"
+      - expression_is_true:
+          expression: "stations_commissioned_last_12m <= stations_commissioned_last_36m"
+      - expression_is_true:
+          expression: "official_station_count = station_count"
+    columns:
+      - name: bundesland
+        description: "ISO 3166-2:DE code; the grain of this mart."
+        data_tests:
+          - unique
+          - not_null
+          - accepted_values:
+              values: ["BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"]
+          - relationships:
+              to: ref('bundesland_reference')
+              field: bundesland
+      - name: bundesland_label_de
+        description: "Official German state name."
+        data_tests:
+          - not_null
+      - name: area_km2
+        description: "Surface area (Destatis), the denominator of every density column."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 400, max_value: 71000 }
+      - name: station_count
+        description: "Charging sites in the state."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: fast_charging_point_count
+        description: "Connectors rated at 50 kW or more."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: installed_power_kw
+        description: >
+          Sum of the site grid connections, falling back to the strongest connector where the
+          register states no site total — so a single-connector site does not contribute zero.
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: median_station_power_kw
+        description: >
+          Median of the reconciled site power. With p90 it describes the *shape* of a state's
+          network rather than its size: two states with equal counts and different p90s have
+          built very different things.
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 1000 }
+      - name: p90_station_power_kw
+        description: "90th percentile of reconciled site power."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 1000 }
+      - name: stations_per_1000_km2
+        description: "Site density. The number that makes Bremen and Bayern comparable."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: fast_station_share_percent
+        description: "Fast sites as a share of all sites; NULL for a state with no sites."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: stations_by_commissioning_year
+        description: >
+          Growth curve as a JSONB object, `{\"2019\": 118, \"2020\": 240, …}`. An object rather
+          than a (state, year) grain, because that grain would make every density and percentile
+          column in this mart meaningless.
+        data_tests:
+          - not_null
+      - name: expansion_rate_12m_percent
+        description: >
+          Sites added in the last twelve months against the stock that existed before them.
+          NULL — not 0 — where there is no prior stock, because growth from nothing is not a rate.
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: share_of_resolved_stations_percent
+        description: "Share of the *resolved* national total — see the model description."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: rank_by_station_density
+        description: "1 = densest state. Ties share a rank."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1, max_value: 16 }
+      - name: stations_with_category_disagreement_count
+        description: >
+          Sites where the register's own power class disagrees with the class implied by its
+          connector list. A property of the source, published rather than silently resolved.
+        data_tests:
+          - not_null
+
+  - name: mart_charging_coverage
+    description: >
+      Fast-charging coverage of each demo corridor, with the gap analysis behind
+      `/api/v1/charging/coverage` and `/api/v1/charging/underserved` (BUILD_SPEC §7.2).
+
+      The headline is `max_gap_km` — the longest stretch with no fast charger on it. Counting
+      stations cannot distinguish a corridor with forty chargers in its first 100 km and none in
+      its last 200 from one with ten evenly spaced; a gap measurement can. Gaps include the two
+      edge stretches (origin → first fast charger, last → destination), which is the part a naive
+      implementation omits and the part that usually *is* the problem.
+
+      Gaps are measured along the route geometry in ETRS89 / UTM 32N; densities per 100 km use
+      the routing engine's driving distance. Both lengths are published so no consumer has to
+      guess which one a number came from.
+    data_tests:
+      - expression_is_true:
+          # The completeness invariant: the gaps tile the route exactly once, so they must sum
+          # to its geometry length. 10 m of slack absorbs the metre-resolution rounding in
+          # `meters_to_km`. This is the test that catches a missing edge gap, a double-counted
+          # station, or an offset measured against the wrong length — three mistakes that leave
+          # every other column here looking entirely plausible.
+          expression: "abs(gap_total_km - route_geometry_length_km) < 0.01"
+      - expression_is_true:
+          expression: "fast_station_count <= station_count"
+      - expression_is_true:
+          expression: "ultra_fast_station_count <= fast_station_count"
+      - expression_is_true:
+          expression: "max_gap_km <= route_geometry_length_km + 0.01"
+      - expression_is_true:
+          # A corridor with no fast charger is represented as one gap the length of the route.
+          expression: >
+            fast_station_count > 0 or (gap_count = 1 and largest_gap_kind = 'whole_route')
+    columns:
+      - name: route_id
+        description: "Demo route; the grain of this mart."
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('dim_route')
+              field: route_id
+      - name: route_slug
+        description: "Stable human key of the corridor."
+        data_tests:
+          - unique
+      - name: route_geometry_length_km
+        description: "Length of the route line in the metric grid — the base every offset and gap is measured against."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0, max_value: 2000, inclusive: false }
+      - name: corridor_buffer_km
+        description: "How far off the route a station may sit and still count. Carried so a stored result stays reproducible."
+        data_tests:
+          - not_null
+      - name: fast_charger_min_kw
+        description: "Power threshold for a station to count in the gap analysis (50 kW, BUILD_SPEC §2)."
+        data_tests:
+          - not_null
+      - name: station_count
+        description: "Charging sites within the corridor buffer."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: fast_station_count
+        description: "Of those, the ones at or above `fast_charger_min_kw`."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: stations_per_100km
+        description: "Site density against the routing engine's driving distance."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: gap_count
+        description: "Number of stretches between consecutive fast chargers, including both edge stretches."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1 }
+      - name: gap_total_km
+        description: "Sum of all gaps. Equal to `route_geometry_length_km` by construction — asserted above."
+        data_tests:
+          - not_null
+      - name: max_gap_km
+        description: "Longest stretch of the corridor with no fast charger. The headline number."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: mean_gap_km
+        description: "Mean gap length."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: p90_gap_km
+        description: "90th percentile gap length — says whether one bad gap is an outlier or the rule."
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: largest_gap_start_km
+        description: "Offset along the route where the worst gap begins."
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: largest_gap_kind
+        description: >
+          `origin`, `between`, `destination` or `whole_route` — which kind of stretch the worst
+          gap is. An `origin` or `destination` worst gap is a different planning problem from an
+          interior one.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["origin", "between", "destination", "whole_route"]
+      - name: coverage_score
+        description: >
+          0-100, weighted 60 % gap and 40 % density against the targets in `dbt_project.yml`.
+          A planning heuristic, not a standard — `methodology` states the parameters used.
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: methodology
+        description: >
+          Human-readable German sentence describing exactly how the numbers on this row were
+          produced, required by BUILD_SPEC §7.2. Built from the same variables as the figures, so
+          the wording and the parameters cannot drift apart.
+        data_tests:
+          - not_null
+
+  - name: mart_route_energy
+    description: >
+      Predicted energy per route segment with the route totals attached — the tabular form of
+      the `RouteAnalysis` payload of BUILD_SPEC §7.3. Route-level figures are repeated on each
+      segment because the consumer is one page showing a header and a segment table together.
+
+      The predictions themselves come from the energy model of BUILD_SPEC §10 and are **not**
+      recomputed here. What this mart adds is attribution: how much of the prediction is climate
+      control, and how much extra energy the traffic severity implies. Both penalties are
+      reconstructions from the same documented anchors the Python model uses — not independent
+      measurements, and not second predictions.
+    data_tests:
+      - unique_combination_of_columns:
+          combination_of_columns: ["route_id", "segment_ordinal"]
+      - expression_is_true:
+          expression: "end_offset_km >= start_offset_km"
+      - expression_is_true:
+          # The delayed journey cannot be shorter than the free-flow one: `delay_factor >= 1`.
+          expression: "delayed_minutes is null or delayed_minutes >= free_flow_minutes"
+      - expression_is_true:
+          # A non-zero climate load must produce a non-zero weather penalty and vice versa.
+          # Catches an attribution that silently lost its time base.
+          expression: >
+            hvac_load_kw is null or weather_penalty_percent is null
+            or (hvac_load_kw = 0) = (weather_penalty_percent = 0)
+    columns:
+      - name: route_segment_id
+        description: "UUID primary key of the segment; the grain of this mart."
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_route_segments')
+              field: route_segment_id
+      - name: route_id
+        description: "Route the segment belongs to."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_route')
+              field: route_id
+      - name: segment_ordinal
+        description: "Position along the route."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: segment_distance_km
+        description: "Length of the segment."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0, inclusive: false }
+      - name: road_class
+        description: "Functional class of the road the segment runs on."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["motorway", "trunk", "primary", "secondary", "tertiary", "residential", "service", "unknown"]
+      - name: gradient_percent
+        description: "Net elevation gain over the segment length. Negative downhill."
+        data_tests:
+          - accepted_range: { min_value: -20, max_value: 20 }
+      - name: temperature_c
+        description: "Outside temperature used for this segment."
+        data_tests:
+          - accepted_range: { min_value: -45, max_value: 50 }
+      - name: traffic_severity
+        description: "Severity of the worst traffic event attributed to the segment; NULL when none."
+        data_tests:
+          - accepted_values:
+              values: ["low", "moderate", "high", "severe"]
+      - name: traffic_delay_factor
+        description: "Multiplier on free-flow time implied by the severity class; 1.0 when there is no event."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1.0, max_value: 2.0 }
+      - name: predicted_kwh
+        description: "Energy the model predicts for the segment."
+        data_tests:
+          - accepted_range: { min_value: -50, max_value: 500 }
+      - name: energy_intensity
+        description: "Bucket produced by the API for the vehicle it was asked about."
+        data_tests:
+          - accepted_values:
+              values: ["low", "medium", "high", "critical"]
+      - name: energy_intensity_vs_reference
+        description: >
+          The same prediction re-bucketed against the project's reference profile, so that two
+          routes analysed for different cars stay comparable on one axis.
+        data_tests:
+          - accepted_values:
+              values: ["low", "medium", "high", "critical"]
+      - name: hvac_load_kw
+        description: "Climate load at the segment's temperature (BUILD_SPEC §10.1 anchors), excluding the constant base draw."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 3.5 }
+      - name: weather_penalty_percent
+        description: >
+          Climate energy as a share of what the segment would have used without it. An
+          attribution of the existing prediction, not a second one.
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 200 }
+      - name: traffic_penalty_percent
+        description: "Extra auxiliary energy over the extra time the severity class implies, as a share of the prediction."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: route_kwh_per_100km
+        description: >
+          Distance-weighted route consumption — not a mean of the segment ratios, so a 300 m slip
+          road cannot carry the same weight as a 40 km motorway stretch.
+        data_tests:
+          - accepted_range: { min_value: 5, max_value: 100 }
+      - name: route_reference_battery_required_percent
+        description: >
+          Share of the reference vehicle's usable battery the whole route would take. Above 100
+          means it cannot be driven without charging.
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: data_origin
+        description: "Provenance: `derived` — a segment is cut and modelled by AutoTwin, not sourced."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["derived"]
+
+  - name: mart_traffic_impact
+    description: >
+      Traffic disruption aggregated by road, kind and severity, with the demo corridors it lands
+      on. Events are attributed to a route segment when their reported point lies within
+      `traffic_match_buffer_m` of it — the feed reports at the nearest kilometre marker, so a
+      tighter buffer drops real matches and a looser one bleeds onto the parallel B-road.
+
+      Reported delay and severity-implied delay live in separate columns on purpose: only the
+      first is a number the source states, and `delay_reporting_coverage_percent` says how
+      little of the group that usually is. Counts of active events are a build-time snapshot —
+      see `evaluated_at`.
+    data_tests:
+      - unique_combination_of_columns:
+          combination_of_columns: ["road_name", "event_type", "severity"]
+      - expression_is_true:
+          expression: "active_event_count <= event_count"
+      - expression_is_true:
+          expression: "corridor_matched_event_count <= event_count"
+      - expression_is_true:
+          expression: "events_with_reported_delay_count <= event_count"
+      - expression_is_true:
+          # A group that matched no corridor cannot have affected segments, and vice versa.
+          expression: "(corridor_matched_event_count = 0) = (affected_segment_count = 0)"
+    columns:
+      - name: road_name
+        description: >
+          Upper-cased road identifier. NULL is a real group — the events the feed publishes
+          without a road — which is why `is_road_known` exists instead of an invented label.
+      - name: is_road_known
+        description: "Whether `road_name` is populated, so a UI can split the unattributed group out."
+        data_tests:
+          - not_null
+      - name: event_type
+        description: "Kind of disruption; part of the grain."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["roadworks", "closure", "incident", "warning", "congestion", "other"]
+      - name: severity
+        description: "Severity class; part of the grain."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["low", "moderate", "high", "severe"]
+      - name: severity_ordinal
+        description: "Rank 1-4, re-derived from the group key rather than aggregated out of the members."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1, max_value: 4 }
+      - name: severity_delay_factor
+        description: "Category-derived multiplier on free-flow travel time. Never a measurement."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1.0, max_value: 2.0 }
+      - name: event_count
+        description: "Events in the group."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1 }
+      - name: active_event_count
+        description: "Of those, in force at `evaluated_at`."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: has_active_event
+        description: "Convenience flag for the dashboard's \"active now\" filter."
+        data_tests:
+          - not_null
+      - name: total_reported_delay_minutes
+        description: "Sum of the delays the source actually states. NULL where none does."
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: delay_reporting_coverage_percent
+        description: >
+          Share of the group that carries a reported delay. Published so that an average delay
+          can never be quoted without its own coverage.
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: affected_route_count
+        description: "Distinct demo routes the group's events touch. 0 is normal — most German motorways are not on a seeded corridor."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: affected_segment_count
+        description: "Distinct route segments touched; a segment hit by three events counts once."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: affected_segment_distance_km
+        description: "Total length of those distinct segments."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: match_buffer_km
+        description: "The buffer the attribution used. Carried so a stored result stays reproducible."
+        data_tests:
+          - not_null
+      - name: evaluated_at
+        description: "When the active/expired verdicts were decided."
+        data_tests:
+          - not_null
+      - name: data_origins
+        description: "Distinct `data_origin` values contributing to the group; `official` for the Autobahn feed."
+        data_tests:
+          - not_null

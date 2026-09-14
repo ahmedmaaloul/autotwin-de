@@ -1,0 +1,573 @@
+version: 2
+
+models:
+  # ---------------------------------------------------------------------------------------
+  # Charging infrastructure
+  # ---------------------------------------------------------------------------------------
+  - name: stg_charging_stations
+    description: >
+      One row per physical charging site from the Bundesnetzagentur Ladesäulenregister,
+      renamed and typed. Official data (`data_origin = official`). Coordinates are unpacked to
+      `latitude` / `longitude`; the `location_geography` column is kept for the spatial models.
+    columns:
+      - name: station_id
+        description: "UUID primary key of the site."
+        data_tests:
+          - unique
+          - not_null
+      - name: external_id
+        description: "Natural key from the source (`bnetza:<hash>`); the upsert key of the pipeline."
+        data_tests:
+          - unique
+          - not_null
+      - name: operator
+        description: "Betreiber, trimmed; NULL where the register leaves it blank."
+      - name: postal_code
+        description: "Five-digit PLZ, re-padded with the leading zero the source can lose."
+        data_tests:
+          - expression_is_true:
+              expression: "is null or length(postal_code) = 5"
+      - name: bundesland
+        description: "ISO 3166-2:DE code without the `DE-` prefix. NULL when the register's spelling could not be resolved."
+        data_tests:
+          - accepted_values:
+              # BUILD_SPEC §2 Bundesland.
+              values: ["BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"]
+          - relationships:
+              to: ref('bundesland_reference')
+              field: bundesland
+      - name: country
+        description: "ISO 3166-1 alpha-2; `DE` for every row the pipeline accepts."
+      - name: latitude
+        description: "WGS 84 latitude in decimal degrees."
+        data_tests:
+          - not_null
+          - accepted_range:
+              # Germany's extent (BUILD_SPEC §6). A row outside it means the source swapped
+              # lat/lon or the decimal comma was parsed as a thousands separator.
+              min_value: 47.2
+              max_value: 55.1
+      - name: longitude
+        description: "WGS 84 longitude in decimal degrees."
+        data_tests:
+          - not_null
+          - accepted_range:
+              min_value: 5.8
+              max_value: 15.1
+      - name: commissioned_year
+        description: "Year of `commissioned_on`, for the growth series in `mart_charging_infrastructure`."
+        data_tests:
+          - accepted_range:
+              # The first public German charging point predates the register, but nothing in it
+              # is older than the 1990s and nothing can be commissioned in the future.
+              min_value: 1990
+              max_value: 2100
+      - name: max_power_kw
+        description: "Strongest single connector in kW; drives the category and the fast-charger flag."
+      - name: charging_category
+        description: "Power class: `< 22 kW` normal, `22-149 kW` fast, `>= 150 kW` ultra_fast."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["normal", "fast", "ultra_fast"]
+      - name: is_fast_charger
+        description: "`max_power_kw >= 50`, computed by the ingestion pipeline (BUILD_SPEC §3.2)."
+        data_tests:
+          - not_null
+      - name: source_system
+        description: "Provenance: which system produced the row."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+      - name: data_origin
+        description: "Provenance: `official` for every row of this model."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+      - name: ingested_at
+        description: "When AutoTwin read the row; the freshness clock for this source."
+        data_tests:
+          - not_null
+
+  - name: stg_charging_points
+    description: >
+      One row per connector, carrying the provenance block BUILD_SPEC §3.1 requires on this
+      table. The pipeline copies the attribution from the parent site, so it always agrees with
+      `stg_charging_stations` — `tests/assert_connector_provenance_matches_station.sql` is what
+      proves it still does.
+    columns:
+      - name: charging_point_id
+        description: "UUID primary key of the connector."
+        data_tests:
+          - unique
+          - not_null
+      - name: station_id
+        description: "FK to the site this connector belongs to."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_charging_stations')
+              field: station_id
+      - name: connector_ordinal
+        description: "1-based position within the station, in source order."
+        data_tests:
+          - not_null
+          - accepted_range:
+              # The register publishes at most six connector groups per site
+              # (docs/data/sources.md §1), and each group can expand to several rows.
+              min_value: 1
+      - name: connector_type
+        description: "Physical connector standard, normalised by `ConnectorType.parse`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["type2", "ccs", "chademo", "schuko", "tesla", "cee", "other", "unknown"]
+      - name: current_type
+        description: "AC or DC, `unknown` where the source does not say."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["ac", "dc", "unknown"]
+      - name: power_kw
+        description: >
+          Rated power of this one connector in kW. NULL is legitimate (the register omits it);
+          zero or negative is not, and `tests/assert_positive_charging_power.sql` catches it.
+      - name: source_system
+        description: "Provenance: which system produced the row — `bundesnetzagentur` for every connector the register describes."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+      - name: data_origin
+        description: "Provenance: `official`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+      - name: ingested_at
+        description: "When AutoTwin read the row."
+        data_tests:
+          - not_null
+
+  # ---------------------------------------------------------------------------------------
+  # Weather
+  # ---------------------------------------------------------------------------------------
+  - name: stg_weather_observations
+    description: >
+      DWD 10-minute observations with the `-999` missing-value sentinel nulled out. Official
+      data. Attribution "Quelle: Deutscher Wetterdienst" is required on anything derived from
+      it (docs/data/sources.md §2).
+    columns:
+      - name: weather_observation_id
+        description: "UUID primary key of the observation."
+        data_tests:
+          - unique
+          - not_null
+      - name: weather_station_id
+        description: "FK to the DWD station; NULL for an observation interpolated to a point."
+        data_tests:
+          - relationships:
+              to: source('autotwin_raw', 'weather_stations')
+              field: id
+      - name: observed_at
+        description: "Observation time in UTC, straight from `MESS_DATUM`."
+        data_tests:
+          - not_null
+      - name: latitude
+        description: "WGS 84 latitude of the measurement point."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 47.2, max_value: 55.1 }
+      - name: longitude
+        description: "WGS 84 longitude of the measurement point."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 5.8, max_value: 15.1 }
+      - name: temperature_c
+        description: "Air temperature in °C (`TT_10`)."
+        data_tests:
+          - accepted_range:
+              # The German record range is roughly -37.8 °C to +41.2 °C; this window is wide
+              # enough to admit any real reading and tight enough to catch a -999 or a Kelvin.
+              min_value: -45
+              max_value: 50
+      - name: precipitation_mm
+        description: "Precipitation sum over the interval in mm (`RWS_10`)."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 200 }
+      - name: wind_speed_ms
+        description: "Mean wind speed in m/s (`FF_10`)."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 120 }
+      - name: humidity_percent
+        description: "Relative humidity in per cent (`RF_10`)."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: pressure_hpa
+        description: "Air pressure in hPa (`PP_10`)."
+        data_tests:
+          - accepted_range: { min_value: 800, max_value: 1100 }
+      - name: weather_condition
+        description: "Coarse condition derived from the measured parameters; DWD does not publish one."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["clear", "clouds", "rain", "snow", "fog", "storm", "unknown"]
+      - name: source_system
+        description: "Provenance: `dwd` for every row of this model."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+      - name: data_origin
+        description: "Provenance: `official`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+
+  # ---------------------------------------------------------------------------------------
+  # Traffic
+  # ---------------------------------------------------------------------------------------
+  - name: stg_traffic_events
+    description: >
+      Traffic disruptions from the Autobahn GmbH feed, with the source's whitespace defects
+      cleaned. Licence of this source is undeclared; AutoTwin caches it and never redistributes
+      it (DATA_LICENSES.md).
+    data_tests:
+      # A disruption cannot end before it starts. Both ends are nullable in the feed, so the
+      # NULL cases are spelled out rather than left to three-valued logic.
+      - expression_is_true:
+          expression: "ends_at is null or starts_at is null or ends_at >= starts_at"
+    columns:
+      - name: traffic_event_id
+        description: "UUID primary key of the event."
+        data_tests:
+          - unique
+          - not_null
+      - name: external_id
+        description: "Identifier from the feed; unique where present, NULL for sources without one."
+        data_tests:
+          - unique
+      - name: event_type
+        description: "Kind of disruption."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["roadworks", "closure", "incident", "warning", "congestion", "other"]
+      - name: severity
+        description: "Expected impact on travel time."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["low", "moderate", "high", "severe"]
+      - name: road_name
+        description: "Upper-cased road identifier such as `A5`; trailing whitespace from the feed stripped."
+      - name: latitude
+        description: "WGS 84 latitude of the reported point."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 47.2, max_value: 55.1 }
+      - name: longitude
+        description: "WGS 84 longitude of the reported point."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 5.8, max_value: 15.1 }
+      - name: starts_at
+        description: >
+          Start of the disruption. NULL means "already in force": the feed omits the field for
+          every `SHORT_TERM_ROADWORKS` item.
+      - name: ends_at
+        description: "End of the disruption; NULL for open-ended items."
+      - name: delay_minutes
+        description: "Delay in minutes where the source states one; usually NULL."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 1440 }
+      - name: source_system
+        description: "Provenance: `autobahn` or `mobilithek`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+      - name: data_origin
+        description: "Provenance: `official`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+
+  # ---------------------------------------------------------------------------------------
+  # Simulated fleet
+  # ---------------------------------------------------------------------------------------
+  - name: stg_telemetry
+    description: >
+      **Simulated** vehicle telemetry, one row per tick per vehicle. Nothing in this model was
+      measured on a real vehicle; every mart built on it inherits that label (BUILD_SPEC §0.2).
+    columns:
+      - name: telemetry_id
+        description: "`bigserial` primary key — volume beats key aesthetics on this table."
+        data_tests:
+          - unique
+          - not_null
+      - name: vehicle_id
+        description: "Human vehicle identifier (`ATW-0042`), *not* a `vehicles.id` UUID."
+        data_tests:
+          - not_null
+      - name: trip_id
+        description: "Human trip identifier; NULL while a vehicle is idle between trips."
+        data_tests:
+          - relationships:
+              to: ref('stg_trips')
+              field: trip_id
+              config:
+                # Warn, not error: the consumer is at-least-once and writes telemetry and trip
+                # rows in separate transactions, so a batch that lands between the two produces
+                # a real orphan for a few seconds. A *persistent* orphan is a defect and shows
+                # up in the stored failures.
+                severity: warn
+      - name: route_id
+        description: "Route the vehicle is driving; NULL for free-roaming vehicles."
+        data_tests:
+          - relationships:
+              to: ref('stg_routes')
+              field: route_id
+      - name: recorded_at
+        description: "Simulated observation time in UTC. Monotonic per vehicle."
+        data_tests:
+          - not_null
+      - name: latitude
+        description: "WGS 84 latitude of the vehicle."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 47.2, max_value: 55.1 }
+      - name: longitude
+        description: "WGS 84 longitude of the vehicle."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 5.8, max_value: 15.1 }
+      - name: speed_kmh
+        description: "Instantaneous speed."
+        data_tests:
+          - accepted_range:
+              # Negative speed would mean the physics integrator went backwards; 320 km/h is
+              # above anything the simulator's road classes allow.
+              min_value: 0
+              max_value: 320
+      - name: battery_soc_percent
+        description: "State of charge in per cent of usable capacity."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: road_class
+        description: "Functional class of the road the vehicle is on."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["motorway", "trunk", "primary", "secondary", "tertiary", "residential", "service", "unknown"]
+      - name: vehicle_state
+        description: "Lifecycle state at the moment of the tick."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["idle", "driving", "charging", "stopped", "completed"]
+      - name: data_origin
+        description: "Provenance: `simulated` for every row, by definition of the table."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["simulated"]
+
+  - name: stg_trips
+    description: >
+      **Simulated** journeys. The `reported_*` columns are the streaming consumer's running
+      aggregates; `int_trip_energy` recomputes the same quantities from telemetry.
+    data_tests:
+      - expression_is_true:
+          expression: "ended_at is null or ended_at >= started_at"
+    columns:
+      - name: trip_uuid
+        description: "UUID primary key."
+        data_tests:
+          - unique
+          - not_null
+      - name: trip_id
+        description: "Human trip identifier — the business key, and what telemetry carries."
+        data_tests:
+          - unique
+          - not_null
+      - name: vehicle_uuid
+        description: "FK to `vehicles.id`. Not the human vehicle id."
+        data_tests:
+          - not_null
+          - relationships:
+              to: source('autotwin_raw', 'vehicles')
+              field: id
+      - name: route_id
+        description: "Corridor the trip follows; NULL for a free-roaming trip."
+        data_tests:
+          - relationships:
+              to: ref('stg_routes')
+              field: route_id
+      - name: started_at
+        description: "Trip start in UTC."
+        data_tests:
+          - not_null
+      - name: ended_at
+        description: "Trip end in UTC; NULL while the trip is still running."
+      - name: start_soc_percent
+        description: "State of charge when the trip started."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: end_soc_percent
+        description: "State of charge when the trip ended; NULL while running."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: reported_distance_km
+        description: "Distance as maintained by the consumer, in km."
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: reported_energy_kwh
+        description: >
+          Energy as maintained by the consumer. Can legitimately be 0 for a trip whose first
+          telemetry batch has not landed yet; negative would mean a broken counter.
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: trip_state
+        description: "Lifecycle state of the trip."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["idle", "driving", "charging", "stopped", "completed"]
+      - name: data_origin
+        description: "Provenance: `simulated`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["simulated"]
+      - name: source_system
+        description: "Provenance: `simulator`."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+
+  # ---------------------------------------------------------------------------------------
+  # Corridors
+  # ---------------------------------------------------------------------------------------
+  - name: stg_routes
+    description: >
+      Planned corridors from OSRM. `is_demo` marks the seeded corridors the dashboard and the
+      coverage analysis are built on. Geometry data is © OpenStreetMap contributors (ODbL).
+    columns:
+      - name: route_id
+        description: "UUID primary key of the route."
+        data_tests:
+          - unique
+          - not_null
+      - name: slug
+        description: "Stable human key such as `frankfurt-stuttgart`; the API accepts it in place of the UUID."
+        data_tests:
+          - unique
+      - name: distance_m
+        description: "Driving distance from the routing engine, in metres."
+        data_tests:
+          - not_null
+          - accepted_range:
+              # 1 km to 2000 km: below that it is not a corridor, above that it left Germany.
+              min_value: 1000
+              max_value: 2000000
+      - name: duration_s
+        description: "Free-flow driving duration from the routing engine, in seconds."
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: is_demo
+        description: "Whether this is one of the seeded demo corridors."
+        data_tests:
+          - not_null
+      - name: origin_latitude
+        description: "WGS 84 latitude of the origin."
+        data_tests:
+          - accepted_range: { min_value: 47.2, max_value: 55.1 }
+      - name: origin_longitude
+        description: "WGS 84 longitude of the origin."
+        data_tests:
+          - accepted_range: { min_value: 5.8, max_value: 15.1 }
+      - name: source_system
+        description: "Provenance: `osrm` for a routed corridor."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["bundesnetzagentur", "dwd", "autobahn", "mobilithek", "osm", "osrm", "simulator", "derived"]
+      - name: data_origin
+        description: "Provenance: `official` for OSRM geometry, `derived` where AutoTwin built the corridor itself."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+
+  - name: stg_route_segments
+    description: >
+      Analysis chunks of a route with their energy prediction. Derived data: AutoTwin cuts the
+      line, joins weather and traffic onto it and runs the energy model of BUILD_SPEC §10.
+    data_tests:
+      - unique_combination_of_columns:
+          combination_of_columns: ["route_id", "segment_ordinal"]
+    columns:
+      - name: route_segment_id
+        description: "UUID primary key of the segment."
+        data_tests:
+          - unique
+          - not_null
+      - name: route_id
+        description: "FK to the route this segment belongs to."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_routes')
+              field: route_id
+      - name: segment_ordinal
+        description: "Position along the route; contiguous within a route by construction."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: segment_distance_m
+        description: "Length of the segment in metres."
+        data_tests:
+          - not_null
+          - accepted_range:
+              min_value: 0
+              inclusive: false
+      - name: road_class
+        description: "Functional class of the road the segment runs on."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["motorway", "trunk", "primary", "secondary", "tertiary", "residential", "service", "unknown"]
+      - name: traffic_severity
+        description: "Severity of the worst traffic event attributed to this segment; NULL when none."
+        data_tests:
+          - accepted_values:
+              values: ["low", "moderate", "high", "severe"]
+      - name: energy_intensity
+        description: "EnergyIntensity bucket produced by the API for the analysed vehicle."
+        data_tests:
+          - accepted_values:
+              values: ["low", "medium", "high", "critical"]
+      - name: predicted_kwh
+        description: "Energy predicted for this segment in kWh."
+        data_tests:
+          - accepted_range:
+              # Regeneration can make a downhill segment negative; -50 kWh would be a bug.
+              min_value: -50
+              max_value: 500
+      - name: temperature_c
+        description: "Outside temperature used for this segment, from the nearest weather observation."
+        data_tests:
+          - accepted_range: { min_value: -45, max_value: 50 }
+      - name: data_origin
+        description: "Provenance: constant `derived` — see the model header."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["derived"]

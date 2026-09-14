@@ -1,0 +1,38 @@
+[project]
+name = "autotwin-core"
+version = "0.1.0"
+description = "AutoTwin DE — settings, structured logging, typed errors and the PostGIS persistence layer"
+requires-python = ">=3.12,<3.14"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "autotwin-contracts",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    # The [asyncio] extra pulls in greenlet, which create_async_engine needs at runtime;
+    # SQLAlchemy stopped installing it by default and the async engine fails without it.
+    "sqlalchemy[asyncio]>=2.0.36",
+    "geoalchemy2>=0.16",
+    "shapely>=2.0",
+    "psycopg[binary,pool]>=3.2",
+    "structlog>=24.4",
+    "httpx>=0.28",
+    # Migrations live with the model layer, so any environment that can import the models
+    # can also bring a database up to head.
+    "alembic>=1.14",
+]
+
+[dependency-groups]
+dev = [
+    # shapely ships no inline annotations; mypy --strict needs its stubs for db/types.py.
+    "types-shapely>=2.0",
+]
+
+[tool.uv.sources]
+autotwin-contracts = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/autotwin_core"]

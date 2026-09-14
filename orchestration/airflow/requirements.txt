@@ -1,0 +1,70 @@
+# Extra packages the AutoTwin DE Airflow image needs.
+#
+# The DAGs never import AutoTwin code — they shell out to `python -m autotwin_*.cli`
+# (BUILD_SPEC §15) and to `dbt` (§16). Both have to exist on the PATH of the interpreter
+# Airflow runs tasks with, which is why they are installed here rather than assumed.
+#
+# ---------------------------------------------------------------------------------------
+# How this file is consumed
+# ---------------------------------------------------------------------------------------
+# Two supported paths, both documented in README.md:
+#
+#   1. Custom image (recommended, and what the compose profile builds):
+#          FROM apache/airflow:2.10.4-python3.12
+#          COPY --chown=airflow:root . /opt/autotwin
+#          RUN pip install --no-cache-dir -r /opt/autotwin/orchestration/airflow/requirements.txt
+#
+#   2. Plain image + runtime install, for a throwaway local try:
+#          x-airflow-common:
+#            environment:
+#              _PIP_ADDITIONAL_REQUIREMENTS: "-r /opt/autotwin/orchestration/airflow/requirements.txt"
+#      Slower (it reinstalls on every container start) and unsuitable for anything but a
+#      laptop, but it needs no image build.
+#
+# Both assume the repository is mounted at /opt/autotwin inside the container. Override
+# with AUTOTWIN_REPO_ROOT if you mount it somewhere else; `common.py` reads it.
+#
+# ---------------------------------------------------------------------------------------
+# The workspace packages
+# ---------------------------------------------------------------------------------------
+# Installed editable from the mount so a code change is picked up by the next task run
+# without rebuilding the image. They are listed individually because pip does not
+# understand uv workspace sources: `pip install -e /opt/autotwin` would try to resolve
+# `autotwin-core` from PyPI, where it does not exist. Listing every member in one
+# requirements file makes each of them a top-level requirement, so pip satisfies the
+# inter-package dependencies from these local paths.
+#
+# Order is irrelevant to pip's resolver; it follows the dependency direction in §1 purely
+# for readability: contracts <- core <- {ingestion, simulator, streaming, ml}.
+-e /opt/autotwin/packages/contracts
+-e /opt/autotwin/packages/core
+-e /opt/autotwin/services/ingestion
+-e /opt/autotwin/services/simulator
+-e /opt/autotwin/services/streaming
+-e /opt/autotwin/services/ml
+
+# ---------------------------------------------------------------------------------------
+# dbt
+# ---------------------------------------------------------------------------------------
+# `run_dbt_models` / `run_dbt_tests` invoke the dbt CLI directly (no Cosmos, no
+# dbt-airflow adapter — a BashOperator and a selector is the whole integration, and it
+# keeps the dbt project runnable by hand with the same command).
+#
+# Pinned to a minor series rather than a single patch: dbt-core and Airflow both constrain
+# Jinja2, MarkupSafe and protobuf, and a floating major on either side is how that
+# resolution quietly breaks. If pip cannot satisfy both in one environment, the documented
+# fallback is to run dbt in its own container — see "Known integration risk" in README.md.
+dbt-core~=1.9.0
+dbt-postgres~=1.9.0
+
+# ---------------------------------------------------------------------------------------
+# Not listed, on purpose
+# ---------------------------------------------------------------------------------------
+# * apache-airflow — comes from the base image. Never pin Airflow in a requirements file
+#   that is installed into an Airflow image; that is how you get a silent downgrade.
+# * apache-airflow-providers-* — the DAGs use BashOperator, PythonOperator, Variables and
+#   short circuits, all of which are core. No provider is needed to make them work, and
+#   adding one for decoration would enlarge the image and the dependency surface.
+# * psycopg / SQLAlchemy / httpx / pydantic / lightgbm / shap — transitive dependencies of
+#   the workspace packages above. Repeating them here would create a second place where
+#   versions are declared, and the two would drift.

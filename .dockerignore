@@ -1,0 +1,72 @@
+# AutoTwin DE — build context filter.
+#
+# Both images build from the repository root (the uv workspace spans packages/ and
+# services/), so this file is what keeps the context from including a multi-gigabyte
+# node_modules, an OSM extract and the developer's virtualenv. Anything listed here is also
+# invisible to COPY, which is why apps/web/node_modules cannot clobber the pnpm layer in
+# infra/docker/web.Dockerfile.
+
+# ---- VCS & CI ----
+.git
+.github
+.gitignore
+.gitattributes
+
+# ---- Python ----
+.venv
+venv
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.coverage
+coverage.xml
+htmlcov
+**/build
+**/dist
+
+# ---- Node / Next.js ----
+**/node_modules
+**/.next
+**/out
+**/.turbo
+**/*.tsbuildinfo
+.pnpm-store
+apps/web/playwright-report
+apps/web/test-results
+apps/web/blob-report
+
+# ---- Data lake and OSM extracts: never part of an image ----
+data
+*.parquet
+*.duckdb
+*.duckdb.wal
+*.osm.pbf
+*.osrm*
+
+# ---- Local runtime state & docker volumes ----
+.volumes
+infra/docker/volumes
+orchestration/airflow/logs
+
+# ---- Secrets: the image gets its configuration from the environment, never from a file ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets
+
+# ---- Editor / OS noise ----
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# ---- Documentation ----
+# Only docs/ is dropped. Every README.md stays: uv reads `readme = "README.md"` out of
+# each workspace member's pyproject.toml while installing it, and a missing readme is a
+# hard metadata error rather than a warning.
+docs

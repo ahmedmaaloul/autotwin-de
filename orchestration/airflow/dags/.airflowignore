@@ -1,0 +1,8 @@
+# Airflow's .airflowignore uses regular expressions by default
+# (AIRFLOW__CORE__DAG_IGNORE_FILE_SYNTAX=regexp).
+#
+# common.py is a shared library, not a DAG file. It imports `airflow`, so the DagBag's
+# safe-mode heuristic would otherwise open and parse it on every scheduler loop only to
+# find no DAG in it. Ignoring it here skips that work; it stays importable, because
+# .airflowignore governs DAG *discovery*, not sys.path.
+^common\.py$

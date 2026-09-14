@@ -1,0 +1,20 @@
+# AutoTwin DE — Grafana datasource provisioning (compose profile `observability`).
+#
+# Provisioned from a file rather than clicked together in the UI so that a fresh
+# `make reset && docker compose --profile observability up -d` yields the same Grafana every
+# time. `uid` is pinned because dashboard JSON references datasources by uid, not by name.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: autotwin-prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      # Must match `global.scrape_interval` in infra/docker/prometheus/prometheus.yml,
+      # otherwise Grafana picks $__rate_interval values that alias the scrape period.
+      timeInterval: 15s
+      httpMethod: POST

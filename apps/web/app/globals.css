@@ -1,0 +1,302 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   AutoTwin DE — design tokens
+   See docs/DESIGN_SYSTEM.md. The palette is derived from the RAL colours used on
+   German road infrastructure, so the semantics are honest rather than decorative:
+   red here is RAL 3020 Verkehrsrot, the colour of an actual Baustelle sign.
+   Values were converted from those sRGB hexes to OKLCH; the hex is kept in a
+   comment so the two can never drift apart silently.
+   ========================================================================== */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+  --font-condensed: var(--font-plex-condensed);
+  --font-heading: var(--font-plex-sans);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Semantic status — used by StatusBadge, map layers and charts alike, so a
+     chart and the map always agree on what "warning" looks like. */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-info: var(--primary);
+
+  /* Ordered energy-intensity ramp (low → critical). */
+  --color-energy-low: var(--energy-low);
+  --color-energy-medium: var(--energy-medium);
+  --color-energy-high: var(--energy-high);
+  --color-energy-critical: var(--energy-critical);
+
+  /* Charts reuse the same ramp so no chart invents a colour of its own. */
+  --color-chart-1: var(--primary);
+  --color-chart-2: var(--success);
+  --color-chart-3: var(--warning);
+  --color-chart-4: var(--danger);
+  --color-chart-5: var(--energy-medium);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Small radii. Engineering instrument, not a consumer app. */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 2.5);
+  --radius-4xl: calc(var(--radius) * 3);
+}
+
+:root {
+  --radius: 0.25rem;
+
+  --background: oklch(0.9851 0 89.88); /* #FAFAFA */
+  --foreground: oklch(0.2103 0.0059 285.89); /* #18181B */
+  --card: oklch(1 0 89.88); /* #FFFFFF */
+  --card-foreground: oklch(0.2103 0.0059 285.89);
+  --popover: oklch(1 0 89.88);
+  --popover-foreground: oklch(0.2103 0.0059 285.89);
+
+  --primary: oklch(0.4342 0.1149 247.28); /* #00548C — RAL 5005 Signalblau */
+  --primary-foreground: oklch(0.9851 0 89.88);
+  --secondary: oklch(0.961 0.0029 264.54); /* #F1F2F4 */
+  --secondary-foreground: oklch(0.2103 0.0059 285.89);
+  --muted: oklch(0.961 0.0029 264.54);
+  --muted-foreground: oklch(0.4602 0.012 267.25); /* #55585F */
+  --accent: oklch(0.961 0.0029 264.54);
+  --accent-foreground: oklch(0.2103 0.0059 285.89);
+
+  --success: oklch(0.4964 0.1116 160.36); /* #00754C — RAL 6024 Verkehrsgrün */
+  --success-foreground: oklch(0.9851 0 89.88);
+  --warning: oklch(0.6152 0.132 71.56); /* #B57500 — RAL 1003 Signalgelb */
+  --warning-foreground: oklch(0.2103 0.0059 285.89);
+  --danger: oklch(0.4985 0.1944 26.31); /* #B8121C — RAL 3020 Verkehrsrot */
+  --danger-foreground: oklch(0.9851 0 89.88);
+  --destructive: oklch(0.4985 0.1944 26.31);
+
+  --energy-low: oklch(0.4964 0.1116 160.36); /* #00754C */
+  --energy-medium: oklch(0.6254 0.1324 112.22); /* #8A8F16 */
+  --energy-high: oklch(0.6498 0.1445 66.14); /* #C97A00 */
+  --energy-critical: oklch(0.4985 0.1944 26.31); /* #B8121C */
+
+  --border: oklch(0.9192 0.0055 274.96); /* #E3E4E8 */
+  --input: oklch(0.9192 0.0055 274.96);
+  --ring: oklch(0.4342 0.1149 247.28);
+
+  --sidebar: oklch(1 0 89.88);
+  --sidebar-foreground: oklch(0.2103 0.0059 285.89);
+  --sidebar-primary: oklch(0.4342 0.1149 247.28);
+  --sidebar-primary-foreground: oklch(0.9851 0 89.88);
+  --sidebar-accent: oklch(0.961 0.0029 264.54);
+  --sidebar-accent-foreground: oklch(0.2103 0.0059 285.89);
+  --sidebar-border: oklch(0.9192 0.0055 274.96);
+  --sidebar-ring: oklch(0.4342 0.1149 247.28);
+}
+
+.dark {
+  --background: oklch(0.1634 0.0091 264.28); /* #0C0E12 */
+  --foreground: oklch(0.9336 0.0058 264.53); /* #E7E9ED */
+  --card: oklch(0.2042 0.0129 264.23); /* #14171D */
+  --card-foreground: oklch(0.9336 0.0058 264.53);
+  --popover: oklch(0.2042 0.0129 264.23);
+  --popover-foreground: oklch(0.9336 0.0058 264.53);
+
+  --primary: oklch(0.6893 0.1266 243.2); /* #4BA3E3 */
+  --primary-foreground: oklch(0.1634 0.0091 264.28);
+  --secondary: oklch(0.2388 0.0165 264.19); /* #1B1F27 */
+  --secondary-foreground: oklch(0.9336 0.0058 264.53);
+  --muted: oklch(0.2388 0.0165 264.19);
+  --muted-foreground: oklch(0.7032 0.0198 258.36); /* #98A0AC */
+  --accent: oklch(0.2388 0.0165 264.19);
+  --accent-foreground: oklch(0.9336 0.0058 264.53);
+
+  --success: oklch(0.6859 0.1401 160.29); /* #2FB47C */
+  --success-foreground: oklch(0.1634 0.0091 264.28);
+  --warning: oklch(0.7965 0.146 80.3); /* #EDB13A */
+  --warning-foreground: oklch(0.1634 0.0091 264.28);
+  --danger: oklch(0.6703 0.181 27.33); /* #F05F54 */
+  --danger-foreground: oklch(0.1634 0.0091 264.28);
+  --destructive: oklch(0.6703 0.181 27.33);
+
+  --energy-low: oklch(0.6859 0.1401 160.29); /* #2FB47C */
+  --energy-medium: oklch(0.784 0.1427 113.28); /* #B9C24A */
+  --energy-high: oklch(0.7703 0.1446 71.39); /* #EDA33A */
+  --energy-critical: oklch(0.6703 0.181 27.33); /* #F05F54 */
+
+  --border: oklch(0.288 0.018 262.21); /* #262B34 */
+  --input: oklch(0.288 0.018 262.21);
+  --ring: oklch(0.6893 0.1266 243.2);
+
+  --sidebar: oklch(0.2042 0.0129 264.23);
+  --sidebar-foreground: oklch(0.9336 0.0058 264.53);
+  --sidebar-primary: oklch(0.6893 0.1266 243.2);
+  --sidebar-primary-foreground: oklch(0.1634 0.0091 264.28);
+  --sidebar-accent: oklch(0.2388 0.0165 264.19);
+  --sidebar-accent-foreground: oklch(0.9336 0.0058 264.53);
+  --sidebar-border: oklch(0.288 0.018 262.21);
+  --sidebar-ring: oklch(0.6893 0.1266 243.2);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      "cv02",
+      "cv03",
+      "ss01";
+  }
+
+  /* Numbers must align down a column. This single rule is the most visible signal
+     that the dashboard was built by someone who reads data. */
+  .tabular,
+  [data-slot="metric-value"],
+  table td,
+  table th {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Visible keyboard focus everywhere — part of the quality floor, not an option. */
+  :focus-visible {
+    @apply outline-ring outline-2 outline-offset-2;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklch, var(--primary) 24%, transparent);
+  }
+
+  /* Restrained, engineering-grade scrollbars in dense panels. */
+  @supports (scrollbar-width: thin) {
+    .scrollbar-thin {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+  }
+}
+
+@layer components {
+  /* The tick motif: a kilometre marker before a section label. The one structural
+     flourish in the system — used on section headers and nowhere else. */
+  .section-tick::before {
+    content: "";
+    display: inline-block;
+    width: 2px;
+    height: 0.75rem;
+    margin-right: 0.5rem;
+    vertical-align: -0.0625rem;
+    background-color: var(--primary);
+  }
+
+  .eyebrow {
+    font-family: var(--font-condensed), var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+}
+
+/* The only animation that runs continuously is vehicle-marker interpolation on
+   /live, and it is a data property rather than decoration. Everything else stops. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* MapLibre ships its own CSS variables-free styling; align its chrome with ours so
+   the map does not look like a third-party widget dropped into the page. */
+.maplibregl-ctrl-group {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: none !important;
+}
+
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border) !important;
+}
+
+.maplibregl-ctrl-group button span {
+  filter: var(--maplibre-icon-filter, none);
+}
+
+.dark .maplibregl-ctrl-group button span {
+  --maplibre-icon-filter: invert(1);
+}
+
+.maplibregl-ctrl-attrib {
+  background: color-mix(in oklch, var(--card) 85%, transparent) !important;
+  color: var(--muted-foreground) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.6875rem !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--muted-foreground) !important;
+}
+
+.maplibregl-ctrl-scale {
+  background: transparent !important;
+  border-color: var(--muted-foreground) !important;
+  color: var(--muted-foreground) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.625rem !important;
+}
+
+.maplibregl-popup-content {
+  background: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: var(--border) !important;
+  border-bottom-color: var(--border) !important;
+}

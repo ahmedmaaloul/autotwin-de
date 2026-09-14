@@ -1,0 +1,46 @@
+# AutoTwin DE — dbt connection profile (BUILD_SPEC §16).
+#
+# This file is committed on purpose: it contains no secret. Every field is read from the
+# environment, and the only literal credential is the local development one that
+# `docker-compose.yml` creates (`autotwin/autotwin` on port 5433, BUILD_SPEC §5) — the same
+# value already written in plain text in the compose file and in `.env.example`.
+#
+# Run with:  dbt build --project-dir dbt --profiles-dir dbt
+# The env var names are the ones BUILD_SPEC §16 fixes; they are the components of
+# AUTOTWIN_DATABASE_URL, kept separate because dbt cannot parse a SQLAlchemy URL.
+
+autotwin:
+  target: dev
+
+  outputs:
+    # Local development against the compose stack.
+    dev:
+      type: postgres
+      host: "{{ env_var('AUTOTWIN_DB_HOST', 'localhost') }}"
+      port: "{{ env_var('AUTOTWIN_DB_PORT', '5433') | as_number }}"
+      user: "{{ env_var('AUTOTWIN_DB_USER', 'autotwin') }}"
+      password: "{{ env_var('AUTOTWIN_DB_PASSWORD', 'autotwin') }}"
+      dbname: "{{ env_var('AUTOTWIN_DB_NAME', 'autotwin') }}"
+      schema: "{{ env_var('AUTOTWIN_DBT_SCHEMA', 'analytics') }}"
+      threads: "{{ env_var('AUTOTWIN_DBT_THREADS', '4') | as_number }}"
+      # Fail fast instead of hanging a `make analytics` behind a stopped container.
+      connect_timeout: 10
+      retries: 1
+      keepalives_idle: 0
+      sslmode: "{{ env_var('AUTOTWIN_DB_SSLMODE', 'prefer') }}"
+
+    # GitHub Actions, where Postgres+PostGIS runs as a service container on the default port
+    # and is reachable under its service hostname. Same schema names, throwaway database.
+    ci:
+      type: postgres
+      host: "{{ env_var('AUTOTWIN_DB_HOST', 'localhost') }}"
+      port: "{{ env_var('AUTOTWIN_DB_PORT', '5432') | as_number }}"
+      user: "{{ env_var('AUTOTWIN_DB_USER', 'autotwin') }}"
+      password: "{{ env_var('AUTOTWIN_DB_PASSWORD', 'autotwin') }}"
+      dbname: "{{ env_var('AUTOTWIN_DB_NAME', 'autotwin') }}"
+      schema: "{{ env_var('AUTOTWIN_DBT_SCHEMA', 'analytics') }}"
+      # Free runners are 2-core; more threads only adds contention on a cold database.
+      threads: 4
+      connect_timeout: 10
+      retries: 1
+      keepalives_idle: 0

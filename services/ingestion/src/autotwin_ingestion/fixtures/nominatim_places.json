@@ -1,0 +1,181 @@
+{
+ "frankfurt am main": [
+  {
+   "place_id": 381622077,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 62400,
+   "lat": "50.1106444",
+   "lon": "8.6820917",
+   "category": "boundary",
+   "type": "administrative",
+   "place_rank": 12,
+   "importance": 0.7575089483239414,
+   "addresstype": "city",
+   "name": "Frankfurt am Main",
+   "display_name": "Frankfurt am Main, Hessen, Deutschland",
+   "address": {
+    "city": "Frankfurt am Main",
+    "state": "Hessen",
+    "ISO3166-2-lvl4": "DE-HE",
+    "country": "Deutschland",
+    "country_code": "de"
+   },
+   "boundingbox": [
+    "50.0153529",
+    "50.2271424",
+    "8.4727605",
+    "8.8004049"
+   ]
+  }
+ ],
+ "stuttgart": [
+  {
+   "place_id": 427022162,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 62375,
+   "lat": "48.7784485",
+   "lon": "9.1800132",
+   "category": "boundary",
+   "type": "administrative",
+   "place_rank": 12,
+   "importance": 0.7482923125603024,
+   "addresstype": "city",
+   "name": "Stuttgart",
+   "display_name": "Stuttgart, Baden-Württemberg, Deutschland",
+   "address": {
+    "city": "Stuttgart",
+    "state": "Baden-Württemberg",
+    "ISO3166-2-lvl4": "DE-BW",
+    "country": "Deutschland",
+    "country_code": "de"
+   },
+   "boundingbox": [
+    "48.6920188",
+    "48.8663994",
+    "9.0386007",
+    "9.3160228"
+   ]
+  }
+ ],
+ "münchen": [
+  {
+   "place_id": 128363114,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 62428,
+   "lat": "48.1371079",
+   "lon": "11.5753822",
+   "category": "boundary",
+   "type": "administrative",
+   "place_rank": 12,
+   "importance": 0.8105981661589455,
+   "addresstype": "city",
+   "name": "München",
+   "display_name": "München, Bayern, Deutschland",
+   "address": {
+    "city": "München",
+    "state": "Bayern",
+    "ISO3166-2-lvl4": "DE-BY",
+    "country": "Deutschland",
+    "country_code": "de"
+   },
+   "boundingbox": [
+    "48.0616244",
+    "48.2481162",
+    "11.3607770",
+    "11.7229099"
+   ]
+  }
+ ],
+ "ingolstadt": [
+  {
+   "place_id": 127149592,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 62381,
+   "lat": "48.7630165",
+   "lon": "11.4250395",
+   "category": "boundary",
+   "type": "administrative",
+   "place_rank": 12,
+   "importance": 0.6326853927006383,
+   "addresstype": "city",
+   "name": "Ingolstadt",
+   "display_name": "Ingolstadt, Bayern, Deutschland",
+   "address": {
+    "city": "Ingolstadt",
+    "state": "Bayern",
+    "ISO3166-2-lvl4": "DE-BY",
+    "country": "Deutschland",
+    "country_code": "de"
+   },
+   "boundingbox": [
+    "48.6838773",
+    "48.8228907",
+    "11.2559076",
+    "11.5034223"
+   ]
+  }
+ ],
+ "wolfsburg": [
+  {
+   "place_id": 142878259,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 62418,
+   "lat": "52.4205588",
+   "lon": "10.7861682",
+   "category": "boundary",
+   "type": "administrative",
+   "place_rank": 12,
+   "importance": 0.6125819419900099,
+   "addresstype": "city",
+   "name": "Wolfsburg",
+   "display_name": "Wolfsburg, Niedersachsen, Deutschland",
+   "address": {
+    "city": "Wolfsburg",
+    "state": "Niedersachsen",
+    "ISO3166-2-lvl4": "DE-NI",
+    "country": "Deutschland",
+    "country_code": "de"
+   },
+   "boundingbox": [
+    "52.3159561",
+    "52.4951587",
+    "10.6471493",
+    "10.9066648"
+   ]
+  }
+ ],
+ "berlin": [
+  {
+   "place_id": 145549253,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "relation",
+   "osm_id": 62422,
+   "lat": "52.5173885",
+   "lon": "13.3951309",
+   "category": "boundary",
+   "type": "administrative",
+   "place_rank": 8,
+   "importance": 0.8522196536088086,
+   "addresstype": "city",
+   "name": "Berlin",
+   "display_name": "Berlin, Deutschland",
+   "address": {
+    "city": "Berlin",
+    "ISO3166-2-lvl4": "DE-BE",
+    "country": "Deutschland",
+    "country_code": "de"
+   },
+   "boundingbox": [
+    "52.3382448",
+    "52.6755087",
+    "13.0883450",
+    "13.7611609"
+   ]
+  }
+ ]
+}

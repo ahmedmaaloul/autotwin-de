@@ -1,0 +1,33 @@
+[project]
+name = "autotwin-ml"
+version = "0.1.0"
+description = "AutoTwin DE — physical energy baseline, ML model, SHAP explainability and charging optimisation"
+requires-python = ">=3.12,<3.14"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "autotwin-contracts",
+    "autotwin-core",
+    "numpy>=2.1",
+    "scikit-learn>=1.6",
+    "lightgbm>=4.5",
+    "shap>=0.46",
+    # shap declares `llvmlite` and `numba` without a lower bound, which lets the universal
+    # resolver walk back to llvmlite 0.36 (Python <3.10 only) and fail the build. Pin the
+    # floor to the first releases that ship wheels for 3.12/3.13.
+    "numba>=0.61",
+    "llvmlite>=0.44",
+    "joblib>=1.4",
+    "polars>=1.17",
+    "pyarrow>=18.1",
+]
+
+[tool.uv.sources]
+autotwin-contracts = { workspace = true }
+autotwin-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/autotwin_ml"]

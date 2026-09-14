@@ -1,0 +1,190 @@
+version: 2
+
+models:
+  - name: int_charging_station_power
+    description: >
+      One row per charging site, with the site's own power declaration reconciled against the
+      ratings of its individual connectors. Ephemeral: it exists to name a join, not to be
+      queried, and inlining it keeps the mart SQL readable.
+    data_tests:
+      - expression_is_true:
+          # The reconciled maximum can never be lower than either of the two inputs it was
+          # reconciled from. If it is, `greatest` was given the arguments in the wrong shape.
+          expression: >
+            effective_max_power_kw is null
+            or (
+              (declared_max_power_kw is null or effective_max_power_kw >= declared_max_power_kw)
+              and (connector_max_power_kw is null or effective_max_power_kw >= connector_max_power_kw)
+            )
+    columns:
+      - name: station_id
+        description: "FK to the site; the grain of this model."
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_charging_stations')
+              field: station_id
+      - name: connector_count
+        description: "Number of `charging_points` rows for the site; 0 when the register listed none."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: effective_max_power_kw
+        description: >
+          Strongest connector at the site: the site's own declaration and the connector ratings,
+          reconciled. NULL only when the source states neither.
+      - name: effective_charging_category
+        description: "Category re-derived from `effective_max_power_kw` with `ChargingCategory.from_power`'s thresholds."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["normal", "fast", "ultra_fast"]
+      - name: power_basis
+        description: >
+          Which description the reconciled power came from: `both`, `connectors`, `site`, or
+          `none`. Every aggregate built on this model can be filtered by it, so "how much of
+          this number rests on data the register actually published?" is always answerable.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["both", "connectors", "site", "none"]
+      - name: power_disagreement_kw
+        description: >
+          |site declaration − strongest connector| in kW, where both exist. Not an error: a
+          300 kW grid connection feeding one 150 kW connector is a legitimate site. Useful for
+          sorting when the register looks wrong.
+      - name: connector_count_delta
+        description: >
+          Connector rows minus the register's declared `charging_points_count`. Usually positive,
+          because one register cell can list several ratings (`"11; 3,7"`) and the adapter
+          expands each into its own row.
+      - name: data_origin
+        description: >
+          Provenance of the site the connectors belong to. Connector rows carry their own copy
+          of the block; this model reads the site's because the site is its grain.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["official", "simulated", "derived"]
+
+  - name: int_trip_energy
+    description: >
+      Per-trip energy, distance and driving-behaviour aggregates recomputed from raw telemetry,
+      independently of the running totals the streaming consumer maintains on `trips`.
+      **Simulated data.**
+    data_tests:
+      - expression_is_true:
+          # A trip belongs to exactly one vehicle. More than one means telemetry was published
+          # with a reused trip id, which would silently merge two journeys into one row.
+          expression: "distinct_vehicle_count = 1"
+      - expression_is_true:
+          expression: "last_recorded_at >= first_recorded_at"
+    columns:
+      - name: trip_id
+        description: "Human trip identifier; the grain of this model."
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_trips')
+              field: trip_id
+      - name: vehicle_id
+        description: "Human vehicle identifier the telemetry was published under."
+        data_tests:
+          - not_null
+      - name: telemetry_point_count
+        description: "Number of telemetry rows behind the aggregates. A trip with two points has no meaningful statistics."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 1 }
+      - name: anomalous_step_count
+        description: >
+          Steps where a monotone counter went backwards inside a trip. Expected to be 0; a
+          non-zero value means the producer reset a counter mid-trip and the affected steps were
+          excluded from the sums rather than clamped.
+        data_tests:
+          - not_null
+      - name: distance_m
+        description: "Distance from odometer differences, in metres."
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: energy_kwh
+        description: "Energy from `cumulative_energy_kwh` differences, in kWh."
+        data_tests:
+          - accepted_range: { min_value: 0 }
+      - name: avg_consumption_kwh_100km
+        description: "Recomputed consumption; NULL for a trip with no distance yet."
+        data_tests:
+          - accepted_range:
+              # An EV below 5 kWh/100 km is not driving, above 100 is not an EV. Wide on
+              # purpose: this is a bug detector, not a plausibility model.
+              min_value: 5
+              max_value: 100
+      - name: start_soc_percent
+        description: "State of charge at the first telemetry point of the trip."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: end_soc_percent
+        description: "State of charge at the last telemetry point of the trip."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+      - name: soc_used_percent
+        description: >
+          `start_soc − end_soc`. Negative when the vehicle charged mid-trip, which is a normal
+          outcome for a long corridor, not an error.
+      - name: accel_events_per_km
+        description: "Count of |a| > 1 m/s² events per kilometre — the `accel_events_per_km` feature of BUILD_SPEC §10.2."
+      - name: motorway_distance_share_percent
+        description: "Share of the trip's distance driven on a motorway, in per cent."
+        data_tests:
+          - accepted_range: { min_value: 0, max_value: 100 }
+
+  - name: int_corridor_stations
+    description: >
+      Charging stations within `corridor_buffer_m` of a demo route, with their offset along
+      that route. The input to every coverage and gap number in the project.
+    data_tests:
+      - unique_combination_of_columns:
+          combination_of_columns: ["route_id", "station_id"]
+      - expression_is_true:
+          # The selection is a metres-on-the-spheroid ST_DWithin, so nothing the join returns
+          # can be further away than the buffer. A violation means the geography/geometry cast
+          # was lost somewhere and the buffer silently became degrees.
+          expression: "distance_to_route_m <= corridor_buffer_m + 1"
+    columns:
+      - name: route_id
+        description: "Demo route the station was matched to."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_routes')
+              field: route_id
+      - name: station_id
+        description: "Station inside the corridor."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_charging_stations')
+              field: station_id
+      - name: distance_to_route_m
+        description: "Perpendicular distance from the station to the route line, in true metres."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: route_fraction
+        description: "Position along the route as a fraction of its projected length, in [0, 1]."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0, max_value: 1 }
+      - name: route_offset_km
+        description: "Distance from the route origin to the station's projection onto the route, in km."
+        data_tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+      - name: effective_max_power_kw
+        description: "Reconciled strongest connector of the station (see `int_charging_station_power`)."
+      - name: is_fast_charger
+        description: "Whether the station reaches 50 kW — the threshold the gap analysis uses."
+        data_tests:
+          - not_null

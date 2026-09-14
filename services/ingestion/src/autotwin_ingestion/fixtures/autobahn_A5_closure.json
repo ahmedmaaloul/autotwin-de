@@ -1,0 +1,923 @@
+{
+ "closure": [
+  {
+   "identifier": "2026-038780--vi-fbm.2026-09-14_20-00-00-000.devi-zus.2026-09-14_20-00-00-000_003.de11",
+   "icon": "448",
+   "isBlocked": "false",
+   "future": true,
+   "extent": "48.826110816757236,8.210716681178976,48.825313965413436,8.207078306698994",
+   "point": "48.826110816757236,8.210716681178976",
+   "startLcPosition": "1000",
+   "impact": {
+    "symbols": [
+     "SEPARATE",
+     "CLOSED",
+     "BORDER_RIGHT",
+     "CLOSED"
+    ]
+   },
+   "display_type": "CLOSURE_ENTRY_EXIT",
+   "subtitle": " AS Rastatt-Süd (aus Richtung Rastatt-Nord)",
+   "title": "A5 Fahrbahninstandsetzung - an div. Bauwerken 2026-038780",
+   "coordinate": {
+    "lat": 48.826110816757236,
+    "long": 8.210716681178976
+   },
+   "description": [
+    "Die Baustelle ist zu folgenden Zeiträumen gültig:",
+    "Jeden Montag, Dienstag, Mittwoch, Donnerstag und Freitag zwischen dem 14.09.26 und dem 19.09.26 von 20:00 bis 00:00 Uhr.",
+    "Jeden Mittwoch, Donnerstag, Freitag und Samstag zwischen dem 16.09.26 und dem 19.09.26 von 00:00 bis 05:00 Uhr.",
+    "16.09.26 20:00 bis zum 17.09.26 05:00 Uhr.",
+    "(Ende der Gesamtmaßnahme: 26.09.26)",
+    "",
+    "Abfahrt von der A5: AS Rastatt-Süd (aus Richtung Rastatt-Nord)",
+    "",
+    "Länge: konnte nicht ermittelt werden",
+    "",
+    "A5 Fahrbahninstandsetzung - an div. Bauwerken 2026-038780"
+   ],
+   "routeRecommendation": [],
+   "footer": [],
+   "lorryParkingFeatureIcons": [],
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      8.210716681,
+      48.826110817
+     ],
+     [
+      8.2094554,
+      48.825412401
+     ],
+     [
+      8.2089609,
+      48.825145501
+     ],
+     [
+      8.2084997,
+      48.824906301
+     ],
+     [
+      8.2081273,
+      48.824798001
+     ],
+     [
+      8.2079297,
+      48.824753201
+     ],
+     [
+      8.2077689,
+      48.824744401
+     ],
+     [
+      8.207545,
+      48.824753401
+     ],
+     [
+      8.2073842,
+      48.824806001
+     ],
+     [
+      8.2072651,
+      48.824875401
+     ],
+     [
+      8.2071773,
+      48.824931501
+     ],
+     [
+      8.2071082,
+      48.825015801
+     ],
+     [
+      8.2070716,
+      48.825089701
+     ],
+     [
+      8.2070439,
+      48.825218901
+     ],
+     [
+      8.207078307,
+      48.825313965
+     ]
+    ]
+   }
+  },
+  {
+   "identifier": "2026-046106--vi-fbm.2026-09-14_19-00-00-000.devi-zus.2026-09-14_19-00-00-000_005.de1",
+   "icon": "448",
+   "isBlocked": "false",
+   "future": true,
+   "extent": "47.775797092446794,7.532629151439683,47.77470559187083,7.53576448490774",
+   "point": "47.775797092446794,7.532629151439683",
+   "startLcPosition": "1000",
+   "impact": {
+    "symbols": [
+     "SEPARATE",
+     "CLOSED",
+     "BORDER_RIGHT",
+     "CLOSED"
+    ]
+   },
+   "display_type": "CLOSURE_ENTRY_EXIT",
+   "subtitle": " AD Neuenburg (aus Richtung Blauenblick)",
+   "title": "A5 Karlsruhe - Basel, zwischen 1.1 km hinter Blauenblick und 3.0 km vor Galgenloch Fahrbahninstandsetzung",
+   "coordinate": {
+    "lat": 47.775797092446794,
+    "long": 7.532629151439683
+   },
+   "description": [
+    "Die Baustelle ist zu folgenden Zeiträumen gültig:",
+    "15.09.26 19:00 bis zum 16.09.26 06:00 Uhr.",
+    "16.09.26 19:00 bis zum 17.09.26 06:00 Uhr.",
+    "17.09.26 19:00 bis zum 18.09.26 06:00 Uhr.",
+    "21.09.26 19:00 bis zum 22.09.26 06:00 Uhr.",
+    "(Ende der Gesamtmaßnahme: 22.09.26)",
+    "",
+    "Auffahrt auf die A5: AD Neuenburg (aus Richtung Blauenblick)",
+    "",
+    "Länge: konnte nicht ermittelt werden",
+    "",
+    "A5 Karlsruhe - Basel, zwischen 1.1 km hinter Blauenblick und 3.0 km vor Galgenloch Fahrbahninstandsetzung"
+   ],
+   "routeRecommendation": [],
+   "footer": [],
+   "lorryParkingFeatureIcons": [],
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      7.532629151,
+      47.775797092
+     ],
+     [
+      7.5329765,
+      47.775828101
+     ],
+     [
+      7.5333891,
+      47.775860301
+     ],
+     [
+      7.533635,
+      47.775852701
+     ],
+     [
+      7.5338114,
+      47.775837201
+     ],
+     [
+      7.5340157,
+      47.775812501
+     ],
+     [
+      7.534224,
+      47.775772801
+     ],
+     [
+      7.5344361,
+      47.775708901
+     ],
+     [
+      7.5346513,
+      47.775642701
+     ],
+     [
+      7.5348274,
+      47.775566401
+     ],
+     [
+      7.5350183,
+      47.775473101
+     ],
+     [
+      7.5351746,
+      47.775373301
+     ],
+     [
+      7.535296,
+      47.775283901
+     ],
+     [
+      7.5354391,
+      47.775153501
+     ],
+     [
+      7.5355485,
+      47.775031201
+     ],
+     [
+      7.5356415,
+      47.774909601
+     ],
+     [
+      7.5357548,
+      47.774725401
+     ],
+     [
+      7.535764485,
+      47.774705592
+     ]
+    ]
+   }
+  },
+  {
+   "identifier": "2026-038780--vi-fbm.2026-09-14_20-00-00-000.devi-zus.2026-09-14_20-00-00-000_003.de12",
+   "icon": "448",
+   "isBlocked": "false",
+   "future": true,
+   "extent": "48.72567443399204,8.101788598717214,48.7262211095751,8.105044160773197",
+   "point": "48.72567443399204,8.101788598717214",
+   "startLcPosition": "1000",
+   "impact": {
+    "symbols": [
+     "SEPARATE",
+     "CLOSED"
+    ]
+   },
+   "display_type": "CLOSURE_ENTRY_EXIT",
+   "subtitle": " Basel -> Karlsruhe",
+   "title": "A5 Fahrbahninstandsetzung - an div. Bauwerken 2026-038780",
+   "coordinate": {
+    "lat": 48.72567443399204,
+    "long": 8.101788598717214
+   },
+   "description": [
+    "Die Baustelle ist zu folgenden Zeiträumen gültig:",
+    "Jeden Montag, Dienstag, Mittwoch, Donnerstag und Freitag zwischen dem 14.09.26 und dem 26.09.26 von 20:00 bis 00:00 Uhr.",
+    "Jeden Dienstag, Mittwoch, Donnerstag, Freitag und Samstag zwischen dem 15.09.26 und dem 26.09.26 von 00:00 bis 05:00 Uhr.",
+    "24.09.26 20:00 bis zum 25.09.26 05:00 Uhr.",
+    "(Ende der Gesamtmaßnahme: 26.09.26)",
+    "",
+    "Von A5: Basel -> Karlsruhe, zwischen 6.6 km hinter Brachfeld und Oberfeld nach Abfahrt von der A5: AS Bühl (aus Richtung Brachfeld)",
+    "",
+    "Länge: konnte nicht ermittelt werden",
+    "",
+    "A5 Fahrbahninstandsetzung - an div. Bauwerken 2026-038780"
+   ],
+   "routeRecommendation": [],
+   "footer": [],
+   "lorryParkingFeatureIcons": [],
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      8.101788599,
+      48.725674434
+     ],
+     [
+      8.1020099,
+      48.725830401
+     ],
+     [
+      8.1031745,
+      48.726689601
+     ],
+     [
+      8.1035991,
+      48.727001201
+     ],
+     [
+      8.1039539,
+      48.727160201
+     ],
+     [
+      8.1040359,
+      48.727202701
+     ],
+     [
+      8.1041316,
+      48.727242401
+     ],
+     [
+      8.1042556,
+      48.727274501
+     ],
+     [
+      8.1043354,
+      48.727288401
+     ],
+     [
+      8.1044297,
+      48.727297001
+     ],
+     [
+      8.104535,
+      48.727297901
+     ],
+     [
+      8.104643,
+      48.727285101
+     ],
+     [
+      8.104762,
+      48.727258801
+     ],
+     [
+      8.1048451,
+      48.727229201
+     ],
+     [
+      8.1049177,
+      48.727199301
+     ],
+     [
+      8.1049827,
+      48.727159301
+     ],
+     [
+      8.105048,
+      48.727113001
+     ],
+     [
+      8.1051053,
+      48.727053501
+     ],
+     [
+      8.1051428,
+      48.727003101
+     ],
+     [
+      8.105167,
+      48.726955001
+     ],
+     [
+      8.1051905,
+      48.726876801
+     ],
+     [
+      8.105197,
+      48.726810901
+     ],
+     [
+      8.1051978,
+      48.726744401
+     ],
+     [
+      8.1051863,
+      48.726674001
+     ],
+     [
+      8.1051515,
+      48.726546701
+     ],
+     [
+      8.1051269,
+      48.726463201
+     ],
+     [
+      8.1050703,
+      48.726284001
+     ],
+     [
+      8.105044161,
+      48.72622111
+     ]
+    ]
+   }
+  },
+  {
+   "identifier": "2023-000361--vi-fbm.2026-05-18_15-30-00-000.devi-zus.2025-03-01_09-30-00-000.f_001.de28",
+   "icon": "448",
+   "isBlocked": "false",
+   "future": false,
+   "extent": "50.133646752687945,8.590001565276038,50.13439180335669,8.588522673834715",
+   "point": "50.133646752687945,8.590001565276038",
+   "startLcPosition": "1000",
+   "impact": {
+    "symbols": [
+     "SEPARATE",
+     "CLOSED",
+     "BORDER_RIGHT",
+     "CLOSED"
+    ]
+   },
+   "display_type": "CLOSURE_ENTRY_EXIT",
+   "subtitle": " AK Nordwestkreuz Frankfurt am Main (aus Richtung Taunusblick)",
+   "title": "A5 BRI Nordwestkreuz Frankfurt",
+   "startTimestamp": "2026-05-18T15:30:00+02:00",
+   "coordinate": {
+    "lat": 50.133646752687945,
+    "long": 8.590001565276038
+   },
+   "description": [
+    "Zeitraum dieser Bauphase:",
+    "Beginn: 18.05.26 um 15:30 Uhr",
+    "Ende: 07.11.26 um 15:30 Uhr",
+    "(Ende der Gesamtmaßnahme: 07.11.26)",
+    "",
+    "Abfahrt von der A5: AK Nordwestkreuz Frankfurt am Main (aus Richtung Taunusblick)",
+    "",
+    "Länge: konnte nicht ermittelt werden",
+    "",
+    "A5 BRI Nordwestkreuz Frankfurt"
+   ],
+   "routeRecommendation": [],
+   "footer": [],
+   "lorryParkingFeatureIcons": [],
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      8.590001565,
+      50.133646753
+     ],
+     [
+      8.5899633,
+      50.133602001
+     ],
+     [
+      8.5898576,
+      50.133499301
+     ],
+     [
+      8.5897912,
+      50.133443301
+     ],
+     [
+      8.5897242,
+      50.133398501
+     ],
+     [
+      8.589653,
+      50.133353701
+     ],
+     [
+      8.5895428,
+      50.133303901
+     ],
+     [
+      8.5894527,
+      50.133270701
+     ],
+     [
+      8.5893314,
+      50.133237101
+     ],
+     [
+      8.5892172,
+      50.133218501
+     ],
+     [
+      8.5890963,
+      50.133209101
+     ],
+     [
+      8.5889728,
+      50.133209001
+     ],
+     [
+      8.5888627,
+      50.133218801
+     ],
+     [
+      8.5887544,
+      50.133234501
+     ],
+     [
+      8.5886204,
+      50.133266701
+     ],
+     [
+      8.5885146,
+      50.133305301
+     ],
+     [
+      8.5884315,
+      50.133342601
+     ],
+     [
+      8.5883657,
+      50.133382601
+     ],
+     [
+      8.5883,
+      50.133424501
+     ],
+     [
+      8.5882322,
+      50.133476601
+     ],
+     [
+      8.5881856,
+      50.133525301
+     ],
+     [
+      8.5881337,
+      50.133591401
+     ],
+     [
+      8.5880989,
+      50.133648801
+     ],
+     [
+      8.5880756,
+      50.133709701
+     ],
+     [
+      8.588063,
+      50.133775701
+     ],
+     [
+      8.5880595,
+      50.133833601
+     ],
+     [
+      8.5880629,
+      50.133898701
+     ],
+     [
+      8.5880757,
+      50.133966501
+     ],
+     [
+      8.5880962,
+      50.134022101
+     ],
+     [
+      8.5881226,
+      50.134066501
+     ],
+     [
+      8.5881613,
+      50.134121001
+     ],
+     [
+      8.5882024,
+      50.134166201
+     ],
+     [
+      8.5882438,
+      50.134207901
+     ],
+     [
+      8.5882862,
+      50.134248901
+     ],
+     [
+      8.5883369,
+      50.134287101
+     ],
+     [
+      8.5884033,
+      50.134332901
+     ],
+     [
+      8.588496,
+      50.134380901
+     ],
+     [
+      8.588522674,
+      50.134391803
+     ]
+    ]
+   }
+  },
+  {
+   "identifier": "2023-000361--vi-fbm.2026-05-18_15-30-00-000.devi-zus.2025-03-01_09-30-00-000.f_001.de27",
+   "icon": "448",
+   "isBlocked": "false",
+   "future": false,
+   "extent": "50.137103400386515,8.591675141126558,50.13677714118424,8.591436128633177",
+   "point": "50.137103400386515,8.591675141126558",
+   "startLcPosition": "1000",
+   "impact": {
+    "symbols": [
+     "SEPARATE",
+     "CLOSED",
+     "BORDER_RIGHT",
+     "CLOSED"
+    ]
+   },
+   "display_type": "CLOSURE_ENTRY_EXIT",
+   "subtitle": " AK Nordwestkreuz Frankfurt am Main (aus Richtung Taunusblick)",
+   "title": "A5 BRI Nordwestkreuz Frankfurt",
+   "startTimestamp": "2026-05-18T15:30:00+02:00",
+   "coordinate": {
+    "lat": 50.137103400386515,
+    "long": 8.591675141126558
+   },
+   "description": [
+    "Zeitraum dieser Bauphase:",
+    "Beginn: 18.05.26 um 15:30 Uhr",
+    "Ende: 07.11.26 um 15:30 Uhr",
+    "(Ende der Gesamtmaßnahme: 07.11.26)",
+    "",
+    "Abfahrt von der A5: AK Nordwestkreuz Frankfurt am Main (aus Richtung Taunusblick)",
+    "",
+    "Länge: konnte nicht ermittelt werden",
+    "",
+    "A5 BRI Nordwestkreuz Frankfurt"
+   ],
+   "routeRecommendation": [],
+   "footer": [],
+   "lorryParkingFeatureIcons": [],
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      8.591675141,
+      50.1371034
+     ],
+     [
+      8.5915908,
+      50.136991401
+     ],
+     [
+      8.5914397,
+      50.136782701
+     ],
+     [
+      8.591436129,
+      50.136777141
+     ]
+    ]
+   }
+  },
+  {
+   "identifier": "2026-030066--vi-fbm.2026-09-08_22-00-00-000.devi-zus.2026-09-08_22-00-00-000.de2",
+   "icon": "448",
+   "isBlocked": "false",
+   "future": false,
+   "extent": "48.53475052514878,7.935900102791722,48.534255962203396,7.934509231097334",
+   "point": "48.53475052514878,7.935900102791722",
+   "startLcPosition": "1000",
+   "impact": {
+    "symbols": [
+     "SEPARATE",
+     "CLOSED"
+    ]
+   },
+   "display_type": "CLOSURE_ENTRY_EXIT",
+   "subtitle": "",
+   "title": "A5 Sperrung im Knotenpunkt - AS Appenweier - GST",
+   "coordinate": {
+    "lat": 48.53475052514878,
+    "long": 7.935900102791722
+   },
+   "description": [
+    "Die Baustelle ist zu folgenden Zeiträumen gültig:",
+    "14.09.26 22:00 bis zum 15.09.26 05:00 Uhr.",
+    "16.09.26 22:00 bis zum 17.09.26 05:00 Uhr.",
+    "21.09.26 22:00 bis zum 22.09.26 05:00 Uhr.",
+    "(Ende der Gesamtmaßnahme: 25.09.26)",
+    "",
+    "Abfahrt von der B28[Straßburg->Dornstetten]",
+    "",
+    "Länge: konnte nicht ermittelt werden",
+    "",
+    "A5 Sperrung im Knotenpunkt - AS Appenweier - GST"
+   ],
+   "routeRecommendation": [],
+   "footer": [],
+   "lorryParkingFeatureIcons": [],
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      7.935900103,
+      48.534750525
+     ],
+     [
+      7.936287,
+      48.534682001
+     ],
+     [
+      7.9363947,
+      48.534666801
+     ],
+     [
+      7.9364693,
+      48.534652301
+     ],
+     [
+      7.936529,
+      48.534635901
+     ],
+     [
+      7.9365816,
+      48.534617901
+     ],
+     [
+      7.9366518,
+      48.534589201
+     ],
+     [
+      7.9367082,
+      48.534560301
+     ],
+     [
+      7.9367451,
+      48.534535901
+     ],
+     [
+      7.9367832,
+      48.534503501
+     ],
+     [
+      7.9368154,
+      48.534468801
+     ],
+     [
+      7.9368585,
+      48.534415601
+     ],
+     [
+      7.9368855,
+      48.534377201
+     ],
+     [
+      7.9369068,
+      48.534328001
+     ],
+     [
+      7.9369206,
+      48.534288801
+     ],
+     [
+      7.9369258,
+      48.534253001
+     ],
+     [
+      7.9369287,
+      48.534215401
+     ],
+     [
+      7.9369252,
+      48.534169501
+     ],
+     [
+      7.9369166,
+      48.534125501
+     ],
+     [
+      7.9369027,
+      48.534088101
+     ],
+     [
+      7.9368842,
+      48.534046801
+     ],
+     [
+      7.9368593,
+      48.534011901
+     ],
+     [
+      7.9368218,
+      48.533965301
+     ],
+     [
+      7.9367837,
+      48.533925801
+     ],
+     [
+      7.9367407,
+      48.533892101
+     ],
+     [
+      7.9367046,
+      48.533867801
+     ],
+     [
+      7.936646,
+      48.533835101
+     ],
+     [
+      7.9365838,
+      48.533806901
+     ],
+     [
+      7.9365169,
+      48.533783801
+     ],
+     [
+      7.9364563,
+      48.533768101
+     ],
+     [
+      7.936375,
+      48.533752101
+     ],
+     [
+      7.9363069,
+      48.533741601
+     ],
+     [
+      7.9362223,
+      48.533732201
+     ],
+     [
+      7.936106,
+      48.533723201
+     ],
+     [
+      7.935784,
+      48.533707201
+     ],
+     [
+      7.9352729,
+      48.533681801
+     ],
+     [
+      7.93514,
+      48.533678801
+     ],
+     [
+      7.9350652,
+      48.533680601
+     ],
+     [
+      7.9350065,
+      48.533683101
+     ],
+     [
+      7.9349469,
+      48.533688701
+     ],
+     [
+      7.9348864,
+      48.533697601
+     ],
+     [
+      7.9348323,
+      48.533707501
+     ],
+     [
+      7.9347702,
+      48.533724801
+     ],
+     [
+      7.9347208,
+      48.533741601
+     ],
+     [
+      7.9346612,
+      48.533768001
+     ],
+     [
+      7.9346235,
+      48.533789201
+     ],
+     [
+      7.9345855,
+      48.533814201
+     ],
+     [
+      7.9345454,
+      48.533846401
+     ],
+     [
+      7.9345168,
+      48.533876901
+     ],
+     [
+      7.9344896,
+      48.533909101
+     ],
+     [
+      7.9344702,
+      48.533941501
+     ],
+     [
+      7.9344553,
+      48.533971901
+     ],
+     [
+      7.9344452,
+      48.534001801
+     ],
+     [
+      7.9344411,
+      48.534024101
+     ],
+     [
+      7.9344393,
+      48.534058001
+     ],
+     [
+      7.9344447,
+      48.534099901
+     ],
+     [
+      7.9344568,
+      48.534147501
+     ],
+     [
+      7.9344782,
+      48.534194601
+     ],
+     [
+      7.934507,
+      48.534253101
+     ],
+     [
+      7.934509231,
+      48.534255962
+     ]
+    ]
+   }
+  }
+ ]
+}
