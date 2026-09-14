@@ -31,6 +31,9 @@ everywhere it appears.
 
 ![AutoTwin DE dashboard](docs/images/dashboard.png)
 
+<sub>116 440 charging stations from the live Bundesnetzagentur register, 1 300+ live Autobahn
+disruptions, simulated vehicles on the map — and every tile saying which of those it is.</sub>
+
 ---
 
 ## Honest data provenance
@@ -115,6 +118,12 @@ rebuilt as an interactive SVG instrument: energy intensity as a colour band, SOC
 across it, traffic above, charging opportunities below, all on one distance axis. Keyboard
 navigable and screen-reader legible.
 
+![Frankfurt am Main → Stuttgart route analysis](docs/images/route-analysis.png)
+
+<sub>Frankfurt am Main → Stuttgart, a sedan EV at 70 %: 203 km, 2 h 14, arriving at 32 %,
+28.3 kWh — with the physical baseline (12.9) shown next to the model (13.9 kWh/100 km), and
+the live source honestly reported as unavailable.</sub>
+
 **Charging optimisation** — beam search over corridor chargers, minimising
 `driving + charging + 2 × detour + range risk`, with a simplified SOC-dependent charging curve.
 Each recommendation carries the reason it won.
@@ -130,6 +139,26 @@ out to the browser over Server-Sent Events, with marker positions interpolated b
 **Data quality as a first-class surface** — rows received / accepted / rejected / duplicate per
 ingestion run, the validation rules that fired, freshness, licence and attribution, all readable
 in the UI.
+
+![Data quality](docs/images/data-quality.png)
+
+<sub>Per source: status, acceptance rate, whether the answer came from the live source or a
+cache, the licence, and the attribution it obliges. A failed ingestion is shown as failed.</sub>
+
+<details>
+<summary><b>More screens</b></summary>
+
+| | |
+|---|---|
+| ![Live digital twin](docs/images/live-twin.png) | ![Charging infrastructure](docs/images/charging.png) |
+| **Live Twin** — simulated EVs streaming over SSE, coloured by state of charge | **Ladeinfrastruktur** — 116 440 sites, clustered, filterable, with full provenance |
+| ![ML Lab](docs/images/ml-lab.png) | ![Dark mode](docs/images/dashboard-dark.png) |
+| **ML Lab** — LightGBM against the physical baseline, SHAP importances | Light and dark, both first-class |
+
+Every screenshot is produced by `apps/web/tests/e2e/screenshots.spec.ts`, which drives the same
+flows as the smoke tests — so a screenshot cannot show a screen that does not work.
+
+</details>
 
 ---
 
@@ -244,6 +273,28 @@ same held-out rows as the baseline, with SHAP attribution.
 
 Details: [`docs/ml/energy-model.md`](docs/ml/energy-model.md),
 [`docs/ml/methodology.md`](docs/ml/methodology.md).
+
+---
+
+## Verified
+
+Every number below is reproducible with `make ci` and `make demo`.
+
+| | |
+|---|---|
+| Backend tests | **1 082 passing** (`pytest`), 1 025 in the no-database CI selection |
+| Frontend tests | **322 passing** (Vitest) |
+| End-to-end | **20 passing** (Playwright), incl. the full Frankfurt→Stuttgart analysis |
+| dbt | 9 marts, 1 incremental model, **440+ tests** against the live warehouse |
+| Types | **`mypy --strict` clean across 114 source files**; TypeScript strict clean |
+| Lint | `ruff` clean across 174 files; `eslint` clean |
+
+The test suites were written against independently derived values rather than current output —
+the aerodynamic term is checked against the v³ law, charging times against a closed-form
+integral of the taper, the gradient term against m·g·h computed by hand. **They found seven
+real defects**, each now pinned by the regression test that first documented it. Two more came
+out of manual verification, including map layers gated on a MapLibre event that never fires in
+a throttled render loop, which silently emptied every map in a background tab or a CI browser.
 
 ---
 

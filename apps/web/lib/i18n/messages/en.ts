@@ -24,6 +24,7 @@ export const en: Messages = {
     dataQuality: "Data Quality",
     system: "System Status",
     docs: "Documentation",
+    mainLabel: "Main navigation",
     sectionPlatform: "Platform",
     sectionEngineering: "Engineering",
     sectionSystem: "System",
@@ -130,6 +131,7 @@ export const en: Messages = {
   overview: {
     title: "Overview",
     subtitle: "Germany-wide mobility overview",
+    activeVehiclesWindow: "in the last telemetry window (15 min)",
     activeVehicles: "Active vehicles",
     chargingStations: "Charging stations",
     fastChargingPoints: "Fast charging points",

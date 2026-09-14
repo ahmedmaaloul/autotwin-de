@@ -301,9 +301,18 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
   )
 }
 
-function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
+/**
+ * AutoTwin DE change from the shadcn default: this renders a `<div>`, not a `<main>`.
+ *
+ * The inset is the layout column beside the sidebar — it contains the top bar as well as the
+ * page body — so marking it as the `main` landmark is wrong twice over: the header ends up
+ * inside `main`, and the app's own `<main>` around the page content nests a second `main`
+ * inside the first. Nested `main` elements are invalid HTML and give a screen-reader user two
+ * competing "main content" regions. `components/layout/app-shell.tsx` owns the real landmark.
+ */
+function SidebarInset({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <main
+    <div
       data-slot="sidebar-inset"
       className={cn(
         "relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",

@@ -329,11 +329,11 @@ Roughly in order of how badly each one is missed:
 from autotwin_ml import ChargingCandidate, charge_time_minutes, charging_power_kw, optimise_charging
 
 power_kw = charging_power_kw(profile, soc_percent=35.0, battery_temp_c=5.0)
-minutes  = charge_time_minutes(profile, 10.0, 80.0, station_power_kw=300.0, battery_temp_c=20.0)
+minutes = charge_time_minutes(profile, 10.0, 80.0, station_power_kw=300.0, battery_temp_c=20.0)
 
 plan = optimise_charging(
-    route_segments_energy,   # Sequence[RouteEnergySegment] from the route analysis
-    vehicle,                 # VehicleProfile
+    route_segments_energy,  # Sequence[RouteEnergySegment] from the route analysis
+    vehicle,  # VehicleProfile
     start_soc=80.0,
     min_soc=10.0,
     candidates=corridor_candidates,

@@ -115,7 +115,10 @@ test.describe("shell", () => {
 
   test("command palette opens with the keyboard and navigates", async ({ page }) => {
     await page.goto("/");
-    await page.keyboard.press(process.platform === "darwin" ? "Meta+k" : "Control+k");
+    // Control+k rather than branching on the host OS: the palette accepts either modifier, and
+    // headless Chromium does not deliver a Meta chord reliably. Testing the binding the app
+    // actually supports everywhere is more useful than testing the one this machine happens to use.
+    await page.keyboard.press("Control+k");
     await expect(page.getByRole("dialog")).toBeVisible();
 
     await page.getByRole("option", { name: /Ladeinfrastruktur/ }).first().click();
@@ -127,7 +130,8 @@ test.describe("honesty", () => {
   test("the live page states that telemetry is simulated", async ({ page }) => {
     await page.goto("/live");
     // ADR 004: simulated telemetry must never be presentable as real fleet data.
-    await expect(page.getByText(/SIMULIERTE FAHRZEUGTELEMETRIE/i)).toBeVisible();
+    // Exact-cased banner text, so this does not also match the page subtitle.
+    await expect(page.getByText(/SIMULIERTE FAHRZEUGTELEMETRIE — keine realen/)).toBeVisible();
   });
 
   test("the ML page states that the model was trained on simulated data", async ({ page }) => {
@@ -166,8 +170,12 @@ test.describe("route analysis @requires-api", () => {
     await expect(page.getByRole("button", { name: /Route analysieren/ })).toBeEnabled();
     await page.getByRole("button", { name: /Route analysieren/ }).click();
 
-    // The analysis calls OSRM and the ML model; allow real time for it.
-    await expect(page.getByText(/Ladezustand bei Ankunft/)).toBeVisible({ timeout: 90_000 });
+    // The analysis calls the routing provider, PostGIS and the ML model; allow real time.
+    // Scoped to the metric tile's own label — the phrase also appears in the charging-plan
+    // prose below, and an unscoped match is a strict-mode violation.
+    await expect(
+      page.getByText("Ladezustand bei Ankunft", { exact: true }).first(),
+    ).toBeVisible({ timeout: 90_000 });
 
     // The Streckenband is the signature output and must be present and interactive.
     const strip = page.getByRole("img", { name: /Streckenband/ });
@@ -188,10 +196,20 @@ test.describe("route analysis @requires-api", () => {
 
   test("simulation controls start and stop a run", async ({ page }) => {
     await page.goto("/simulation");
-    const start = page.getByRole("button", { name: /^Starten$/ });
+
+    // "Anlegen und starten" rather than "Starten": the control creates a simulation_runs row
+    // and then starts it, and the label says so.
+    const start = page.getByRole("button", { name: "Anlegen und starten" });
     await expect(start).toBeVisible();
     await start.click();
-    await expect(page.getByText(/Läuft|Running/)).toBeVisible({ timeout: 30_000 });
-    await page.getByRole("button", { name: /^Stoppen$/ }).click();
+
+    await expect(page.getByText(/Läuft|Running/).first()).toBeVisible({ timeout: 45_000 });
+
+    const stop = page.getByRole("button", { name: "Stoppen" });
+    await expect(stop).toBeEnabled({ timeout: 15_000 });
+    await stop.click();
+    await expect(page.getByText(/Gestoppt|Stopped|Abgeschlossen|Completed/).first()).toBeVisible({
+      timeout: 45_000,
+    });
   });
 });

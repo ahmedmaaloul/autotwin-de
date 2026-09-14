@@ -61,14 +61,7 @@ def frozen_now() -> datetime:
 @pytest.fixture
 def fixtures_dir() -> Path:
     """The committed provider fixtures — real source bytes, trimmed."""
-    return (
-        REPO_ROOT
-        / "services"
-        / "ingestion"
-        / "src"
-        / "autotwin_ingestion"
-        / "fixtures"
-    )
+    return REPO_ROOT / "services" / "ingestion" / "src" / "autotwin_ingestion" / "fixtures"
 
 
 @pytest.fixture

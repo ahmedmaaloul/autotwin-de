@@ -399,7 +399,19 @@ def _ladder_energies(
         for rung, segment in zip(reference, segments, strict=True)
     ]
     traffic = [
-        replace(rung, speed_kmh=segment.speed_kmh, traffic_severity=segment.traffic_severity)
+        # ``duration_s`` is restored HERE, with speed, and not on a later rung. The reference
+        # rung nulls it so the free-flow rung derives its own duration from distance/speed; an
+        # explicit duration supplied by the caller — which is exactly what a telemetry window
+        # is — describes the same physical fact as the real speed. Restoring it any later would
+        # credit the whole duration correction to whichever rung happened to carry it, and a
+        # 600 s window over a 180 s free-flow segment would surface to the driver as a
+        # +200 % "Gegenwind" driver.
+        replace(
+            rung,
+            speed_kmh=segment.speed_kmh,
+            traffic_severity=segment.traffic_severity,
+            duration_s=segment.duration_s,
+        )
         for rung, segment in zip(gradient, segments, strict=True)
     ]
     temperature = [
@@ -411,7 +423,7 @@ def _ladder_energies(
         for rung, segment in zip(traffic, segments, strict=True)
     ]
     wind = [
-        replace(rung, headwind_ms=segment.headwind_ms, duration_s=segment.duration_s)
+        replace(rung, headwind_ms=segment.headwind_ms)
         for rung, segment in zip(temperature, segments, strict=True)
     ]
     return {

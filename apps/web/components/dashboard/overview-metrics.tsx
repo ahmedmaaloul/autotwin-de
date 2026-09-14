@@ -63,7 +63,15 @@ export function OverviewMetrics({
         icon={Car}
         loading={loading}
         hint={t.overview.simulatedFleetHint}
-        footer={<SourceBadge origin="simulated" source="simulator" compact />}
+        footer={
+          // The window is part of the number's meaning. Without it the tile appears to
+          // contradict the map's vehicle count, which shows the latest position of every
+          // vehicle regardless of how long ago it reported.
+          <span className="flex flex-col gap-1">
+            <SourceBadge origin="simulated" source="simulator" compact />
+            <span>{t.overview.activeVehiclesWindow}</span>
+          </span>
+        }
       />
       <MetricCard
         label={t.overview.chargingStations}

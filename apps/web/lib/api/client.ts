@@ -52,11 +52,18 @@ export class ApiError extends Error {
     this.requestId = requestId;
   }
 
-  /** True when the backend told us a provider is down, rather than that we asked wrongly. */
+  /**
+   * True when the backend told us an upstream source failed, rather than that we asked wrongly.
+   *
+   * `invalid_source_data` (502) belongs here: it means the source answered with something
+   * unparseable, which is a failure on their side. Treating it as a client error would show the
+   * reader "check your request" when the right message is "the source is having a bad day".
+   */
   get isProviderFailure(): boolean {
     return (
       this.code === "provider_unavailable" ||
       this.code === "provider_timeout" ||
+      this.code === "invalid_source_data" ||
       this.code === "rate_limited"
     );
   }
@@ -103,6 +110,13 @@ function isDataMode(value: string | null): value is DataMode {
   return value === "live" || value === "cache" || value === "fixture";
 }
 
+function mergeHeaders(hasBody: boolean, extra: HeadersInit | undefined): Headers {
+  const merged = new Headers({ accept: "application/json" });
+  if (hasBody) merged.set("content-type", "application/json");
+  new Headers(extra).forEach((value, key) => merged.set(key, value));
+  return merged;
+}
+
 export interface ApiFetchOptions extends Omit<RequestInit, "body"> {
   /** Request body; serialised as JSON. */
   json?: unknown;
@@ -130,11 +144,9 @@ export async function apiFetchWithMeta<T>(
     response = await fetch(`${root ? resolveRootBase() : resolveBase()}${path}`, {
       ...init,
       method: init.method ?? (json !== undefined ? "POST" : "GET"),
-      headers: {
-        accept: "application/json",
-        ...(json !== undefined ? { "content-type": "application/json" } : {}),
-        ...headers,
-      },
+      // `HeadersInit` may be a Headers instance or a string[][] — neither has own enumerable
+      // properties, so spreading it would drop the caller's headers without a word. Normalise.
+      headers: mergeHeaders(json !== undefined, headers),
       body: json !== undefined ? JSON.stringify(json) : undefined,
       signal: controller.signal,
     });

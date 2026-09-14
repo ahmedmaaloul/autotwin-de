@@ -496,13 +496,13 @@ Base64 identifiers confirmed broken (200, zero bytes); raw and URL-encoded ident
 ### Exact URLs (all verified by me today)
 ```python
 BASE = "https://verkehr.autobahn.de/o/autobahn"
-f"{BASE}/"                                          # {"roads": [...]}
-f"{BASE}/{road}/services/roadworks"                 # {"roadworks": [...]}
-f"{BASE}/{road}/services/closure"                   # {"closure": [...]}
-f"{BASE}/{road}/services/warning"                   # {"warning": [...]}
-f"{BASE}/{road}/services/parking_lorry"             # {"parking_lorry": [...]}
-f"{BASE}/{road}/services/electric_charging_station" # {"electric_charging_station": [...]}
-f"{BASE}/details/{service}/{identifier}"            # raw or quote(id, safe=''); NEVER base64
+f"{BASE}/"  # {"roads": [...]}
+f"{BASE}/{road}/services/roadworks"  # {"roadworks": [...]}
+f"{BASE}/{road}/services/closure"  # {"closure": [...]}
+f"{BASE}/{road}/services/warning"  # {"warning": [...]}
+f"{BASE}/{road}/services/parking_lorry"  # {"parking_lorry": [...]}
+f"{BASE}/{road}/services/electric_charging_station"  # {"electric_charging_station": [...]}
+f"{BASE}/details/{service}/{identifier}"  # raw or quote(id, safe=''); NEVER base64
 ```
 Skip `webcam` and anything traffic-flow shaped. `http://` 301-redirects to https — always call https directly.
 
@@ -513,14 +513,14 @@ Skip `webcam` and anything traffic-flow shaped. `http://` 301-redirects to https
 def fetch_layer(road: str, service: str) -> list[dict]:
     r = session.get(f"{BASE}/{road}/services/{service}", timeout=30)
     r.raise_for_status()
-    if not r.content:                      # /details/ with a bad id → 200, zero bytes
+    if not r.content:  # /details/ with a bad id → 200, zero bytes
         return []
     try:
         payload = r.json()
     except ValueError:
         log.warning("non-JSON body for %s/%s", road, service)
         return []
-    if service not in payload:             # unknown path echoes the last segment
+    if service not in payload:  # unknown path echoes the last segment
         raise ProviderSchemaError(f"missing key {service!r}")
     return payload[service] or []
 ```
@@ -537,10 +537,10 @@ roads = sorted({r.strip() for r in get_json(f"{BASE}/")["roads"]})  # 108
 def to_lat_lon(coord: dict | None) -> tuple[float, float] | None:
     if not coord:
         return None
-    if coord.get("type") == "Point":          # GeoJSON: [lon, lat] — LON FIRST
+    if coord.get("type") == "Point":  # GeoJSON: [lon, lat] — LON FIRST
         lon, lat = coord["coordinates"][:2]
         return float(lat), float(lon)
-    if "lat" in coord:                        # note the key is "long", not lng/lon
+    if "lat" in coord:  # note the key is "long", not lng/lon
         return float(coord["lat"]), float(coord["long"])
     return None
 ```
@@ -549,9 +549,9 @@ Both shapes occur **inside one `electric_charging_station` response** (447 `lat/
 **4. `impact` — every subfield is optional.**
 ```python
 impact = item.get("impact") or {}
-symbols = [s for s in (impact.get("symbols") or []) if s]   # drops embedded nulls
+symbols = [s for s in (impact.get("symbols") or []) if s]  # drops embedded nulls
 lanes_closed = "CLOSED" in symbols
-lower, upper = impact.get("lower"), impact.get("upper")     # absent on 26% of items
+lower, upper = impact.get("lower"), impact.get("upper")  # absent on 26% of items
 ```
 `warning` has **no `impact` key at all** (0/49).
 
@@ -559,15 +559,18 @@ lower, upper = impact.get("lower"), impact.get("upper")     # absent on 26% of i
 ```python
 from datetime import datetime, date
 
+
 def parse_ts(raw):
-    if not raw:                       # covers absent (via .get) and null (details endpoint)
+    if not raw:  # covers absent (via .get) and null (details endpoint)
         return None
-    if raw.endswith("Z"):             # warning, source="inrix"
+    if raw.endswith("Z"):  # warning, source="inrix"
         return datetime.fromisoformat(raw.replace("Z", "+00:00"))
     try:
-        return datetime.fromisoformat(raw)   # roadworks/closure, warning source="eva"
+        return datetime.fromisoformat(raw)  # roadworks/closure, warning source="eva"
     except ValueError:
-        return datetime.combine(datetime.strptime(raw, "%d.%m.%Y").date(), ...)  # charging: "30.03.2026"
+        return datetime.combine(
+            datetime.strptime(raw, "%d.%m.%Y").date(), ...
+        )  # charging: "30.03.2026"
 ```
 Always `item.get("startTimestamp")` — in *list* responses the key is **missing**; in *detail* responses it is **present but may be null**. Do not use `display_type` to predict presence (holds for roadworks, fails for closures).
 
@@ -882,20 +885,27 @@ Fetch the landing page and regex out the absolute URL. I verified the raw HTML c
 ```python
 import re, requests
 
-LANDING = ("https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/"
-           "E-Mobilitaet/Ladesaeulenkarte/start.html")
+LANDING = (
+    "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/"
+    "E-Mobilitaet/Ladesaeulenkarte/start.html"
+)
+
 
 def resolve_csv_url() -> str:
     html = requests.get(LANDING, timeout=60).text
     m = re.findall(
         r"https://data\.bundesnetzagentur\.de/\S*?"
-        r"Ladesaeulenregister_BNetzA_(\d{4}-\d{2}-\d{2})\.csv", html)
+        r"Ladesaeulenregister_BNetzA_(\d{4}-\d{2}-\d{2})\.csv",
+        html,
+    )
     urls = re.findall(
         r"https://data\.bundesnetzagentur\.de/\S*?"
-        r"Ladesaeulenregister_BNetzA_\d{4}-\d{2}-\d{2}\.csv", html)
+        r"Ladesaeulenregister_BNetzA_\d{4}-\d{2}-\d{2}\.csv",
+        html,
+    )
     if not urls:
         raise RuntimeError("BNetzA landing page layout changed - CSV link not found")
-    return urls[0]          # edition date available in m[0]
+    return urls[0]  # edition date available in m[0]
 ```
 
 Capture the edition date from the filename and store it as the dataset vintage — it is the authoritative `Stand`. Cross-check it against line 8 of the file (`Letzte Aktualisierung vom: 01.09.2026`).
@@ -908,10 +918,10 @@ import pandas as pd
 df = pd.read_csv(
     resolve_csv_url(),
     sep=";",
-    encoding="utf-8-sig",   # BOM-aware. NOT cp1252.
-    skiprows=10,            # 9 notice lines + 1 group-banner row
+    encoding="utf-8-sig",  # BOM-aware. NOT cp1252.
+    skiprows=10,  # 9 notice lines + 1 group-banner row
     quotechar='"',
-    dtype=str,              # parse everything as text first, convert explicitly
+    dtype=str,  # parse everything as text first, convert explicitly
     keep_default_na=False,
 )
 assert len(df.columns) == 47, f"schema drift: {len(df.columns)} cols"
@@ -921,17 +931,17 @@ assert df.columns[0] == "Ladeeinrichtungs-ID"
 Deliberately **not** using `decimal=","` — because `dtype=str` is safer here given `Nennleistung Stecker1` can contain `"11; 3,7"`, which is neither a number nor safe to coerce. Convert explicitly instead:
 
 ```python
-def de_num(s):                      # "48,442398" -> 48.442398 ; "11; 3,7" -> None
+def de_num(s):  # "48,442398" -> 48.442398 ; "11; 3,7" -> None
     s = (s or "").strip()
     if not s or ";" in s:
         return None
     return float(s.replace(",", "."))
 
+
 df["lat"] = df["Breitengrad"].map(de_num)
 df["lon"] = df["Längengrad"].map(de_num)
 df["power_kw"] = df["Nennleistung Ladeeinrichtung [kW]"].map(de_num)
-df["commissioned"] = pd.to_datetime(
-    df["Inbetriebnahmedatum"], format="%d.%m.%Y", errors="coerce")
+df["commissioned"] = pd.to_datetime(df["Inbetriebnahmedatum"], format="%d.%m.%Y", errors="coerce")
 ```
 
 ### Step 3 — reshape the wide connector block to long
@@ -941,11 +951,16 @@ The 24 connector columns are a repeating 4-tuple. Melt them:
 ```python
 points = []
 for i in range(1, 7):
-    blk = df[["Ladeeinrichtungs-ID",
-              f"Steckertypen{i}", f"Nennleistung Stecker{i}",
-              f"EVSE-ID{i}", f"Public Key{i}"]].copy()
-    blk.columns = ["station_id", "connector_type", "connector_kw",
-                   "evse_id", "public_key"]
+    blk = df[
+        [
+            "Ladeeinrichtungs-ID",
+            f"Steckertypen{i}",
+            f"Nennleistung Stecker{i}",
+            f"EVSE-ID{i}",
+            f"Public Key{i}",
+        ]
+    ].copy()
+    blk.columns = ["station_id", "connector_type", "connector_kw", "evse_id", "public_key"]
     blk["point_index"] = i
     points.append(blk[blk["connector_type"].str.strip() != ""])
 points = pd.concat(points, ignore_index=True)
@@ -995,20 +1010,25 @@ Note the exact spellings: `Art der Ladeeinrichtung` (historic typo IS fixed), `N
 ```python
 import io, re, csv, requests
 
-LANDING = ("https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/"
-           "E-Mobilitaet/Ladesaeulenkarte/start.html")
+LANDING = (
+    "https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/"
+    "E-Mobilitaet/Ladesaeulenkarte/start.html"
+)
 URL_RE = re.compile(
     r"https://data\.bundesnetzagentur\.de/[^\s\"'<>)]*?"
-    r"Ladesaeulenregister_BNetzA_(\d{4}-\d{2}-\d{2})\.csv")
+    r"Ladesaeulenregister_BNetzA_(\d{4}-\d{2}-\d{2})\.csv"
+)
+
 
 def resolve_csv_url(session) -> tuple[str, str]:
     r = session.get(LANDING, timeout=60)
     r.raise_for_status()
-    hits = URL_RE.findall(r.text)          # -> ['2026-09-01']
+    hits = URL_RE.findall(r.text)  # -> ['2026-09-01']
     urls = [m.group(0) for m in URL_RE.finditer(r.text)]
     if not urls:
         raise SourceUnavailable("BNetzA landing page changed: no dated CSV link found")
-    return urls[0], hits[0]                # url, edition date == dataset vintage
+    return urls[0], hits[0]  # url, edition date == dataset vintage
+
 
 def download(session, url, dest):
     with session.get(url, stream=True, timeout=(30, 600)) as r:
@@ -1036,8 +1056,15 @@ with open(dest, encoding="utf-8-sig", newline="") as fh:
 header, data = rows[10], rows[11:]
 
 # or pandas
-df = pd.read_csv(dest, sep=";", encoding="utf-8-sig", skiprows=10,
-                 quotechar='"', dtype=str, keep_default_na=False)
+df = pd.read_csv(
+    dest,
+    sep=";",
+    encoding="utf-8-sig",
+    skiprows=10,
+    quotechar='"',
+    dtype=str,
+    keep_default_na=False,
+)
 ```
 
 Assertions worth failing loudly on: `len(header) == 47`, `header[0] == "Ladeeinrichtungs-ID"`, `header[4] == "Art der Ladeeinrichtung"`, and `rows[7][0].startswith("Letzte Aktualisierung vom:")` (that row carries `01.09.2026` — cross-check it against the date in the filename).
@@ -1067,13 +1094,17 @@ def de_num(s):
 for i in range(1, 7):
     typ = row[f"Steckertypen{i}"].strip()
     if not typ:
-        continue                       # slot unused
-    types  = [t.strip() for t in typ.split(";") if t.strip()]
+        continue  # slot unused
+    types = [t.strip() for t in typ.split(";") if t.strip()]
     powers = [de_num(p) for p in row[f"Nennleistung Stecker{i}"].split(";")]
-    yield dict(station_id=row["Ladeeinrichtungs-ID"], point_index=i,
-               connector_types=types, connector_kw=powers,
-               evse_id=row[f"EVSE-ID{i}"].strip() or None,
-               public_key="".join(row[f"Public Key{i}"].split()) or None)
+    yield dict(
+        station_id=row["Ladeeinrichtungs-ID"],
+        point_index=i,
+        connector_types=types,
+        connector_kw=powers,
+        evse_id=row[f"EVSE-ID{i}"].strip() or None,
+        public_key="".join(row[f"Public Key{i}"].split()) or None,
+    )
 ```
 
 One `Ladepunkt` slot can list several connector types (`AC Typ 2 Steckdose; AC Schuko`), so `connector_types` is a list, not a scalar. Strip all whitespace out of `Public Key` — many are multi-line hex blocks.
@@ -1510,28 +1541,38 @@ Observations — `;`-delimited with space padding, **ISO-8859-1**, `-999` = null
 ```python
 import pandas as pd, zipfile, io, re
 
+
 def read_produkt(zbytes):
     z = zipfile.ZipFile(io.BytesIO(zbytes))
     member = next(n for n in z.namelist() if n.startswith("produkt_"))  # NOT "zehn_now_"
-    df = pd.read_csv(io.BytesIO(z.read(member)), sep=";", encoding="latin-1",
-                     skipinitialspace=True, na_values=["-999", "-999.0"])
+    df = pd.read_csv(
+        io.BytesIO(z.read(member)),
+        sep=";",
+        encoding="latin-1",
+        skipinitialspace=True,
+        na_values=["-999", "-999.0"],
+    )
     df.columns = [c.strip() for c in df.columns]
     df = df.drop(columns=[c for c in df.columns if c == "eor"])
     fmt = "%Y%m%d%H%M" if df["MESS_DATUM"].astype(str).str.len().iloc[0] == 12 else "%Y%m%d%H"
     df["ts"] = pd.to_datetime(df["MESS_DATUM"].astype(str), format=fmt, utc=True)
-    df["STATIONS_ID"] = df["STATIONS_ID"].astype(int)   # file has "         44", filename has "00044"
+    df["STATIONS_ID"] = df["STATIONS_ID"].astype(
+        int
+    )  # file has "         44", filename has "00044"
     return df
 ```
 Select the quality column as `[c for c in df.columns if c.startswith("QN")][0]` — it is `QN`, `QN_9`, `QN_3` or `QN_8` depending on product.
 
 MOSMIX — KMZ is a ZIP with exactly one KML member; stream it.
 ```python
-NS = {"kml": "http://www.opengis.net/kml/2.2",
-      "dwd": "https://opendata.dwd.de/weather/lib/pointforecast_dwd_extension_V1_0.xsd"}
+NS = {
+    "kml": "http://www.opengis.net/kml/2.2",
+    "dwd": "https://opendata.dwd.de/weather/lib/pointforecast_dwd_extension_V1_0.xsd",
+}
 steps = [t.text for t in root.iterfind(".//dwd:ForecastTimeSteps/dwd:TimeStep", NS)]  # ISO-8601 Z
-vals  = fc.find("dwd:value", NS).text.split()
-assert len(vals) == len(steps)                     # non-negotiable; a mismatch time-shifts everything
-v = [None if x == "-" else float(x) for x in vals] # MOSMIX null is "-", NOT -999
+vals = fc.find("dwd:value", NS).text.split()
+assert len(vals) == len(steps)  # non-negotiable; a mismatch time-shifts everything
+v = [None if x == "-" else float(x) for x in vals]  # MOSMIX null is "-", NOT -999
 # TTT, Td, TX, TN, T5cm: Kelvin -> subtract 273.15
 # PPPP: Pascal -> divide by 100
 # FF, FX1: m/s already;  RR1c: kg/m2 == mm
@@ -1543,8 +1584,8 @@ lon, lat, elev = map(float, pm.find(".//kml:coordinates", NS).text.split(","))  
 MOSMIX ids and CDC ids are **different namespaces**, and the 19 numeric collisions are all false. Resolve once at build time by nearest-neighbour on coordinates with an elevation sanity check, and freeze the mapping as a checked-in table:
 
 ```python
-STATION_MAP = {            # verified by coordinates + elevation, not by id
-    "muenchen_stadt": {"mosmix": "10865", "cdc": 3379},   # both elev 515 m
+STATION_MAP = {  # verified by coordinates + elevation, not by id
+    "muenchen_stadt": {"mosmix": "10865", "cdc": 3379},  # both elev 515 m
 }
 ```
 Take MOSMIX coordinates from the KML `<kml:Point>` (decimal degrees). If you must parse the catalogue at `https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg?view=nasPublication&nn=16102` (299,502 bytes, 5,651 lines, 5,649 data rows, LF, ASCII), it is **DD.MM**: `deg = trunc(v) + (v-trunc(v))*100/60`, applied to `abs(v)` then re-signed. Ids are right-aligned in 5 chars and may be alphanumeric with a leading space — strip them; stripped alphanumeric ids work in URLs (`E426`, `A051` both return 200, `99999` returns 404). CDC station-description files are the opposite format: true fixed-width, CRLF, rows padded to 1000 chars, coordinates in **decimal degrees** at 4 dp — slice by offset, never `split()`, because names contain spaces.
@@ -1943,15 +1984,15 @@ Query string (verified against `docs/http.md` and live):
 ### Parsing rules that are load-bearing
 
 ```python
-COORDS = "{lon1},{lat1};{lon2},{lat2}"   # LONGITUDE FIRST, both here and in geometry
+COORDS = "{lon1},{lat1};{lon2},{lat2}"  # LONGITUDE FIRST, both here and in geometry
 
-n = len(route["geometry"]["coordinates"])        # 3089 on the reference route
+n = len(route["geometry"]["coordinates"])  # 3089 on the reference route
 ann = route["legs"][0]["annotation"]
-assert len(ann["distance"]) == n - 1             # 3088 — segment i is coord i -> i+1
+assert len(ann["distance"]) == n - 1  # 3088 — segment i is coord i -> i+1
 # BUT, only with annotations=true:
 # len(ann["nodes"]) == n, NOT n-1.  Verified 131 vs 130.
 
-speed_kmh = [s * 3.6 for s in ann["speed"]]      # raw values are m/s
+speed_kmh = [s * 3.6 for s in ann["speed"]]  # raw values are m/s
 ```
 
 Prefer the explicit `annotations=distance,duration,speed` over `annotations=true` — `true` adds a `nodes` array of 64-bit OSM ids plus `datasources`/`weight`/`metadata` (`metadata.datasource_names == ["lua profile"]`, verified) for no UI benefit.
@@ -1962,9 +2003,9 @@ Prefer the explicit `annotations=distance,duration,speed` over `annotations=true
 def validate(resp, max_snap_m=200.0):
     if resp.get("code") != "Ok":
         raise OsrmError(resp.get("code"), resp.get("message"))
-    for wp in resp["waypoints"]:                  # THE real guard
+    for wp in resp["waypoints"]:  # THE real guard
         if wp["distance"] > max_snap_m:
-            raise OsrmError("SnapTooFar", f'{wp["distance"]:.0f} m from road')
+            raise OsrmError("SnapTooFar", f"{wp['distance']:.0f} m from road")
     r = resp["routes"][0]
     if r["distance"] <= 0 or r["duration"] <= 0:
         raise OsrmError("EmptyRoute")
@@ -1999,13 +2040,15 @@ HEADERS = {"User-Agent": "AutoTwinDE/1.0 (+https://your-url; contact: you@exampl
 **If your Python code ever fetches `tile.openstreetmap.org` directly, you must validate the body, not the status code.**
 
 ```python
-OSM_BLOCKED_MD5 = "c069a15b2cc2d6b6f527ad09eb93c61a"   # 6987-byte placeholder PNG
+OSM_BLOCKED_MD5 = "c069a15b2cc2d6b6f527ad09eb93c61a"  # 6987-byte placeholder PNG
+
 
 def fetch_osm_tile(z, x, y, session):
     # HTTPS only — the policy explicitly prohibits the http:// URL
-    r = session.get(f"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    headers=HEADERS, timeout=20)      # never a default UA
-    r.raise_for_status()                              # will NOT fire when blocked
+    r = session.get(
+        f"https://tile.openstreetmap.org/{z}/{x}/{y}.png", headers=HEADERS, timeout=20
+    )  # never a default UA
+    r.raise_for_status()  # will NOT fire when blocked
     if hashlib.md5(r.content).hexdigest() == OSM_BLOCKED_MD5:
         raise TileBlocked("UA rejected by OSMF CDN; response was 200 + placeholder")
     return r.content
@@ -2049,15 +2092,25 @@ One JS-side note the report missed: VersaTiles styles use the **array form** of 
 
 ```python
 TILE_STYLES = [
-  ("openfreemap", {"light": "https://tiles.openfreemap.org/styles/positron",
-                   "dark":  "https://tiles.openfreemap.org/styles/dark"}),
-  ("versatiles",  {"light": "https://tiles.versatiles.org/assets/styles/graybeard/style.json",
-                   "dark":  "https://tiles.versatiles.org/assets/styles/eclipse/style.json"}),
+    (
+        "openfreemap",
+        {
+            "light": "https://tiles.openfreemap.org/styles/positron",
+            "dark": "https://tiles.openfreemap.org/styles/dark",
+        },
+    ),
+    (
+        "versatiles",
+        {
+            "light": "https://tiles.versatiles.org/assets/styles/graybeard/style.json",
+            "dark": "https://tiles.versatiles.org/assets/styles/eclipse/style.json",
+        },
+    ),
 ]
 ROUTING_HOSTS = [
-  os.environ.get("OSRM_URL"),                              # self-hosted, wins if set
-  "https://routing.openstreetmap.de/routed-car",
-  "https://router.project-osrm.org",                       # same FOSSGIS infra, car only
+    os.environ.get("OSRM_URL"),  # self-hosted, wins if set
+    "https://routing.openstreetmap.de/routed-car",
+    "https://router.project-osrm.org",  # same FOSSGIS infra, car only
 ]
 ```
 Probe a style URL with a HEAD/GET and check `json["version"] == 8` and non-empty `sources` before committing. For routing, on connection error or 5xx, fall to the next host; on 400-class `InvalidQuery`/`InvalidOptions`, do **not** retry — it is your bug.

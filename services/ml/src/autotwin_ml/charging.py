@@ -178,12 +178,18 @@ def charge_time_minutes(
     for index in range(steps):
         soc_mid = soc_from + (index + 0.5) * step_percent
         vehicle_kw = charging_power_kw(profile, soc_mid, battery_temp_c)
+        if vehicle_kw < _MIN_CHARGING_POWER_KW:
+            # The taper (or a severe derate) has stalled the session on the VEHICLE side.
+            # Charging the remaining SOC would take hours; report the time at the floor power
+            # rather than returning infinity, so the optimiser can still rank the option and
+            # reject it on cost.
+            #
+            # The floor must not be applied to the combined limit. A pillar rated below the
+            # floor is genuinely that slow, and clamping it would report a charge time shorter
+            # than the station can physically deliver — the Ladesäulenregister does publish
+            # malformed power columns, so this is reachable from real data.
+            vehicle_kw = _MIN_CHARGING_POWER_KW
         available_kw = min(station_power_kw, vehicle_kw)
-        if available_kw < _MIN_CHARGING_POWER_KW:
-            # The taper (or a severe derate) has stalled the session. Charging the remaining
-            # SOC would take hours; report the time at the floor power rather than returning
-            # infinity, so the optimiser can still rank the option and reject it on cost.
-            available_kw = _MIN_CHARGING_POWER_KW
         minutes += energy_per_step_kwh / available_kw * 60.0
     return minutes
 

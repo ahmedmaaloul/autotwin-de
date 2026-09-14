@@ -27,6 +27,7 @@ export const de = {
     dataQuality: "Datenqualität",
     system: "Systemstatus",
     docs: "Dokumentation",
+    mainLabel: "Hauptnavigation",
     sectionPlatform: "Plattform",
     sectionEngineering: "Engineering",
     sectionSystem: "System",
@@ -136,6 +137,7 @@ export const de = {
   overview: {
     title: "Übersicht",
     subtitle: "Deutschlandweite Mobilitätsübersicht",
+    activeVehiclesWindow: "im letzten Telemetriefenster (15 Min.)",
     activeVehicles: "Aktive Fahrzeuge",
     chargingStations: "Ladestationen",
     fastChargingPoints: "Schnellladepunkte",

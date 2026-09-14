@@ -134,8 +134,39 @@ def route_template(scope: Scope) -> str:
     route = scope.get("route")
     if route is None:
         return UNMATCHED_PATH
-    template = getattr(route, "path_format", None) or getattr(route, "path", None)
-    return str(template) if template else UNMATCHED_PATH
+
+    raw = getattr(route, "path_format", None)
+    if raw is None:
+        raw = getattr(route, "path", None)
+    template = "" if raw is None else str(raw)
+
+    # `path_format` is the route's path *within the router that owns it*, not within the app,
+    # and `root_path` is empty for an included router. Left alone the label is wrong twice
+    # over: `GET /api/v1/ml/metrics` and `GET /metrics` both report `/metrics` and share one
+    # series, and a router-root endpoint such as `GET /api/v1/vehicles` has a local path of
+    # `""` — falsy, so it would be filed under `unmatched` together with every 404 a crawler
+    # produces.
+    #
+    # The mount prefix is recovered from the request itself: substituting the path params back
+    # into the template gives the concrete tail of the request path, and whatever precedes it
+    # is the prefix. The label is then assembled from the *template*, never the substituted
+    # value, so cardinality stays bounded.
+    request_path = str(scope.get("path") or "")
+    params = scope.get("path_params") or {}
+    try:
+        concrete_tail = template.format(**params) if params else template
+    except (KeyError, IndexError, ValueError):  # pragma: no cover - defensive
+        concrete_tail = template
+
+    if not concrete_tail:
+        prefix = request_path
+    elif request_path.endswith(concrete_tail):
+        prefix = request_path[: len(request_path) - len(concrete_tail)]
+    else:  # pragma: no cover - the route matched, so the tail should always be present
+        prefix = ""
+
+    full = f"{prefix}{template}"
+    return full if full else UNMATCHED_PATH
 
 
 def observe_request(*, method: str, path: str, status: int, duration_s: float) -> None:

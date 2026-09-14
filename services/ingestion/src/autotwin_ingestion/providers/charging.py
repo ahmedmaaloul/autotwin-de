@@ -587,10 +587,12 @@ def iter_records(
             except (ValueError, TypeError) as error:
                 _report(on_skip, f"row {row_number}: {error}")
                 continue
-            yield record
-            emitted += 1
+            # Guard BEFORE the yield: checking afterwards makes ``limit=0`` emit one record,
+            # and callers use limit=0 to mean "parse nothing, just validate the header".
             if limit is not None and emitted >= limit:
                 return
+            yield record
+            emitted += 1
 
 
 def _read_header(reader: Iterator[list[str]], path: Path) -> list[str]:

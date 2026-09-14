@@ -8,6 +8,7 @@ only pins current behaviour catches refactors, not mistakes.
 from __future__ import annotations
 
 import math
+from itertools import pairwise
 
 import pytest
 
@@ -76,7 +77,9 @@ class TestPolylineMaths:
             STUTTGART,
         ]
 
-    def test_cumulative_distances_start_at_zero_and_increase(self, corridor: list[Coordinate]) -> None:
+    def test_cumulative_distances_start_at_zero_and_increase(
+        self, corridor: list[Coordinate]
+    ) -> None:
         cumulative = cumulative_distances_m(corridor)
         assert cumulative[0] == 0.0
         assert cumulative == sorted(cumulative)
@@ -101,7 +104,7 @@ class TestPolylineMaths:
 
     def test_densify_never_exceeds_spacing(self, corridor: list[Coordinate]) -> None:
         dense = densify(corridor, max_spacing_m=5_000)
-        gaps = [haversine_m(a, b) for a, b in zip(dense, dense[1:], strict=False)]
+        gaps = [haversine_m(a, b) for a, b in pairwise(dense)]
         assert max(gaps) <= 5_000 * 1.01
         # Inserted points are interpolated linearly in lat/lon, so the densified polyline is a
         # chord approximation of the original great-circle legs and its length drifts by about
@@ -137,7 +140,7 @@ class TestSegmentation:
 
     def test_offsets_are_monotonic_and_contiguous(self, corridor: list[Coordinate]) -> None:
         segments = segment_polyline(corridor, target_length_m=20_000)
-        for previous, current in zip(segments, segments[1:], strict=False):
+        for previous, current in pairwise(segments):
             assert current.start_offset_m == pytest.approx(
                 previous.start_offset_m + previous.length_m, abs=1.0
             )
@@ -166,7 +169,9 @@ class TestSegmentation:
 
 
 class TestCoordinateValidation:
-    @pytest.mark.parametrize(("lat", "lon"), [(91.0, 0.0), (-91.0, 0.0), (0.0, 181.0), (0.0, -181.0)])
+    @pytest.mark.parametrize(
+        ("lat", "lon"), [(91.0, 0.0), (-91.0, 0.0), (0.0, 181.0), (0.0, -181.0)]
+    )
     def test_rejects_impossible_coordinates(self, lat: float, lon: float) -> None:
         with pytest.raises(ValueError):
             Coordinate(latitude=lat, longitude=lon)

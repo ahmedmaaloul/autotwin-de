@@ -249,7 +249,7 @@ Every provider result is wrapped:
 @dataclass(frozen=True, slots=True)
 class ProviderResult[T]:
     data: T
-    mode: ProviderMode          # live | cache | fixture
+    mode: ProviderMode  # live | cache | fixture
     source_url: str | None
     fetched_at: datetime
     warnings: list[str] = field(default_factory=list)

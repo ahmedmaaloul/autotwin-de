@@ -5,7 +5,9 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatDelta } from "@/lib/i18n/format";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useLocale } from "@/providers/locale-provider";
 import { cn } from "@/lib/utils";
 
 export interface MetricCardProps {
@@ -41,6 +43,7 @@ export function MetricCard({
   loading = false,
   className,
 }: MetricCardProps) {
+  const locale = useLocale();
   const deltaIsGood = delta == null ? null : delta >= 0 === positiveIsGood;
   const DeltaIcon = delta != null && delta < 0 ? TrendingDown : TrendingUp;
 
@@ -85,8 +88,9 @@ export function MetricCard({
               )}
             >
               <DeltaIcon className="size-3" aria-hidden />
-              {delta > 0 ? "+" : ""}
-              {delta.toFixed(1)} %
+              {/* Locale-aware: toFixed() always emits a dot, which would put "+5.7 %" next to
+                  a value rendered as "18,7" — two decimal conventions inside one tile. */}
+              {formatDelta(delta, locale)}
             </span>
           ) : null}
         </div>

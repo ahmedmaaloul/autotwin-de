@@ -99,7 +99,10 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="scrollbar-thin">
+      {/* shadcn's Sidebar primitives are unsemantic <div>s. The link list is the application's
+          primary navigation, so it gets a real landmark: screen-reader users can jump straight
+          to it, and "skip to content" behaviour works. */}
+      <SidebarContent className="scrollbar-thin" role="navigation" aria-label={t.nav.mainLabel}>
         {SECTIONS.map((section) => (
           <SidebarGroup key={section.label(t)}>
             <SidebarGroupLabel className="eyebrow">{section.label(t)}</SidebarGroupLabel>

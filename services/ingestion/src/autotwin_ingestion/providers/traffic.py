@@ -52,7 +52,7 @@ import asyncio
 import json
 import re
 from collections.abc import Iterable, Mapping, Sequence
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Final
@@ -293,8 +293,13 @@ class AutobahnTrafficProvider(TrafficProvider):
 
         requests = [(road, service) for road in self._roads for service in self._services]
         tasks = [self._load_service(road, service, failures) for road, service in requests]
-        for road, service, payload, mode in await asyncio.gather(*tasks):
+        # The oldest contributing payload sets the reported age: a result is only as fresh as
+        # its stalest part, and one live road must not make five cached ones look current.
+        oldest_fetch: datetime | None = None
+        for road, service, payload, mode, fetched_at in await asyncio.gather(*tasks):
             modes.add(mode)
+            if fetched_at is not None and (oldest_fetch is None or fetched_at < oldest_fetch):
+                oldest_fetch = fetched_at
             if payload is None:
                 continue
             effective_road = road
@@ -337,7 +342,9 @@ class AutobahnTrafficProvider(TrafficProvider):
             data=records,
             mode=mode,
             source_url=self._settings.autobahn_base_url.rstrip("/") + "/",
-            fetched_at=utc_now(),
+            # Never utc_now() unconditionally: a cached answer reports when it was really
+            # fetched, so /data-quality shows the true age instead of a comforting fiction.
+            fetched_at=oldest_fetch or utc_now(),
             warnings=warnings,
         )
 
@@ -345,7 +352,7 @@ class AutobahnTrafficProvider(TrafficProvider):
         """Fetch the index of road ids the API knows about, stripped of trailing whitespace."""
         url = self._settings.autobahn_base_url.rstrip("/") + "/"
         failures: list[str] = []
-        payload, mode = await self._load(
+        payload, mode, fetched_at = await self._load(
             url, _CACHE_NAMESPACE, "roads", AUTOBAHN_ROADS_FIXTURE, failures
         )
         if payload is None:
@@ -360,7 +367,7 @@ class AutobahnTrafficProvider(TrafficProvider):
             data=roads,
             mode=mode,
             source_url=url,
-            fetched_at=utc_now(),
+            fetched_at=fetched_at or utc_now(),
             warnings=failures,
         )
 
@@ -371,13 +378,15 @@ class AutobahnTrafficProvider(TrafficProvider):
         road: str,
         service: str,
         failures: list[str],
-    ) -> tuple[str, str, Mapping[str, Any] | None, ProviderMode]:
+    ) -> tuple[str, str, Mapping[str, Any] | None, ProviderMode, datetime | None]:
         """Load one ``(road, service)`` response through the fallback chain."""
         url = self._service_url(road, service)
         fixture = _FIXTURE_BY_SERVICE.get(service)
         async with self._semaphore:
-            payload, mode = await self._load(url, _CACHE_NAMESPACE, url, fixture, failures)
-        return road, service, payload, mode
+            payload, mode, fetched_at = await self._load(
+                url, _CACHE_NAMESPACE, url, fixture, failures
+            )
+        return road, service, payload, mode, fetched_at
 
     async def _load(
         self,
@@ -386,8 +395,15 @@ class AutobahnTrafficProvider(TrafficProvider):
         key: str,
         fixture_name: str | None,
         failures: list[str],
-    ) -> tuple[Mapping[str, Any] | None, ProviderMode]:
-        """Walk ``live → cache → fixture`` for one JSON endpoint."""
+    ) -> tuple[Mapping[str, Any] | None, ProviderMode, datetime | None]:
+        """Walk ``live → cache → fixture`` for one JSON endpoint.
+
+        Returns the payload, the mode that produced it, and **when that payload was actually
+        retrieved**. The third element is the point: a cached answer is not fresh, and reporting
+        ``utc_now()`` for it would make a six-hour-old roadworks list look like it arrived this
+        second — which is precisely the kind of quiet dishonesty this project exists not to do.
+        ``None`` means "unknown", which the caller renders as the cache age being unavailable.
+        """
         if self._data_mode is not DataMode.fixture:
             try:
                 payload = await self._client().get_json(url)
@@ -398,21 +414,25 @@ class AutobahnTrafficProvider(TrafficProvider):
             else:
                 if isinstance(payload, dict):
                     self._cache.set_json(namespace, key, payload)
-                    return payload, ProviderMode.live
+                    return payload, ProviderMode.live, utc_now()
                 msg = f"{url} returned {type(payload).__name__}, expected a JSON object"
                 raise InvalidSourceData(msg)
 
             cached = self._cache.get_json(namespace, key, allow_stale=True)
             if isinstance(cached, dict):
-                return cached, ProviderMode.cache
+                age_s = self._cache.age_seconds(namespace, key, suffix=".json")
+                cached_at = None if age_s is None else utc_now() - timedelta(seconds=age_s)
+                return cached, ProviderMode.cache, cached_at
 
+        # A bundled fixture has no meaningful retrieval time: it is a committed sample, not
+        # something that was fetched. Saying so is more useful than inventing a timestamp.
         if fixture_name is None:
-            return None, ProviderMode.fixture
+            return None, ProviderMode.fixture, None
         try:
             path = resolve_fixture(fixture_name)
         except FileNotFoundError:
-            return None, ProviderMode.fixture
-        return _read_json(path), ProviderMode.fixture
+            return None, ProviderMode.fixture, None
+        return _read_json(path), ProviderMode.fixture, None
 
     def _service_url(self, road: str, service: str) -> str:
         """Absolute URL of one road's service endpoint."""

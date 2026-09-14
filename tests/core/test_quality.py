@@ -122,9 +122,7 @@ class TestRules:
         assert rule(station(external_id="bnetza:other"), None) is None
 
     def test_monotonic_timestamps_per_vehicle(self) -> None:
-        rule = monotonic_timestamps(
-            key_fn=lambda r: r.vehicle_id, ts_fn=lambda r: r.recorded_at
-        )
+        rule = monotonic_timestamps(key_fn=lambda r: r.vehicle_id, ts_fn=lambda r: r.recorded_at)
         base = datetime(2026, 9, 14, 12, 0, tzinfo=UTC)
         assert rule(Reading("A", base, 90.0), None) is None
         assert rule(Reading("A", base + timedelta(seconds=1), 89.0), None) is None
@@ -146,11 +144,11 @@ class TestRecordValidator:
         )
         records = [
             station(),
-            station(external_id="b", operator=None),            # rejected: no operator
+            station(external_id="b", operator=None),  # rejected: no operator
             station(external_id="c", latitude=48.8566, longitude=2.3522),  # rejected: Paris
-            station(external_id="d", power_kw=-1.0),             # rejected: negative power
-            station(external_id="e"),                            # accepted
-            station(external_id="e"),                            # rejected: duplicate
+            station(external_id="d", power_kw=-1.0),  # rejected: negative power
+            station(external_id="e"),  # accepted
+            station(external_id="e"),  # rejected: duplicate
         ]
 
         accepted, report = validator.validate(records)
@@ -162,13 +160,18 @@ class TestRecordValidator:
         # partition the batch exactly: accepted + rejected + duplicate == received.
         assert report.rows_rejected == 3
         assert report.rows_duplicate == 1
-        assert report.rows_accepted + report.rows_rejected + report.rows_duplicate == report.rows_received
+        assert (
+            report.rows_accepted + report.rows_rejected + report.rows_duplicate
+            == report.rows_received
+        )
         assert report.acceptance_rate == pytest.approx(2 / 6)
         assert {violation.rule for violation in report.violations}
 
     def test_strict_mode_raises_when_the_source_changes_shape(self) -> None:
         """A collapse in acceptance rate means the file changed, not that the data got worse."""
-        validator = RecordValidator(rules=[required_field("operator")], strict=True, min_acceptance_rate=0.5)
+        validator = RecordValidator(
+            rules=[required_field("operator")], strict=True, min_acceptance_rate=0.5
+        )
         # Above `strict_min_rows`, otherwise the rate is statistically meaningless and the
         # validator deliberately stays quiet.
         records = [station(external_id=str(i), operator=None) for i in range(30)]
@@ -176,7 +179,9 @@ class TestRecordValidator:
             validator.validate(records)
 
     def test_strict_mode_stays_quiet_on_a_batch_too_small_to_judge(self) -> None:
-        validator = RecordValidator(rules=[required_field("operator")], strict=True, min_acceptance_rate=0.5)
+        validator = RecordValidator(
+            rules=[required_field("operator")], strict=True, min_acceptance_rate=0.5
+        )
         accepted, report = validator.validate(
             [station(external_id=str(i), operator=None) for i in range(5)]
         )
@@ -202,7 +207,9 @@ class TestRecordValidator:
 class TestQualityReport:
     def test_serialises_to_json_compatible_dict(self) -> None:
         report = QualityReport(rows_received=3, rows_accepted=2, rows_rejected=1, rows_duplicate=0)
-        report.record_violation(Violation(rule="required_field", field="operator", message="missing", row_index=1))
+        report.record_violation(
+            Violation(rule="required_field", field="operator", message="missing", row_index=1)
+        )
         payload = report.as_dict()
         import json
 
@@ -211,10 +218,14 @@ class TestQualityReport:
 
     def test_caps_stored_violations(self) -> None:
         """A catastrophic source file must not bloat the ingestion-run row."""
-        report = QualityReport(rows_received=10_000, rows_accepted=0, rows_rejected=10_000, rows_duplicate=0)
+        report = QualityReport(
+            rows_received=10_000, rows_accepted=0, rows_rejected=10_000, rows_duplicate=0
+        )
         for index in range(1_000):
             report.record_violation(
-                Violation(rule="required_field", field="operator", message="missing", row_index=index)
+                Violation(
+                    rule="required_field", field="operator", message="missing", row_index=index
+                )
             )
         payload = report.as_dict(max_violations=200)
         assert len(payload["violations"]) <= 200

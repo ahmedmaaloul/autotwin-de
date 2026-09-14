@@ -351,18 +351,40 @@ function segmentAriaLabel(
   return `${t.routes.segment} ${segment.ordinal + 1}, ${t.common.from} ${km} km, ${consumption} kWh/100 km, ${t.live.soc} ${soc} %`;
 }
 
-/** Round tick spacing so the axis reads 0, 50, 100 … rather than 0, 41, 82. */
+/**
+ * Round tick spacing so the axis reads 0, 50, 100 … rather than 0, 41, 82.
+ *
+ * The final tick is always the route's true length, because a reader checking "how long is
+ * this trip?" should find the answer on the axis. That means the last rounded tick can land
+ * close enough to it that the two labels overlap — 200 and 203 render as "20020" at typical
+ * widths — so a rounded tick within a third of a step of the end is dropped in its favour.
+ */
 function buildTicks(totalKm: number): number[] {
   if (totalKm <= 0) return [0];
   const target = 6;
   const raw = totalKm / target;
   const magnitude = 10 ** Math.floor(Math.log10(raw));
-  const step = [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => s >= raw) ?? magnitude * 10;
+  // Labels are whole kilometres, so a sub-kilometre step would round several ticks onto the
+  // same number: a 3 km route produced 0,1,1,2,2,3 — overlapping labels *and* duplicate React
+  // keys. One kilometre is the finest step the axis can actually render.
+  const step = Math.max(
+    1,
+    [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => s >= raw) ?? magnitude * 10,
+  );
+
+  const end = Math.round(totalKm);
+  const minSpacing = step / 3;
 
   const ticks: number[] = [];
-  for (let km = 0; km < totalKm; km += step) ticks.push(Math.round(km));
-  ticks.push(Math.round(totalKm));
-  return ticks;
+  for (let km = 0; km < totalKm; km += step) {
+    const value = Math.round(km);
+    if (value !== 0 && end - value < minSpacing) continue;
+    ticks.push(value);
+  }
+  ticks.push(end);
+  // Belt and braces: whatever the step, the rendered labels must be unique, because they are
+  // also the React keys.
+  return [...new Set(ticks)];
 }
 
 /**

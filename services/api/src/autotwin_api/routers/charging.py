@@ -730,6 +730,7 @@ async def coverage(
             "Provide route_slug or route_id to identify the corridor",
             details={"parameter": "route_slug"},
         )
+    await _publish_register_mode(session)
     results = await compute_corridor_coverage(
         session,
         route_id=route_id,

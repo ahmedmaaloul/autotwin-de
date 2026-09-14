@@ -557,9 +557,18 @@ async def compute_corridor_coverage(
         route_distance_km = float(head.route_distance_m) / 1000.0
         geometry_length_km = float(head.geometry_length_m) / 1000.0
         qualifying = int(head.qualifying_stations)
-        stations = None if head.stations_in_corridor is None else int(head.stations_in_corridor)
+        # When the candidate set was restricted by power, the rollup counted only the stations
+        # that could qualify. Reporting that number as "stations in corridor" would be a
+        # narrower fact wearing a wider name, so the totals are withheld instead.
+        stations = (
+            int(head.stations_in_corridor)
+            if count_all_stations and head.stations_in_corridor is not None
+            else None
+        )
         fast_stations = (
-            None if head.fast_stations_in_corridor is None else int(head.fast_stations_in_corridor)
+            int(head.fast_stations_in_corridor)
+            if count_all_stations and head.fast_stations_in_corridor is not None
+            else None
         )
         max_gap_km = float(head.max_gap_m) / 1000.0
         qualifying_per_100km = 100.0 * qualifying / route_distance_km

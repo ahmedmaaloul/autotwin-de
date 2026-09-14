@@ -138,9 +138,15 @@ class TestRoadClass:
 
 class TestTrafficSeverity:
     def test_delay_factor_increases_with_severity(self) -> None:
-        factors = [s.delay_factor for s in (
-            TrafficSeverity.low, TrafficSeverity.moderate, TrafficSeverity.high, TrafficSeverity.severe
-        )]
+        factors = [
+            s.delay_factor
+            for s in (
+                TrafficSeverity.low,
+                TrafficSeverity.moderate,
+                TrafficSeverity.high,
+                TrafficSeverity.severe,
+            )
+        ]
         assert factors == sorted(factors)
         # Free-flow traffic must not make a journey faster than the routing engine said.
         assert TrafficSeverity.low.delay_factor >= 1.0
