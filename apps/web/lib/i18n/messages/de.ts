@@ -974,6 +974,13 @@ export const de = {
       },
     },
   },
+  snapshot: {
+    title: "Statischer Demo-Snapshot vom {date}.",
+    body:
+      "Kein laufendes Backend: Alle Werte sind echte Ausgaben der Plattform zu diesem Zeitpunkt, darunter {stations} Ladestationen aus dem Ladesäulenregister. Aktionen wie Simulationssteuerung oder frei gewählte Strecken sind hier nicht verfügbar.",
+    explorerNote:
+      "Der Snapshot enthält die Schnellladestandorte (≥ 50 kW). Das vollständige Register erfordert ein laufendes Backend.",
+  },
 } as const;
 
 /**

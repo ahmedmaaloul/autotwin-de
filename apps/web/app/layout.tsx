@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
-import { cookies } from "next/headers";
 
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { LOCALE_COOKIE, LOCALE_TAGS, resolveLocale } from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, LOCALE_TAGS } from "@/lib/i18n/config";
 import { LocaleProvider } from "@/providers/locale-provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -67,21 +66,19 @@ export const viewport: Viewport = {
   ],
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
-  // The locale cookie is read on the server so `<html lang>` is correct on the first paint —
-  // no flash of the wrong language, and screen readers get the right pronunciation immediately.
-  const store = await cookies();
-  const locale = resolveLocale(store.get(LOCALE_COOKIE)?.value);
-
+export default function RootLayout({ children }: LayoutProps<"/">) {
+  // `lang` is rendered as the default and corrected on the client by LocaleProvider once the
+  // cookie is read. Resolving it here would need a request, and the hosted demo is a fully
+  // static export with no server — the same layout has to work in both worlds.
   return (
     <html
-      lang={LOCALE_TAGS[locale]}
+      lang={LOCALE_TAGS[DEFAULT_LOCALE]}
       className={`${plexSans.variable} ${plexMono.variable} ${plexCondensed.variable} h-full`}
       suppressHydrationWarning
     >
       <body className="bg-background text-foreground min-h-full font-sans antialiased">
         <ThemeProvider>
-          <LocaleProvider locale={locale}>
+          <LocaleProvider>
             <QueryProvider>
               <TooltipProvider delayDuration={200}>
                 {children}

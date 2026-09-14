@@ -36,10 +36,13 @@ export function renderWithProviders(
   { locale = "de", ...options }: RenderWithProvidersOptions = {},
 ): RenderResult {
   const client = createTestQueryClient();
+  // The provider resolves the locale from the cookie — there is no server in a static export —
+  // so a test picks a language exactly the way a browser does.
+  document.cookie = `autotwin_locale=${locale}; path=/`;
 
   function Wrapper({ children }: { children: ReactNode }): ReactElement {
     return (
-      <LocaleProvider locale={locale}>
+      <LocaleProvider>
         <QueryClientProvider client={client}>
           <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
         </QueryClientProvider>

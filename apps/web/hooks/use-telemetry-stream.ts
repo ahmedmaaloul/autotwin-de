@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { loadSnapshotVehicles, SNAPSHOT_ENABLED } from "@/lib/api/snapshot";
 import type { VehicleLive } from "@/types/domain";
 
 export type StreamStatus = "connecting" | "open" | "closed" | "error";
@@ -62,6 +63,22 @@ export function useTelemetryStream({
 
   useEffect(() => {
     if (!enabled) return;
+
+    // Static demo: there is no stream to subscribe to. Load the captured fleet once and report
+    // the connection as open; the positions are a snapshot and the site banner says so.
+    if (SNAPSHOT_ENABLED) {
+      let cancelled = false;
+      void loadSnapshotVehicles<VehicleLive>().then((fleet) => {
+        if (cancelled) return;
+        for (const vehicle of fleet) bufferRef.current.set(vehicle.vehicle_id, vehicle);
+        countRef.current += fleet.length;
+        setState((previous) => ({ ...previous, status: "open" }));
+        schedulePublish();
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
 
     const params = new URLSearchParams();
     if (bbox) params.set("bbox", bbox);

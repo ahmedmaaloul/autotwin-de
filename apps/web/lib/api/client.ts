@@ -14,13 +14,11 @@ import { DATA_MODE_HEADER, REQUEST_ID_HEADER } from "@/lib/constants";
  *    API origin out of the client bundle and removes CORS from the development loop.
  */
 
-export type DataMode = "live" | "cache" | "fixture";
+import { ApiError, isDataMode, type ApiResult, type DataMode } from "./errors";
+import { resolveSnapshot, SNAPSHOT_ENABLED } from "./snapshot";
 
-export interface ApiResult<T> {
-  data: T;
-  dataMode: DataMode | null;
-  requestId: string | null;
-}
+export { ApiError };
+export type { ApiResult, DataMode };
 
 interface ErrorEnvelope {
   error?: {
@@ -29,48 +27,6 @@ interface ErrorEnvelope {
     details?: Record<string, unknown>;
     request_id?: string;
   };
-}
-
-export class ApiError extends Error {
-  readonly status: number;
-  readonly code: string;
-  readonly details: Record<string, unknown>;
-  readonly requestId: string | null;
-
-  constructor(
-    status: number,
-    code: string,
-    message: string,
-    details: Record<string, unknown> = {},
-    requestId: string | null = null,
-  ) {
-    super(message);
-    this.name = "ApiError";
-    this.status = status;
-    this.code = code;
-    this.details = details;
-    this.requestId = requestId;
-  }
-
-  /**
-   * True when the backend told us an upstream source failed, rather than that we asked wrongly.
-   *
-   * `invalid_source_data` (502) belongs here: it means the source answered with something
-   * unparseable, which is a failure on their side. Treating it as a client error would show the
-   * reader "check your request" when the right message is "the source is having a bad day".
-   */
-  get isProviderFailure(): boolean {
-    return (
-      this.code === "provider_unavailable" ||
-      this.code === "provider_timeout" ||
-      this.code === "invalid_source_data" ||
-      this.code === "rate_limited"
-    );
-  }
-
-  get isNotFound(): boolean {
-    return this.status === 404;
-  }
 }
 
 /**
@@ -106,10 +62,6 @@ export function buildQuery(params: Record<string, QueryValue> = {}): string {
   return query ? `?${query}` : "";
 }
 
-function isDataMode(value: string | null): value is DataMode {
-  return value === "live" || value === "cache" || value === "fixture";
-}
-
 function mergeHeaders(hasBody: boolean, extra: HeadersInit | undefined): Headers {
   const merged = new Headers({ accept: "application/json" });
   if (hasBody) merged.set("content-type", "application/json");
@@ -133,6 +85,13 @@ export async function apiFetchWithMeta<T>(
   path: string,
   { json, timeoutMs = 30_000, headers, root = false, ...init }: ApiFetchInternalOptions = {},
 ): Promise<ApiResult<T>> {
+  // The hosted demo has no backend: answer from the dated static snapshot instead. Everything
+  // above this line (the typed error envelope, the data-mode header) behaves identically, so
+  // no component can tell the difference — except that every result says "fixture".
+  if (SNAPSHOT_ENABLED) {
+    return resolveSnapshot<T>(init.method ?? (json !== undefined ? "POST" : "GET"), path, root, json);
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 

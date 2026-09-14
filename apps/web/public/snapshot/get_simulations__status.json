@@ -1,0 +1,1 @@
+{"state":"pending","run_id":null,"vehicles_active":0,"events_per_second":0.0,"messages_processed":0,"db_writes":0,"errors":0,"transport":"database","kafka":{"connected":false,"bootstrap_servers":"localhost:19092","topics":["vehicle.telemetry.v1","vehicle.trip-events.v1","traffic.events.v1","charging.events.v1"]},"degraded_reason":null,"simulated_time":null,"last_error":null}

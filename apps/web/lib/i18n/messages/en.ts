@@ -968,4 +968,11 @@ export const en: Messages = {
       },
     },
   },
+  snapshot: {
+    title: "Static demo snapshot from {date}.",
+    body:
+      "No backend is running: every figure is a real output of the platform at that time, including {stations} charging stations from the federal register. Actions such as simulation control or free-text routes are not available here.",
+    explorerNote:
+      "The snapshot holds the fast-charging sites (≥ 50 kW). The full register needs a running backend.",
+  },
 };

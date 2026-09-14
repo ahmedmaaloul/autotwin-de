@@ -1,0 +1,3430 @@
+{
+  "captured_at": "2026-09-14T22:42:46.222371+00:00",
+  "api": "http://localhost:8000",
+  "entries": {
+    "get_root__health": {
+      "method": "GET",
+      "path": "/health",
+      "query": {},
+      "data_mode": null,
+      "bytes": 52
+    },
+    "get_root__ready": {
+      "method": "GET",
+      "path": "/ready",
+      "query": {},
+      "data_mode": null,
+      "bytes": 75
+    },
+    "get_dashboard__summary": {
+      "method": "GET",
+      "path": "/dashboard/summary",
+      "query": {},
+      "data_mode": null,
+      "bytes": 7545
+    },
+    "get_charging__stations_page=1&page_size=50": {
+      "method": "GET",
+      "path": "/charging/stations",
+      "query": {
+        "page": 1,
+        "page_size": 50
+      },
+      "data_mode": "live",
+      "bytes": 20736
+    },
+    "get_charging__stations__geojson": {
+      "method": "GET",
+      "path": "/charging/stations/geojson",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 6325140
+    },
+    "get_charging__statistics": {
+      "method": "GET",
+      "path": "/charging/statistics",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 4137
+    },
+    "get_charging__coverage_buffer_km=5&min_power_kw=150&route_slug=frankfurt-stuttgart": {
+      "method": "GET",
+      "path": "/charging/coverage",
+      "query": {
+        "route_slug": "frankfurt-stuttgart",
+        "buffer_km": 5,
+        "min_power_kw": 150
+      },
+      "data_mode": "live",
+      "bytes": 37090
+    },
+    "get_charging__coverage_buffer_km=5&min_power_kw=150&route_slug=frankfurt-muenchen": {
+      "method": "GET",
+      "path": "/charging/coverage",
+      "query": {
+        "route_slug": "frankfurt-muenchen",
+        "buffer_km": 5,
+        "min_power_kw": 150
+      },
+      "data_mode": "live",
+      "bytes": 60917
+    },
+    "get_charging__coverage_buffer_km=5&min_power_kw=150&route_slug=stuttgart-muenchen": {
+      "method": "GET",
+      "path": "/charging/coverage",
+      "query": {
+        "route_slug": "stuttgart-muenchen",
+        "buffer_km": 5,
+        "min_power_kw": 150
+      },
+      "data_mode": "live",
+      "bytes": 41361
+    },
+    "get_charging__coverage_buffer_km=5&min_power_kw=150&route_slug=muenchen-ingolstadt": {
+      "method": "GET",
+      "path": "/charging/coverage",
+      "query": {
+        "route_slug": "muenchen-ingolstadt",
+        "buffer_km": 5,
+        "min_power_kw": 150
+      },
+      "data_mode": "live",
+      "bytes": 23995
+    },
+    "get_charging__coverage_buffer_km=5&min_power_kw=150&route_slug=wolfsburg-berlin": {
+      "method": "GET",
+      "path": "/charging/coverage",
+      "query": {
+        "route_slug": "wolfsburg-berlin",
+        "buffer_km": 5,
+        "min_power_kw": 150
+      },
+      "data_mode": "live",
+      "bytes": 52087
+    },
+    "get_charging__underserved_corridor_buffer_km=5&max_gap_km=50&min_power_kw=150": {
+      "method": "GET",
+      "path": "/charging/underserved",
+      "query": {
+        "min_power_kw": 150,
+        "max_gap_km": 50,
+        "corridor_buffer_km": 5
+      },
+      "data_mode": "live",
+      "bytes": 1276
+    },
+    "charging_stations_shards": {
+      "method": "GET",
+      "path": "/charging/stations",
+      "query": {
+        "_sharded_by": "bundesland",
+        "is_fast_charger": true
+      },
+      "data_mode": null,
+      "bytes": 12724611
+    },
+    "get_charging__stations__10f5fc56-2cfc-4c7b-837e-e8bb578c077b": {
+      "method": "GET",
+      "path": "/charging/stations/10f5fc56-2cfc-4c7b-837e-e8bb578c077b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__1837b0a9-3c5e-4907-b918-10acb9b87730": {
+      "method": "GET",
+      "path": "/charging/stations/1837b0a9-3c5e-4907-b918-10acb9b87730",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__192f705f-ddbc-4190-a3fc-747e6a50be06": {
+      "method": "GET",
+      "path": "/charging/stations/192f705f-ddbc-4190-a3fc-747e6a50be06",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1057
+    },
+    "get_charging__stations__20ac6688-2fcf-46a7-9426-fdcb3a89f933": {
+      "method": "GET",
+      "path": "/charging/stations/20ac6688-2fcf-46a7-9426-fdcb3a89f933",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__253b190e-7a17-431e-b6b3-03f5cf9dfa27": {
+      "method": "GET",
+      "path": "/charging/stations/253b190e-7a17-431e-b6b3-03f5cf9dfa27",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__2c753514-cae0-4670-9b9a-99737308b63c": {
+      "method": "GET",
+      "path": "/charging/stations/2c753514-cae0-4670-9b9a-99737308b63c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__3a202556-30db-4e31-a907-6e48c12537e8": {
+      "method": "GET",
+      "path": "/charging/stations/3a202556-30db-4e31-a907-6e48c12537e8",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__4f7eea69-e8e7-483e-b53e-8e2bfe8a0964": {
+      "method": "GET",
+      "path": "/charging/stations/4f7eea69-e8e7-483e-b53e-8e2bfe8a0964",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__5952f22c-7f0f-4b46-b398-44a0dd1021a1": {
+      "method": "GET",
+      "path": "/charging/stations/5952f22c-7f0f-4b46-b398-44a0dd1021a1",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1058
+    },
+    "get_charging__stations__6954ee3a-6634-499b-a976-0d1389b2bd24": {
+      "method": "GET",
+      "path": "/charging/stations/6954ee3a-6634-499b-a976-0d1389b2bd24",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__6e08a8c9-c0a8-4d88-91c6-349b1e2200f1": {
+      "method": "GET",
+      "path": "/charging/stations/6e08a8c9-c0a8-4d88-91c6-349b1e2200f1",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__6e5dd255-024b-47a2-887d-54fb67d1699a": {
+      "method": "GET",
+      "path": "/charging/stations/6e5dd255-024b-47a2-887d-54fb67d1699a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__6f4f6a23-0c73-4317-844b-b2bcd7be28c2": {
+      "method": "GET",
+      "path": "/charging/stations/6f4f6a23-0c73-4317-844b-b2bcd7be28c2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__744dbb9d-9cdc-4e9f-b2c6-a14cf594b740": {
+      "method": "GET",
+      "path": "/charging/stations/744dbb9d-9cdc-4e9f-b2c6-a14cf594b740",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__869f54d1-b9da-43b4-80e6-7b17832aabb0": {
+      "method": "GET",
+      "path": "/charging/stations/869f54d1-b9da-43b4-80e6-7b17832aabb0",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__8f08044a-5f6b-4cb0-8a3c-4bc3c1484718": {
+      "method": "GET",
+      "path": "/charging/stations/8f08044a-5f6b-4cb0-8a3c-4bc3c1484718",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__8f6e6908-2381-4fd6-bdf4-f1940f50bc38": {
+      "method": "GET",
+      "path": "/charging/stations/8f6e6908-2381-4fd6-bdf4-f1940f50bc38",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__92518624-666d-4ecc-998c-fcc52441f7f2": {
+      "method": "GET",
+      "path": "/charging/stations/92518624-666d-4ecc-998c-fcc52441f7f2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__a8eddf66-2833-4064-ae29-5c7736958775": {
+      "method": "GET",
+      "path": "/charging/stations/a8eddf66-2833-4064-ae29-5c7736958775",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__b0f44afb-ee65-4345-9327-1621d3b3a3a8": {
+      "method": "GET",
+      "path": "/charging/stations/b0f44afb-ee65-4345-9327-1621d3b3a3a8",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__ba37761d-22ec-4288-ba88-98dfde15abad": {
+      "method": "GET",
+      "path": "/charging/stations/ba37761d-22ec-4288-ba88-98dfde15abad",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1058
+    },
+    "get_charging__stations__bfe5ebca-a1ce-4efb-a8c1-fb9a04408d2d": {
+      "method": "GET",
+      "path": "/charging/stations/bfe5ebca-a1ce-4efb-a8c1-fb9a04408d2d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__c770855e-27aa-40cf-8f1e-5fe640eb1495": {
+      "method": "GET",
+      "path": "/charging/stations/c770855e-27aa-40cf-8f1e-5fe640eb1495",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__c7edff28-8167-408b-a8e6-e3c7e8053257": {
+      "method": "GET",
+      "path": "/charging/stations/c7edff28-8167-408b-a8e6-e3c7e8053257",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__c87a0b6e-b8bf-437e-bcc6-3099a226af94": {
+      "method": "GET",
+      "path": "/charging/stations/c87a0b6e-b8bf-437e-bcc6-3099a226af94",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__cc6d450f-fade-47ce-a863-0ced42fecdcf": {
+      "method": "GET",
+      "path": "/charging/stations/cc6d450f-fade-47ce-a863-0ced42fecdcf",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__cd1bb680-efe7-4fc2-9f7d-ad8df630d34e": {
+      "method": "GET",
+      "path": "/charging/stations/cd1bb680-efe7-4fc2-9f7d-ad8df630d34e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__cd9eb632-9c67-4e64-867d-7bb1a6005ddc": {
+      "method": "GET",
+      "path": "/charging/stations/cd9eb632-9c67-4e64-867d-7bb1a6005ddc",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1057
+    },
+    "get_charging__stations__da18323a-b417-4648-8412-75ffec8b4fde": {
+      "method": "GET",
+      "path": "/charging/stations/da18323a-b417-4648-8412-75ffec8b4fde",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__ec209f05-e434-469e-8de3-ce0f67f6b559": {
+      "method": "GET",
+      "path": "/charging/stations/ec209f05-e434-469e-8de3-ce0f67f6b559",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__fac01685-b15e-477f-a332-c3e4541ae40f": {
+      "method": "GET",
+      "path": "/charging/stations/fac01685-b15e-477f-a332-c3e4541ae40f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__f9d2af1e-5a98-4957-ab7c-8eb8fc632bc7": {
+      "method": "GET",
+      "path": "/charging/stations/f9d2af1e-5a98-4957-ab7c-8eb8fc632bc7",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 958
+    },
+    "get_charging__stations__0e09cd8a-f4ed-43a2-a5e4-7ea27b657d55": {
+      "method": "GET",
+      "path": "/charging/stations/0e09cd8a-f4ed-43a2-a5e4-7ea27b657d55",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__211c7d11-70f9-41d9-a79a-2c1cef5dae2e": {
+      "method": "GET",
+      "path": "/charging/stations/211c7d11-70f9-41d9-a79a-2c1cef5dae2e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__5291b66e-eaf1-444a-a826-b6a69679e2a4": {
+      "method": "GET",
+      "path": "/charging/stations/5291b66e-eaf1-444a-a826-b6a69679e2a4",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__96f877df-e197-43e4-b1c9-cc80e5f42d44": {
+      "method": "GET",
+      "path": "/charging/stations/96f877df-e197-43e4-b1c9-cc80e5f42d44",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__e166759b-faac-4a97-81fa-46e508f073b7": {
+      "method": "GET",
+      "path": "/charging/stations/e166759b-faac-4a97-81fa-46e508f073b7",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1196
+    },
+    "get_charging__stations__2a81c5d5-5a87-4ca4-bb5c-7eff830ac839": {
+      "method": "GET",
+      "path": "/charging/stations/2a81c5d5-5a87-4ca4-bb5c-7eff830ac839",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__5ab4f857-7f11-4d5e-a7f9-9fa23ff45a24": {
+      "method": "GET",
+      "path": "/charging/stations/5ab4f857-7f11-4d5e-a7f9-9fa23ff45a24",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1186
+    },
+    "get_charging__stations__caada989-5442-4fe7-a6b7-f8e7f4e66b70": {
+      "method": "GET",
+      "path": "/charging/stations/caada989-5442-4fe7-a6b7-f8e7f4e66b70",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__d42bc659-7ec2-4c6e-bfc5-50cb4cb7ac36": {
+      "method": "GET",
+      "path": "/charging/stations/d42bc659-7ec2-4c6e-bfc5-50cb4cb7ac36",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__172778ab-7948-4ffe-9351-d98444f1a540": {
+      "method": "GET",
+      "path": "/charging/stations/172778ab-7948-4ffe-9351-d98444f1a540",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 949
+    },
+    "get_charging__stations__18acad8f-3268-41c8-8775-a6a772c9e039": {
+      "method": "GET",
+      "path": "/charging/stations/18acad8f-3268-41c8-8775-a6a772c9e039",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 949
+    },
+    "get_charging__stations__200bc79e-c25f-48a2-afaa-4bb80f4442d3": {
+      "method": "GET",
+      "path": "/charging/stations/200bc79e-c25f-48a2-afaa-4bb80f4442d3",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 949
+    },
+    "get_charging__stations__217c03ba-4d9f-4ac7-8049-ec3b44dc9f6e": {
+      "method": "GET",
+      "path": "/charging/stations/217c03ba-4d9f-4ac7-8049-ec3b44dc9f6e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 949
+    },
+    "get_charging__stations__44a936e6-f48c-4540-864f-0058fca2938c": {
+      "method": "GET",
+      "path": "/charging/stations/44a936e6-f48c-4540-864f-0058fca2938c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 949
+    },
+    "get_charging__stations__6c955c3d-3867-47df-a9e9-e7d3725bb450": {
+      "method": "GET",
+      "path": "/charging/stations/6c955c3d-3867-47df-a9e9-e7d3725bb450",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 949
+    },
+    "get_charging__stations__94a56337-2a52-4873-b3ff-f8e2fd4a7767": {
+      "method": "GET",
+      "path": "/charging/stations/94a56337-2a52-4873-b3ff-f8e2fd4a7767",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 949
+    },
+    "get_charging__stations__a052eb49-4ae9-4e5b-a032-1f5fa720c024": {
+      "method": "GET",
+      "path": "/charging/stations/a052eb49-4ae9-4e5b-a032-1f5fa720c024",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 938
+    },
+    "get_charging__stations__c6abf7e6-76b8-43d3-8b63-b6841f5001b9": {
+      "method": "GET",
+      "path": "/charging/stations/c6abf7e6-76b8-43d3-8b63-b6841f5001b9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__d1453306-16e7-43e2-af30-cd88cdfd9fdf": {
+      "method": "GET",
+      "path": "/charging/stations/d1453306-16e7-43e2-af30-cd88cdfd9fdf",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 938
+    },
+    "get_charging__stations__e6fbc441-1718-45d6-9d6b-dffe1da9ad30": {
+      "method": "GET",
+      "path": "/charging/stations/e6fbc441-1718-45d6-9d6b-dffe1da9ad30",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 938
+    },
+    "get_charging__stations__fd4c4234-53de-4f56-9333-114727d19fca": {
+      "method": "GET",
+      "path": "/charging/stations/fd4c4234-53de-4f56-9333-114727d19fca",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 949
+    },
+    "get_charging__stations__1c71e247-66eb-4d76-9ca7-46a1ed54c4db": {
+      "method": "GET",
+      "path": "/charging/stations/1c71e247-66eb-4d76-9ca7-46a1ed54c4db",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1318
+    },
+    "get_charging__stations__753a9174-fcfb-4d36-8307-51ca1361d2a9": {
+      "method": "GET",
+      "path": "/charging/stations/753a9174-fcfb-4d36-8307-51ca1361d2a9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1318
+    },
+    "get_charging__stations__7c756a9b-ecee-419f-87e0-3e4527392a28": {
+      "method": "GET",
+      "path": "/charging/stations/7c756a9b-ecee-419f-87e0-3e4527392a28",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1318
+    },
+    "get_charging__stations__85290e4a-ef95-48be-a361-dba8ade41e60": {
+      "method": "GET",
+      "path": "/charging/stations/85290e4a-ef95-48be-a361-dba8ade41e60",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1298
+    },
+    "get_charging__stations__9f1bdd6b-2e27-4cf2-95b9-d4e882b6e928": {
+      "method": "GET",
+      "path": "/charging/stations/9f1bdd6b-2e27-4cf2-95b9-d4e882b6e928",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1318
+    },
+    "get_charging__stations__e66e4a70-ac6d-4c88-a9eb-e3c504c6cf7b": {
+      "method": "GET",
+      "path": "/charging/stations/e66e4a70-ac6d-4c88-a9eb-e3c504c6cf7b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1312
+    },
+    "get_charging__stations__e900ac7c-948f-4008-a027-52d980081e35": {
+      "method": "GET",
+      "path": "/charging/stations/e900ac7c-948f-4008-a027-52d980081e35",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1318
+    },
+    "get_charging__stations__a7fc2ebf-d466-4ce8-a9f2-c3c1b528945c": {
+      "method": "GET",
+      "path": "/charging/stations/a7fc2ebf-d466-4ce8-a9f2-c3c1b528945c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1072
+    },
+    "get_charging__stations__d7dea42b-462f-45c1-8844-a29cfe216213": {
+      "method": "GET",
+      "path": "/charging/stations/d7dea42b-462f-45c1-8844-a29cfe216213",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1072
+    },
+    "get_charging__stations__0034583e-18e1-4036-a9d0-a5ead28d17da": {
+      "method": "GET",
+      "path": "/charging/stations/0034583e-18e1-4036-a9d0-a5ead28d17da",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__003993f9-73db-487e-ad1f-48206e259818": {
+      "method": "GET",
+      "path": "/charging/stations/003993f9-73db-487e-ad1f-48206e259818",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__00457a98-723b-4639-8e7a-df63270c7360": {
+      "method": "GET",
+      "path": "/charging/stations/00457a98-723b-4639-8e7a-df63270c7360",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1080
+    },
+    "get_charging__stations__00461fa5-528b-46cf-a23a-00a7a528723b": {
+      "method": "GET",
+      "path": "/charging/stations/00461fa5-528b-46cf-a23a-00a7a528723b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__0069773b-00d7-4c1a-b205-14709a27a290": {
+      "method": "GET",
+      "path": "/charging/stations/0069773b-00d7-4c1a-b205-14709a27a290",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__0080e54b-5270-4d80-ba45-5eb68b0904d8": {
+      "method": "GET",
+      "path": "/charging/stations/0080e54b-5270-4d80-ba45-5eb68b0904d8",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__0081fe4a-eea5-4378-a960-0f8f1613c86f": {
+      "method": "GET",
+      "path": "/charging/stations/0081fe4a-eea5-4378-a960-0f8f1613c86f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__008eae1f-8823-45f5-8b72-16cf52843314": {
+      "method": "GET",
+      "path": "/charging/stations/008eae1f-8823-45f5-8b72-16cf52843314",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__008f08a2-8f63-40a7-887a-714c19ec5d1b": {
+      "method": "GET",
+      "path": "/charging/stations/008f08a2-8f63-40a7-887a-714c19ec5d1b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__009e509b-c114-4a33-bf6a-f21efd1a949e": {
+      "method": "GET",
+      "path": "/charging/stations/009e509b-c114-4a33-bf6a-f21efd1a949e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1056
+    },
+    "get_charging__stations__00aa6ebe-deaa-41e9-92de-e5e2a39989bd": {
+      "method": "GET",
+      "path": "/charging/stations/00aa6ebe-deaa-41e9-92de-e5e2a39989bd",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__00c0cde1-8486-43ec-8eb4-21087de85ce0": {
+      "method": "GET",
+      "path": "/charging/stations/00c0cde1-8486-43ec-8eb4-21087de85ce0",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1088
+    },
+    "get_charging__stations__010b7b4b-7721-438a-b0ff-ea0833dcad13": {
+      "method": "GET",
+      "path": "/charging/stations/010b7b4b-7721-438a-b0ff-ea0833dcad13",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__011a06e4-ba62-426b-a0e2-2d4216423306": {
+      "method": "GET",
+      "path": "/charging/stations/011a06e4-ba62-426b-a0e2-2d4216423306",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1086
+    },
+    "get_charging__stations__012a93b1-beab-401a-8692-8d1bd6f28b66": {
+      "method": "GET",
+      "path": "/charging/stations/012a93b1-beab-401a-8692-8d1bd6f28b66",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__013286df-dedc-42e7-973b-baa4bc829d56": {
+      "method": "GET",
+      "path": "/charging/stations/013286df-dedc-42e7-973b-baa4bc829d56",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__014f10d3-c17b-4405-8d09-7c92ce2e6559": {
+      "method": "GET",
+      "path": "/charging/stations/014f10d3-c17b-4405-8d09-7c92ce2e6559",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1072
+    },
+    "get_charging__stations__015a74fe-9f35-4570-989d-4c8faa71fdb9": {
+      "method": "GET",
+      "path": "/charging/stations/015a74fe-9f35-4570-989d-4c8faa71fdb9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1054
+    },
+    "get_charging__stations__016a41e2-1bdc-4a52-b636-b8d84aadc2be": {
+      "method": "GET",
+      "path": "/charging/stations/016a41e2-1bdc-4a52-b636-b8d84aadc2be",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1072
+    },
+    "get_charging__stations__01897486-74f6-46b5-9ec5-4e5760643cfa": {
+      "method": "GET",
+      "path": "/charging/stations/01897486-74f6-46b5-9ec5-4e5760643cfa",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1053
+    },
+    "get_charging__stations__0191cfed-9c77-4cad-9636-d5d90944172a": {
+      "method": "GET",
+      "path": "/charging/stations/0191cfed-9c77-4cad-9636-d5d90944172a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1072
+    },
+    "get_charging__stations__019fa32b-01b8-4e68-b7e0-b93453827458": {
+      "method": "GET",
+      "path": "/charging/stations/019fa32b-01b8-4e68-b7e0-b93453827458",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__01a4e736-d71b-496c-96c1-dc577b4fa4f2": {
+      "method": "GET",
+      "path": "/charging/stations/01a4e736-d71b-496c-96c1-dc577b4fa4f2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__01cb98b0-f16d-4cbe-8db6-68672f6fc560": {
+      "method": "GET",
+      "path": "/charging/stations/01cb98b0-f16d-4cbe-8db6-68672f6fc560",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1059
+    },
+    "get_charging__stations__022dc69b-1b16-4910-914d-5f2fd18015ff": {
+      "method": "GET",
+      "path": "/charging/stations/022dc69b-1b16-4910-914d-5f2fd18015ff",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__023cf42f-71f1-4b31-a799-3e6317bc3003": {
+      "method": "GET",
+      "path": "/charging/stations/023cf42f-71f1-4b31-a799-3e6317bc3003",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1193
+    },
+    "get_charging__stations__02428c32-5911-49f0-bb47-3ebfb4254b0b": {
+      "method": "GET",
+      "path": "/charging/stations/02428c32-5911-49f0-bb47-3ebfb4254b0b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__0282eab5-887e-43fd-a8ad-fb22c9be6c75": {
+      "method": "GET",
+      "path": "/charging/stations/0282eab5-887e-43fd-a8ad-fb22c9be6c75",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__02d990d6-db70-462e-8604-18dc7df4de7d": {
+      "method": "GET",
+      "path": "/charging/stations/02d990d6-db70-462e-8604-18dc7df4de7d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1059
+    },
+    "get_charging__stations__02e07109-67b9-49f5-9c0b-e841dd1a5ed7": {
+      "method": "GET",
+      "path": "/charging/stations/02e07109-67b9-49f5-9c0b-e841dd1a5ed7",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1082
+    },
+    "get_charging__stations__02e2795a-9b8f-498e-932f-db13c28c1b62": {
+      "method": "GET",
+      "path": "/charging/stations/02e2795a-9b8f-498e-932f-db13c28c1b62",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1074
+    },
+    "get_charging__stations__0307dd51-58f5-4d16-b949-18093690fde9": {
+      "method": "GET",
+      "path": "/charging/stations/0307dd51-58f5-4d16-b949-18093690fde9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1057
+    },
+    "get_charging__stations__033eed3f-85c2-4db5-b3c0-be3c5a7a4467": {
+      "method": "GET",
+      "path": "/charging/stations/033eed3f-85c2-4db5-b3c0-be3c5a7a4467",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__036eae88-09e7-4ac1-8e10-cfe18382a516": {
+      "method": "GET",
+      "path": "/charging/stations/036eae88-09e7-4ac1-8e10-cfe18382a516",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__0389f10f-c86e-4f49-8bb3-a32a5aa69b0d": {
+      "method": "GET",
+      "path": "/charging/stations/0389f10f-c86e-4f49-8bb3-a32a5aa69b0d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__03b3c464-782d-429e-a30c-5326534b7793": {
+      "method": "GET",
+      "path": "/charging/stations/03b3c464-782d-429e-a30c-5326534b7793",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1056
+    },
+    "get_charging__stations__03c7f5f0-0387-4d8b-ae5b-ef3fcd822702": {
+      "method": "GET",
+      "path": "/charging/stations/03c7f5f0-0387-4d8b-ae5b-ef3fcd822702",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1091
+    },
+    "get_charging__stations__03cb8d3c-adb1-4987-819c-def5ee52bc05": {
+      "method": "GET",
+      "path": "/charging/stations/03cb8d3c-adb1-4987-819c-def5ee52bc05",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__03dafd9a-9136-4f0f-b26d-da0ca628102f": {
+      "method": "GET",
+      "path": "/charging/stations/03dafd9a-9136-4f0f-b26d-da0ca628102f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__03e3862f-227b-4da7-bb79-bc98087476cf": {
+      "method": "GET",
+      "path": "/charging/stations/03e3862f-227b-4da7-bb79-bc98087476cf",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1060
+    },
+    "get_charging__stations__042c4ac6-c340-431d-aace-3afba1927f22": {
+      "method": "GET",
+      "path": "/charging/stations/042c4ac6-c340-431d-aace-3afba1927f22",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__044891b7-6330-420c-a568-75f8413feb73": {
+      "method": "GET",
+      "path": "/charging/stations/044891b7-6330-420c-a568-75f8413feb73",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__045642f5-84b6-493a-8338-7d6ce1630c8c": {
+      "method": "GET",
+      "path": "/charging/stations/045642f5-84b6-493a-8338-7d6ce1630c8c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__045dc5ac-d7de-4bb4-a517-94d7ee8c6257": {
+      "method": "GET",
+      "path": "/charging/stations/045dc5ac-d7de-4bb4-a517-94d7ee8c6257",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__0464f9da-a490-483a-9e8c-759aaae5a6b5": {
+      "method": "GET",
+      "path": "/charging/stations/0464f9da-a490-483a-9e8c-759aaae5a6b5",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1084
+    },
+    "get_charging__stations__046d07f9-a42b-48b4-9b79-59025dc6d6b0": {
+      "method": "GET",
+      "path": "/charging/stations/046d07f9-a42b-48b4-9b79-59025dc6d6b0",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__047a7f37-b9ab-422a-a9a3-f2f267783093": {
+      "method": "GET",
+      "path": "/charging/stations/047a7f37-b9ab-422a-a9a3-f2f267783093",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1059
+    },
+    "get_charging__stations__048986fc-c7a1-4e84-8980-1e80d7820edc": {
+      "method": "GET",
+      "path": "/charging/stations/048986fc-c7a1-4e84-8980-1e80d7820edc",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1079
+    },
+    "get_charging__stations__0492bb16-a29d-496f-9340-4f6074d3a1ad": {
+      "method": "GET",
+      "path": "/charging/stations/0492bb16-a29d-496f-9340-4f6074d3a1ad",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__04a7f1c1-1eda-434d-a071-d218c35f13ce": {
+      "method": "GET",
+      "path": "/charging/stations/04a7f1c1-1eda-434d-a071-d218c35f13ce",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1087
+    },
+    "get_charging__stations__04bd8247-0da8-4d20-8563-4bf7ee145216": {
+      "method": "GET",
+      "path": "/charging/stations/04bd8247-0da8-4d20-8563-4bf7ee145216",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__04f132ae-4c18-4286-8d4d-60ca89591c0d": {
+      "method": "GET",
+      "path": "/charging/stations/04f132ae-4c18-4286-8d4d-60ca89591c0d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1080
+    },
+    "get_charging__stations__052cee70-4a3b-44cd-9271-4185a7c3a54b": {
+      "method": "GET",
+      "path": "/charging/stations/052cee70-4a3b-44cd-9271-4185a7c3a54b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1077
+    },
+    "get_charging__stations__054090fc-8b38-4129-b91a-37fdfdd2ad48": {
+      "method": "GET",
+      "path": "/charging/stations/054090fc-8b38-4129-b91a-37fdfdd2ad48",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__0543ecdf-e529-4562-a1d6-8471b1140511": {
+      "method": "GET",
+      "path": "/charging/stations/0543ecdf-e529-4562-a1d6-8471b1140511",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1101
+    },
+    "get_charging__stations__0549c1d8-c963-4db3-9b91-6b9f10d81b1a": {
+      "method": "GET",
+      "path": "/charging/stations/0549c1d8-c963-4db3-9b91-6b9f10d81b1a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__05808edd-30c7-4b90-ac94-996f0ee3a2dc": {
+      "method": "GET",
+      "path": "/charging/stations/05808edd-30c7-4b90-ac94-996f0ee3a2dc",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1062
+    },
+    "get_charging__stations__059ab1bf-0d39-4905-8e31-e14355f5f5e7": {
+      "method": "GET",
+      "path": "/charging/stations/059ab1bf-0d39-4905-8e31-e14355f5f5e7",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1060
+    },
+    "get_charging__stations__05ed07b2-93b6-4aae-bb81-6ab31667a5fc": {
+      "method": "GET",
+      "path": "/charging/stations/05ed07b2-93b6-4aae-bb81-6ab31667a5fc",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1091
+    },
+    "get_charging__stations__05fd4c1f-b150-4260-bbeb-50547ff042b4": {
+      "method": "GET",
+      "path": "/charging/stations/05fd4c1f-b150-4260-bbeb-50547ff042b4",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__05fdb6df-8d6d-49e0-bcf3-f40a67002c7b": {
+      "method": "GET",
+      "path": "/charging/stations/05fdb6df-8d6d-49e0-bcf3-f40a67002c7b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1067
+    },
+    "get_charging__stations__060033a7-ff2b-4eed-bbc1-6ee0630c693d": {
+      "method": "GET",
+      "path": "/charging/stations/060033a7-ff2b-4eed-bbc1-6ee0630c693d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__0600cf71-6304-4fb1-9afd-ffd530ae2b72": {
+      "method": "GET",
+      "path": "/charging/stations/0600cf71-6304-4fb1-9afd-ffd530ae2b72",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1091
+    },
+    "get_charging__stations__06154686-1560-4688-9783-d24dc1ca843c": {
+      "method": "GET",
+      "path": "/charging/stations/06154686-1560-4688-9783-d24dc1ca843c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__0685ed4d-9605-4bf2-ac5c-7c08c4a59527": {
+      "method": "GET",
+      "path": "/charging/stations/0685ed4d-9605-4bf2-ac5c-7c08c4a59527",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1095
+    },
+    "get_charging__stations__06a125b9-6f1d-4dde-98b6-c991f48af907": {
+      "method": "GET",
+      "path": "/charging/stations/06a125b9-6f1d-4dde-98b6-c991f48af907",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__06a82bf2-02fc-4e62-ac9a-0bc74a6b4589": {
+      "method": "GET",
+      "path": "/charging/stations/06a82bf2-02fc-4e62-ac9a-0bc74a6b4589",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__06d83a5e-86c1-40c2-84c9-7632fd0f56e5": {
+      "method": "GET",
+      "path": "/charging/stations/06d83a5e-86c1-40c2-84c9-7632fd0f56e5",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__06ff1d86-0413-4874-88f9-f600cb54ffcb": {
+      "method": "GET",
+      "path": "/charging/stations/06ff1d86-0413-4874-88f9-f600cb54ffcb",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1099
+    },
+    "get_charging__stations__07229d29-6b9f-4140-8f44-12cc8d5686a8": {
+      "method": "GET",
+      "path": "/charging/stations/07229d29-6b9f-4140-8f44-12cc8d5686a8",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1062
+    },
+    "get_charging__stations__073519cb-6cad-4da8-b08b-bfe0e9f9a41a": {
+      "method": "GET",
+      "path": "/charging/stations/073519cb-6cad-4da8-b08b-bfe0e9f9a41a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1088
+    },
+    "get_charging__stations__0736ec03-5cf0-4d16-92fb-09f62d7a3a73": {
+      "method": "GET",
+      "path": "/charging/stations/0736ec03-5cf0-4d16-92fb-09f62d7a3a73",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1082
+    },
+    "get_charging__stations__073c0a65-d3d4-481f-bbe9-6d6f89da50f2": {
+      "method": "GET",
+      "path": "/charging/stations/073c0a65-d3d4-481f-bbe9-6d6f89da50f2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1074
+    },
+    "get_charging__stations__0754b308-d410-4388-a2f3-1aa7986ede6d": {
+      "method": "GET",
+      "path": "/charging/stations/0754b308-d410-4388-a2f3-1aa7986ede6d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1086
+    },
+    "get_charging__stations__077cdf55-1d25-489a-90ed-84dd8b904e13": {
+      "method": "GET",
+      "path": "/charging/stations/077cdf55-1d25-489a-90ed-84dd8b904e13",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__077f8a91-8b60-4e96-8ad9-bdb4f38018fe": {
+      "method": "GET",
+      "path": "/charging/stations/077f8a91-8b60-4e96-8ad9-bdb4f38018fe",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__078041fa-bc6b-4395-b7de-ebfad54c16c1": {
+      "method": "GET",
+      "path": "/charging/stations/078041fa-bc6b-4395-b7de-ebfad54c16c1",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__08385b7f-b13c-4c53-8b66-2cfa435d3e3e": {
+      "method": "GET",
+      "path": "/charging/stations/08385b7f-b13c-4c53-8b66-2cfa435d3e3e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1059
+    },
+    "get_charging__stations__086951d6-6c92-4ccc-95e0-e77dee5b1bbc": {
+      "method": "GET",
+      "path": "/charging/stations/086951d6-6c92-4ccc-95e0-e77dee5b1bbc",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__08b2af48-c7da-4573-97eb-4c4d147bc28c": {
+      "method": "GET",
+      "path": "/charging/stations/08b2af48-c7da-4573-97eb-4c4d147bc28c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__08c16adf-ef5c-49c7-b56a-0c00712f8885": {
+      "method": "GET",
+      "path": "/charging/stations/08c16adf-ef5c-49c7-b56a-0c00712f8885",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__08f02710-2ed0-4245-b2e6-7d793fbbca84": {
+      "method": "GET",
+      "path": "/charging/stations/08f02710-2ed0-4245-b2e6-7d793fbbca84",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1060
+    },
+    "get_charging__stations__09104581-71d9-4a48-8a15-50d2a3a472f2": {
+      "method": "GET",
+      "path": "/charging/stations/09104581-71d9-4a48-8a15-50d2a3a472f2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1091
+    },
+    "get_charging__stations__09519139-2045-483a-afa1-6af985048b34": {
+      "method": "GET",
+      "path": "/charging/stations/09519139-2045-483a-afa1-6af985048b34",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1058
+    },
+    "get_charging__stations__097d72a5-978f-4e13-b64f-f49af7372d02": {
+      "method": "GET",
+      "path": "/charging/stations/097d72a5-978f-4e13-b64f-f49af7372d02",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1052
+    },
+    "get_charging__stations__099362e4-f2ab-4aaf-b541-9aad90472c36": {
+      "method": "GET",
+      "path": "/charging/stations/099362e4-f2ab-4aaf-b541-9aad90472c36",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1085
+    },
+    "get_charging__stations__09a1f722-d3d6-4e96-bf95-41b5c891a4c6": {
+      "method": "GET",
+      "path": "/charging/stations/09a1f722-d3d6-4e96-bf95-41b5c891a4c6",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1079
+    },
+    "get_charging__stations__09bb93d0-259c-4195-bd58-39646ca47123": {
+      "method": "GET",
+      "path": "/charging/stations/09bb93d0-259c-4195-bd58-39646ca47123",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1076
+    },
+    "get_charging__stations__09d1820d-1c30-490d-8fbe-5eda558dc876": {
+      "method": "GET",
+      "path": "/charging/stations/09d1820d-1c30-490d-8fbe-5eda558dc876",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__09f4bb00-7bdc-48c6-8329-d91dd2b02f55": {
+      "method": "GET",
+      "path": "/charging/stations/09f4bb00-7bdc-48c6-8329-d91dd2b02f55",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1062
+    },
+    "get_charging__stations__09f6a869-7f7d-4537-9380-8caf2f155da4": {
+      "method": "GET",
+      "path": "/charging/stations/09f6a869-7f7d-4537-9380-8caf2f155da4",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1098
+    },
+    "get_charging__stations__09fd6933-8308-4220-a91d-ee8a94104611": {
+      "method": "GET",
+      "path": "/charging/stations/09fd6933-8308-4220-a91d-ee8a94104611",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1074
+    },
+    "get_charging__stations__0a08a053-0401-44c4-85ba-4ae5108a8273": {
+      "method": "GET",
+      "path": "/charging/stations/0a08a053-0401-44c4-85ba-4ae5108a8273",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1087
+    },
+    "get_charging__stations__0a272c03-4c43-4b0f-a1c9-894d342db038": {
+      "method": "GET",
+      "path": "/charging/stations/0a272c03-4c43-4b0f-a1c9-894d342db038",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__0a3fe5bd-2320-49f1-8bd0-a1b69c3896ca": {
+      "method": "GET",
+      "path": "/charging/stations/0a3fe5bd-2320-49f1-8bd0-a1b69c3896ca",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1081
+    },
+    "get_charging__stations__0a4cba0b-04e4-48b6-9b27-305b241daa68": {
+      "method": "GET",
+      "path": "/charging/stations/0a4cba0b-04e4-48b6-9b27-305b241daa68",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__0aaa7daa-54b4-4ec6-a5ca-5eaad4e7d68b": {
+      "method": "GET",
+      "path": "/charging/stations/0aaa7daa-54b4-4ec6-a5ca-5eaad4e7d68b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__0ad46d26-408d-4ced-9084-fa5f7ec24f4f": {
+      "method": "GET",
+      "path": "/charging/stations/0ad46d26-408d-4ced-9084-fa5f7ec24f4f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1056
+    },
+    "get_charging__stations__0aebb1ad-b86c-416b-ab4a-dc5f6656d4f5": {
+      "method": "GET",
+      "path": "/charging/stations/0aebb1ad-b86c-416b-ab4a-dc5f6656d4f5",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__0b0e1c30-2c16-4d1e-9eec-bae3ad2a7e02": {
+      "method": "GET",
+      "path": "/charging/stations/0b0e1c30-2c16-4d1e-9eec-bae3ad2a7e02",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1056
+    },
+    "get_charging__stations__0b4ef071-dac8-4dcd-b5da-49d9f0238875": {
+      "method": "GET",
+      "path": "/charging/stations/0b4ef071-dac8-4dcd-b5da-49d9f0238875",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1092
+    },
+    "get_charging__stations__0b887ec2-47a1-4cd2-8218-92da7d1bee9f": {
+      "method": "GET",
+      "path": "/charging/stations/0b887ec2-47a1-4cd2-8218-92da7d1bee9f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1081
+    },
+    "get_charging__stations__0b88dbd9-f862-4d1c-8634-8e8288de381a": {
+      "method": "GET",
+      "path": "/charging/stations/0b88dbd9-f862-4d1c-8634-8e8288de381a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__0b8a5c7d-5b27-42aa-8d85-e7cb41d8c574": {
+      "method": "GET",
+      "path": "/charging/stations/0b8a5c7d-5b27-42aa-8d85-e7cb41d8c574",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__0b99a749-c408-4100-b836-429f01a153cb": {
+      "method": "GET",
+      "path": "/charging/stations/0b99a749-c408-4100-b836-429f01a153cb",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__0b9a2d13-7949-44d4-8dcb-18b29d4b7346": {
+      "method": "GET",
+      "path": "/charging/stations/0b9a2d13-7949-44d4-8dcb-18b29d4b7346",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__0bbd8355-8a52-4893-af4b-6527dfaefc30": {
+      "method": "GET",
+      "path": "/charging/stations/0bbd8355-8a52-4893-af4b-6527dfaefc30",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1077
+    },
+    "get_charging__stations__0bc1bec4-65ca-4454-9d28-e34c76436fe7": {
+      "method": "GET",
+      "path": "/charging/stations/0bc1bec4-65ca-4454-9d28-e34c76436fe7",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1092
+    },
+    "get_charging__stations__0bc7961e-b0f3-4040-ba7d-eafa4eee0dab": {
+      "method": "GET",
+      "path": "/charging/stations/0bc7961e-b0f3-4040-ba7d-eafa4eee0dab",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1054
+    },
+    "get_charging__stations__0be9ca4d-0735-4e35-8495-f4c7da5d0caa": {
+      "method": "GET",
+      "path": "/charging/stations/0be9ca4d-0735-4e35-8495-f4c7da5d0caa",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__0bf1097f-1cc5-4b3a-a1f7-62c482a20780": {
+      "method": "GET",
+      "path": "/charging/stations/0bf1097f-1cc5-4b3a-a1f7-62c482a20780",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__0bf603e5-be9e-41c6-9452-d9fa1842793e": {
+      "method": "GET",
+      "path": "/charging/stations/0bf603e5-be9e-41c6-9452-d9fa1842793e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__0c2c355b-dd40-4954-a6e4-d550104b208b": {
+      "method": "GET",
+      "path": "/charging/stations/0c2c355b-dd40-4954-a6e4-d550104b208b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__0c4213c9-1bb4-4306-b675-7feba28177b9": {
+      "method": "GET",
+      "path": "/charging/stations/0c4213c9-1bb4-4306-b675-7feba28177b9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1088
+    },
+    "get_charging__stations__0cb0b552-53a5-4be0-a9b8-051c2677de74": {
+      "method": "GET",
+      "path": "/charging/stations/0cb0b552-53a5-4be0-a9b8-051c2677de74",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__0cb407bd-95d4-43af-9846-21b86c0c05fb": {
+      "method": "GET",
+      "path": "/charging/stations/0cb407bd-95d4-43af-9846-21b86c0c05fb",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1062
+    },
+    "get_charging__stations__0cc5c77a-8e4e-4c9e-9f76-6c6951148921": {
+      "method": "GET",
+      "path": "/charging/stations/0cc5c77a-8e4e-4c9e-9f76-6c6951148921",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__0cc9fea5-9168-4ae0-ba35-1cd7fbf1d14f": {
+      "method": "GET",
+      "path": "/charging/stations/0cc9fea5-9168-4ae0-ba35-1cd7fbf1d14f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__0ccebdfe-804b-42b1-8c87-226ba847deaa": {
+      "method": "GET",
+      "path": "/charging/stations/0ccebdfe-804b-42b1-8c87-226ba847deaa",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1060
+    },
+    "get_charging__stations__0cd89be6-2e12-4c64-908d-c3e33eb1c842": {
+      "method": "GET",
+      "path": "/charging/stations/0cd89be6-2e12-4c64-908d-c3e33eb1c842",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1079
+    },
+    "get_charging__stations__0d2e7d76-2103-4a9b-9bd9-e671799874ac": {
+      "method": "GET",
+      "path": "/charging/stations/0d2e7d76-2103-4a9b-9bd9-e671799874ac",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__0d3e56e8-e3a9-4fdb-9176-4820b13f60f9": {
+      "method": "GET",
+      "path": "/charging/stations/0d3e56e8-e3a9-4fdb-9176-4820b13f60f9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1095
+    },
+    "get_charging__stations__0d7dac3a-b39e-4449-8626-56b74f505369": {
+      "method": "GET",
+      "path": "/charging/stations/0d7dac3a-b39e-4449-8626-56b74f505369",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__0d8886c7-8cec-4ec6-bbcf-96afd14351a9": {
+      "method": "GET",
+      "path": "/charging/stations/0d8886c7-8cec-4ec6-bbcf-96afd14351a9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__0d9946f9-501b-45e3-a9a4-eb327702e63f": {
+      "method": "GET",
+      "path": "/charging/stations/0d9946f9-501b-45e3-a9a4-eb327702e63f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1056
+    },
+    "get_charging__stations__0dae38ce-3c1b-4e13-905e-56842b622ebd": {
+      "method": "GET",
+      "path": "/charging/stations/0dae38ce-3c1b-4e13-905e-56842b622ebd",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1054
+    },
+    "get_charging__stations__0dca4e40-5862-42c5-9334-520c2153917b": {
+      "method": "GET",
+      "path": "/charging/stations/0dca4e40-5862-42c5-9334-520c2153917b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1072
+    },
+    "get_charging__stations__0dcd0c1b-99da-4027-b608-0d8bc3f2720e": {
+      "method": "GET",
+      "path": "/charging/stations/0dcd0c1b-99da-4027-b608-0d8bc3f2720e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1054
+    },
+    "get_charging__stations__0deb250d-f828-4618-a05f-6c2e398d0470": {
+      "method": "GET",
+      "path": "/charging/stations/0deb250d-f828-4618-a05f-6c2e398d0470",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__0e0cf383-da42-47e7-abeb-3eee39f8c1fa": {
+      "method": "GET",
+      "path": "/charging/stations/0e0cf383-da42-47e7-abeb-3eee39f8c1fa",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__0e5aad45-331c-48c2-8f15-a8e66c73331f": {
+      "method": "GET",
+      "path": "/charging/stations/0e5aad45-331c-48c2-8f15-a8e66c73331f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1056
+    },
+    "get_charging__stations__0e8ce4cd-96b5-4948-b07b-5962b85b7e9a": {
+      "method": "GET",
+      "path": "/charging/stations/0e8ce4cd-96b5-4948-b07b-5962b85b7e9a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__0eb5d0e9-c140-41b3-b205-5389cdb25e84": {
+      "method": "GET",
+      "path": "/charging/stations/0eb5d0e9-c140-41b3-b205-5389cdb25e84",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__0efd5ec8-bd3e-42ed-96e5-4254aae0b126": {
+      "method": "GET",
+      "path": "/charging/stations/0efd5ec8-bd3e-42ed-96e5-4254aae0b126",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1052
+    },
+    "get_charging__stations__0f0f34ea-59cc-4ce0-9703-e44823f3f9cb": {
+      "method": "GET",
+      "path": "/charging/stations/0f0f34ea-59cc-4ce0-9703-e44823f3f9cb",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1059
+    },
+    "get_charging__stations__0f124ce5-3184-49b5-abed-da82fb6d602b": {
+      "method": "GET",
+      "path": "/charging/stations/0f124ce5-3184-49b5-abed-da82fb6d602b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1086
+    },
+    "get_charging__stations__0f4a05c1-1af5-4710-b1a0-2e6ca3f0c700": {
+      "method": "GET",
+      "path": "/charging/stations/0f4a05c1-1af5-4710-b1a0-2e6ca3f0c700",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1091
+    },
+    "get_charging__stations__0f5bf0ca-4311-4155-ac95-c156c351028b": {
+      "method": "GET",
+      "path": "/charging/stations/0f5bf0ca-4311-4155-ac95-c156c351028b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__0f730f0d-2b5e-48dd-8eee-91453fa7f533": {
+      "method": "GET",
+      "path": "/charging/stations/0f730f0d-2b5e-48dd-8eee-91453fa7f533",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__0f74a2ad-603a-4510-a7be-2cfec62010d7": {
+      "method": "GET",
+      "path": "/charging/stations/0f74a2ad-603a-4510-a7be-2cfec62010d7",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__0f7e0043-5644-497b-80b0-3e1520bc3657": {
+      "method": "GET",
+      "path": "/charging/stations/0f7e0043-5644-497b-80b0-3e1520bc3657",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__0f83de34-1bc0-46d5-8ba2-5435570befd6": {
+      "method": "GET",
+      "path": "/charging/stations/0f83de34-1bc0-46d5-8ba2-5435570befd6",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__0f84e467-f92a-4440-b813-9167781acbc0": {
+      "method": "GET",
+      "path": "/charging/stations/0f84e467-f92a-4440-b813-9167781acbc0",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1062
+    },
+    "get_charging__stations__0f9aa909-eadf-4cf1-8718-0593c0ff16aa": {
+      "method": "GET",
+      "path": "/charging/stations/0f9aa909-eadf-4cf1-8718-0593c0ff16aa",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1062
+    },
+    "get_charging__stations__0fa92c0a-aae9-4010-bf83-36d8311607ce": {
+      "method": "GET",
+      "path": "/charging/stations/0fa92c0a-aae9-4010-bf83-36d8311607ce",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__0fe8bde1-d72c-4b14-ba9a-b2960499768d": {
+      "method": "GET",
+      "path": "/charging/stations/0fe8bde1-d72c-4b14-ba9a-b2960499768d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1082
+    },
+    "get_charging__stations__0ff86bea-20b5-408b-b254-9fc2dcadc235": {
+      "method": "GET",
+      "path": "/charging/stations/0ff86bea-20b5-408b-b254-9fc2dcadc235",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__1022af91-cd0c-4f10-b435-ae4bb33d6c23": {
+      "method": "GET",
+      "path": "/charging/stations/1022af91-cd0c-4f10-b435-ae4bb33d6c23",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__103f3584-ea60-42b8-9404-74758caada28": {
+      "method": "GET",
+      "path": "/charging/stations/103f3584-ea60-42b8-9404-74758caada28",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1099
+    },
+    "get_charging__stations__104fb824-c861-477f-ab5e-5b40e14caf92": {
+      "method": "GET",
+      "path": "/charging/stations/104fb824-c861-477f-ab5e-5b40e14caf92",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__107d95c7-5206-451c-b352-9359db819090": {
+      "method": "GET",
+      "path": "/charging/stations/107d95c7-5206-451c-b352-9359db819090",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1077
+    },
+    "get_charging__stations__1092f104-b121-454e-84f3-375608e76f6b": {
+      "method": "GET",
+      "path": "/charging/stations/1092f104-b121-454e-84f3-375608e76f6b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__1098cde8-2120-4f5f-bf88-934d9265455a": {
+      "method": "GET",
+      "path": "/charging/stations/1098cde8-2120-4f5f-bf88-934d9265455a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__110618d1-e0c2-478e-8328-d775a65f1c48": {
+      "method": "GET",
+      "path": "/charging/stations/110618d1-e0c2-478e-8328-d775a65f1c48",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1060
+    },
+    "get_charging__stations__113dfc4b-d1d4-4778-9367-057ea9e16fa9": {
+      "method": "GET",
+      "path": "/charging/stations/113dfc4b-d1d4-4778-9367-057ea9e16fa9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__115153d7-bcad-42a1-a225-bed9eebb9454": {
+      "method": "GET",
+      "path": "/charging/stations/115153d7-bcad-42a1-a225-bed9eebb9454",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__117c5d35-f0bd-4658-bf3e-ac0fe8f8279b": {
+      "method": "GET",
+      "path": "/charging/stations/117c5d35-f0bd-4658-bf3e-ac0fe8f8279b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__117f5017-61ec-460b-85d8-18c98803d3f4": {
+      "method": "GET",
+      "path": "/charging/stations/117f5017-61ec-460b-85d8-18c98803d3f4",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1058
+    },
+    "get_charging__stations__1184b3c7-c1a8-4ab5-98dd-f916c4077641": {
+      "method": "GET",
+      "path": "/charging/stations/1184b3c7-c1a8-4ab5-98dd-f916c4077641",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__118ecb1e-e318-4b04-a1a8-4750c4af062d": {
+      "method": "GET",
+      "path": "/charging/stations/118ecb1e-e318-4b04-a1a8-4750c4af062d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__119b64f7-cbb2-4612-886e-9cc92e4d2753": {
+      "method": "GET",
+      "path": "/charging/stations/119b64f7-cbb2-4612-886e-9cc92e4d2753",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__11a26be8-2fc0-4146-8116-3ed8d0c427c6": {
+      "method": "GET",
+      "path": "/charging/stations/11a26be8-2fc0-4146-8116-3ed8d0c427c6",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1067
+    },
+    "get_charging__stations__11ab729d-e316-42c0-909c-f8a75aedfef9": {
+      "method": "GET",
+      "path": "/charging/stations/11ab729d-e316-42c0-909c-f8a75aedfef9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1092
+    },
+    "get_charging__stations__11b5409e-02c0-44d6-b84e-0511b4c651e2": {
+      "method": "GET",
+      "path": "/charging/stations/11b5409e-02c0-44d6-b84e-0511b4c651e2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__11ba1454-c1b6-4673-8dd1-7ff0518dbf08": {
+      "method": "GET",
+      "path": "/charging/stations/11ba1454-c1b6-4673-8dd1-7ff0518dbf08",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__11ccdda2-3cc7-42f2-9762-31d2d889bd64": {
+      "method": "GET",
+      "path": "/charging/stations/11ccdda2-3cc7-42f2-9762-31d2d889bd64",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1072
+    },
+    "get_charging__stations__11d73898-5c27-4635-8ded-db4e2539d248": {
+      "method": "GET",
+      "path": "/charging/stations/11d73898-5c27-4635-8ded-db4e2539d248",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1085
+    },
+    "get_charging__stations__11e05aae-8681-4497-904e-32bec65333ad": {
+      "method": "GET",
+      "path": "/charging/stations/11e05aae-8681-4497-904e-32bec65333ad",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__12227f51-1b2c-430a-baa6-e4baf30a3d16": {
+      "method": "GET",
+      "path": "/charging/stations/12227f51-1b2c-430a-baa6-e4baf30a3d16",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__124c194e-32e2-4876-abe9-dfaa00d36666": {
+      "method": "GET",
+      "path": "/charging/stations/124c194e-32e2-4876-abe9-dfaa00d36666",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1099
+    },
+    "get_charging__stations__125d1c69-056b-412c-9a4d-fc2665225768": {
+      "method": "GET",
+      "path": "/charging/stations/125d1c69-056b-412c-9a4d-fc2665225768",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1081
+    },
+    "get_charging__stations__126459c7-e891-4df8-b816-6db8e1111ee2": {
+      "method": "GET",
+      "path": "/charging/stations/126459c7-e891-4df8-b816-6db8e1111ee2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1074
+    },
+    "get_charging__stations__12b4cb63-6fd5-4426-9716-907fdee27276": {
+      "method": "GET",
+      "path": "/charging/stations/12b4cb63-6fd5-4426-9716-907fdee27276",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1090
+    },
+    "get_charging__stations__12c2c659-510b-490a-8e88-624b994dd330": {
+      "method": "GET",
+      "path": "/charging/stations/12c2c659-510b-490a-8e88-624b994dd330",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__12ea4c6a-1955-468d-ab55-8f9884bfd914": {
+      "method": "GET",
+      "path": "/charging/stations/12ea4c6a-1955-468d-ab55-8f9884bfd914",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1081
+    },
+    "get_charging__stations__12f5cce9-99f7-422c-ae61-7a0d8bbc9a1f": {
+      "method": "GET",
+      "path": "/charging/stations/12f5cce9-99f7-422c-ae61-7a0d8bbc9a1f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__13259ce9-5786-4945-9285-1e0d03768bf5": {
+      "method": "GET",
+      "path": "/charging/stations/13259ce9-5786-4945-9285-1e0d03768bf5",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1068
+    },
+    "get_charging__stations__135d7b61-1511-45ac-a4e1-0762da51c8a3": {
+      "method": "GET",
+      "path": "/charging/stations/135d7b61-1511-45ac-a4e1-0762da51c8a3",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1084
+    },
+    "get_charging__stations__13934b3b-ec25-4b3c-a059-49985d4e4021": {
+      "method": "GET",
+      "path": "/charging/stations/13934b3b-ec25-4b3c-a059-49985d4e4021",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__13cfe052-8b5e-4dc4-895e-df5e008b56ab": {
+      "method": "GET",
+      "path": "/charging/stations/13cfe052-8b5e-4dc4-895e-df5e008b56ab",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1195
+    },
+    "get_charging__stations__13eec4a3-c38a-46ce-9c40-47c1a11a9550": {
+      "method": "GET",
+      "path": "/charging/stations/13eec4a3-c38a-46ce-9c40-47c1a11a9550",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1099
+    },
+    "get_charging__stations__140b0a8b-032a-46c2-9d5f-14866f4d473e": {
+      "method": "GET",
+      "path": "/charging/stations/140b0a8b-032a-46c2-9d5f-14866f4d473e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1082
+    },
+    "get_charging__stations__142311b3-e793-4d88-846e-7d4597624844": {
+      "method": "GET",
+      "path": "/charging/stations/142311b3-e793-4d88-846e-7d4597624844",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__143d012e-fbc7-4968-8051-97007a295dff": {
+      "method": "GET",
+      "path": "/charging/stations/143d012e-fbc7-4968-8051-97007a295dff",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__145030cc-1541-42c2-9bf5-4f6d3f74c6dd": {
+      "method": "GET",
+      "path": "/charging/stations/145030cc-1541-42c2-9bf5-4f6d3f74c6dd",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1063
+    },
+    "get_charging__stations__14520fce-eac1-4000-8aa8-5556bb179179": {
+      "method": "GET",
+      "path": "/charging/stations/14520fce-eac1-4000-8aa8-5556bb179179",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__146e51d8-1286-425a-87b3-1e154e77ea6a": {
+      "method": "GET",
+      "path": "/charging/stations/146e51d8-1286-425a-87b3-1e154e77ea6a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__14763993-f42e-4d00-bfa1-950788e709d9": {
+      "method": "GET",
+      "path": "/charging/stations/14763993-f42e-4d00-bfa1-950788e709d9",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__149094b4-de0a-4ccd-81f8-cd3bfc71e41b": {
+      "method": "GET",
+      "path": "/charging/stations/149094b4-de0a-4ccd-81f8-cd3bfc71e41b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__149fab6b-7f7e-4c8e-ac20-1683d6850b27": {
+      "method": "GET",
+      "path": "/charging/stations/149fab6b-7f7e-4c8e-ac20-1683d6850b27",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1072
+    },
+    "get_charging__stations__14afeaae-c412-41ae-bb44-2ae1a1868e77": {
+      "method": "GET",
+      "path": "/charging/stations/14afeaae-c412-41ae-bb44-2ae1a1868e77",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__14cead8f-0cc5-4dbd-b2b2-0b6b96cd591f": {
+      "method": "GET",
+      "path": "/charging/stations/14cead8f-0cc5-4dbd-b2b2-0b6b96cd591f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__14d9fc9d-d3d5-4955-87b9-8244906c05e5": {
+      "method": "GET",
+      "path": "/charging/stations/14d9fc9d-d3d5-4955-87b9-8244906c05e5",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__150cdc68-0f59-4516-830b-a6748904f38c": {
+      "method": "GET",
+      "path": "/charging/stations/150cdc68-0f59-4516-830b-a6748904f38c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__15390ca9-966b-4551-807a-9b4ae543620c": {
+      "method": "GET",
+      "path": "/charging/stations/15390ca9-966b-4551-807a-9b4ae543620c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1079
+    },
+    "get_charging__stations__153e023a-94d1-439d-bc71-b0e0b23abcc1": {
+      "method": "GET",
+      "path": "/charging/stations/153e023a-94d1-439d-bc71-b0e0b23abcc1",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__155cc596-1cbb-45a4-9ed1-8faf869ea53d": {
+      "method": "GET",
+      "path": "/charging/stations/155cc596-1cbb-45a4-9ed1-8faf869ea53d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1095
+    },
+    "get_charging__stations__156e3f19-89a5-444a-a11d-28fb545e6b7f": {
+      "method": "GET",
+      "path": "/charging/stations/156e3f19-89a5-444a-a11d-28fb545e6b7f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1082
+    },
+    "get_charging__stations__1585415f-07ae-489f-91ea-927d59f28b85": {
+      "method": "GET",
+      "path": "/charging/stations/1585415f-07ae-489f-91ea-927d59f28b85",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__15bafeb9-9d52-425b-beb1-5110164376e2": {
+      "method": "GET",
+      "path": "/charging/stations/15bafeb9-9d52-425b-beb1-5110164376e2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__15c444f4-012f-493d-9318-56aef3fa737d": {
+      "method": "GET",
+      "path": "/charging/stations/15c444f4-012f-493d-9318-56aef3fa737d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1092
+    },
+    "get_charging__stations__15d42335-09f5-4872-b682-39879b925fbb": {
+      "method": "GET",
+      "path": "/charging/stations/15d42335-09f5-4872-b682-39879b925fbb",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__15dcf2fe-5e6c-4f0e-8641-af94fb8083bf": {
+      "method": "GET",
+      "path": "/charging/stations/15dcf2fe-5e6c-4f0e-8641-af94fb8083bf",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1081
+    },
+    "get_charging__stations__160db071-b600-4340-9449-364a8800d89d": {
+      "method": "GET",
+      "path": "/charging/stations/160db071-b600-4340-9449-364a8800d89d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1075
+    },
+    "get_charging__stations__16467fb2-2873-4756-82dc-1fe648bad27a": {
+      "method": "GET",
+      "path": "/charging/stations/16467fb2-2873-4756-82dc-1fe648bad27a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__164904d2-0fb6-46e5-9824-167b27d77ad1": {
+      "method": "GET",
+      "path": "/charging/stations/164904d2-0fb6-46e5-9824-167b27d77ad1",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__167a80e4-cfe6-44d3-b334-2ac22ddd5558": {
+      "method": "GET",
+      "path": "/charging/stations/167a80e4-cfe6-44d3-b334-2ac22ddd5558",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__168a325b-dde9-4c2a-9ce1-7787f051eb61": {
+      "method": "GET",
+      "path": "/charging/stations/168a325b-dde9-4c2a-9ce1-7787f051eb61",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1067
+    },
+    "get_charging__stations__169d49d5-f6ed-4836-93af-5bacf00eca4e": {
+      "method": "GET",
+      "path": "/charging/stations/169d49d5-f6ed-4836-93af-5bacf00eca4e",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__16bbf25b-55ac-4c40-8bd0-23fc850286e2": {
+      "method": "GET",
+      "path": "/charging/stations/16bbf25b-55ac-4c40-8bd0-23fc850286e2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__16c2144f-e726-4cdf-8fc1-5a94e5ebd592": {
+      "method": "GET",
+      "path": "/charging/stations/16c2144f-e726-4cdf-8fc1-5a94e5ebd592",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__16e2854c-5faa-48fa-b804-b9040a7f4ee3": {
+      "method": "GET",
+      "path": "/charging/stations/16e2854c-5faa-48fa-b804-b9040a7f4ee3",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1085
+    },
+    "get_charging__stations__16e374c4-c196-457c-b160-eb578ebec3e1": {
+      "method": "GET",
+      "path": "/charging/stations/16e374c4-c196-457c-b160-eb578ebec3e1",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1070
+    },
+    "get_charging__stations__16f36780-7356-4c7d-a713-235e5150bcc3": {
+      "method": "GET",
+      "path": "/charging/stations/16f36780-7356-4c7d-a713-235e5150bcc3",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__16fa193d-b29b-486b-a13f-37f49fd9e9f4": {
+      "method": "GET",
+      "path": "/charging/stations/16fa193d-b29b-486b-a13f-37f49fd9e9f4",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1301
+    },
+    "get_charging__stations__17019150-946a-4e90-acab-8aee5cfe7d23": {
+      "method": "GET",
+      "path": "/charging/stations/17019150-946a-4e90-acab-8aee5cfe7d23",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1071
+    },
+    "get_charging__stations__170322d3-44cd-47c9-b8fc-87b04a80982b": {
+      "method": "GET",
+      "path": "/charging/stations/170322d3-44cd-47c9-b8fc-87b04a80982b",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1087
+    },
+    "get_charging__stations__171cc14e-3b7d-437b-b6d1-386a1f525807": {
+      "method": "GET",
+      "path": "/charging/stations/171cc14e-3b7d-437b-b6d1-386a1f525807",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1060
+    },
+    "get_charging__stations__17760be9-bcb5-4cf6-99af-3939e21c2884": {
+      "method": "GET",
+      "path": "/charging/stations/17760be9-bcb5-4cf6-99af-3939e21c2884",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1066
+    },
+    "get_charging__stations__178fed71-1000-4bbf-ad4b-130271f7093d": {
+      "method": "GET",
+      "path": "/charging/stations/178fed71-1000-4bbf-ad4b-130271f7093d",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1058
+    },
+    "get_charging__stations__179c007c-56b2-4987-b718-3665648bb686": {
+      "method": "GET",
+      "path": "/charging/stations/179c007c-56b2-4987-b718-3665648bb686",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__17b67f92-152e-4c22-b05b-bd6dbad610ed": {
+      "method": "GET",
+      "path": "/charging/stations/17b67f92-152e-4c22-b05b-bd6dbad610ed",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1052
+    },
+    "get_charging__stations__17d27705-67f3-4695-afcc-f851da0bf5ec": {
+      "method": "GET",
+      "path": "/charging/stations/17d27705-67f3-4695-afcc-f851da0bf5ec",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1060
+    },
+    "get_charging__stations__17f08605-3f8c-4444-915f-17d9655dafc2": {
+      "method": "GET",
+      "path": "/charging/stations/17f08605-3f8c-4444-915f-17d9655dafc2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1078
+    },
+    "get_charging__stations__17f53adf-1a56-43c1-96ed-50e715411334": {
+      "method": "GET",
+      "path": "/charging/stations/17f53adf-1a56-43c1-96ed-50e715411334",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1083
+    },
+    "get_charging__stations__1813d8fa-71e6-4693-b4de-b2f4ec591575": {
+      "method": "GET",
+      "path": "/charging/stations/1813d8fa-71e6-4693-b4de-b2f4ec591575",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1060
+    },
+    "get_charging__stations__181c5b15-256a-4569-9db3-e5035f76873f": {
+      "method": "GET",
+      "path": "/charging/stations/181c5b15-256a-4569-9db3-e5035f76873f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1069
+    },
+    "get_charging__stations__1835ea12-9a56-43f9-874d-007ba3a2c26c": {
+      "method": "GET",
+      "path": "/charging/stations/1835ea12-9a56-43f9-874d-007ba3a2c26c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1193
+    },
+    "get_charging__stations__1845f343-c6cf-45e8-9794-db4a7a63c049": {
+      "method": "GET",
+      "path": "/charging/stations/1845f343-c6cf-45e8-9794-db4a7a63c049",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1057
+    },
+    "get_charging__stations__1889e694-aa9f-4fc3-b633-f56dacd58d3c": {
+      "method": "GET",
+      "path": "/charging/stations/1889e694-aa9f-4fc3-b633-f56dacd58d3c",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1074
+    },
+    "get_charging__stations__189d6e23-27de-4e4f-aabb-65f19975624a": {
+      "method": "GET",
+      "path": "/charging/stations/189d6e23-27de-4e4f-aabb-65f19975624a",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1064
+    },
+    "get_charging__stations__18a931b3-0d88-4161-af04-bca3dbc4dadc": {
+      "method": "GET",
+      "path": "/charging/stations/18a931b3-0d88-4161-af04-bca3dbc4dadc",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1055
+    },
+    "get_charging__stations__18c6eca5-f7cd-4e5c-8120-327ded03326f": {
+      "method": "GET",
+      "path": "/charging/stations/18c6eca5-f7cd-4e5c-8120-327ded03326f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1065
+    },
+    "get_charging__stations__18d14d76-d9fe-40da-aca3-81d040211209": {
+      "method": "GET",
+      "path": "/charging/stations/18d14d76-d9fe-40da-aca3-81d040211209",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__18e86a46-20dc-4992-943f-2d0e6f56a1e8": {
+      "method": "GET",
+      "path": "/charging/stations/18e86a46-20dc-4992-943f-2d0e6f56a1e8",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__190a4958-062f-4c6d-99a6-b56fe245901f": {
+      "method": "GET",
+      "path": "/charging/stations/190a4958-062f-4c6d-99a6-b56fe245901f",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1061
+    },
+    "get_charging__stations__196d5e8e-546f-4074-8efa-cb097bdb7996": {
+      "method": "GET",
+      "path": "/charging/stations/196d5e8e-546f-4074-8efa-cb097bdb7996",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1073
+    },
+    "get_charging__stations__1a036433-0389-4b25-9e46-66243f6e61f2": {
+      "method": "GET",
+      "path": "/charging/stations/1a036433-0389-4b25-9e46-66243f6e61f2",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 1067
+    },
+    "get_traffic__events_active_only=true&page=1&page_size=250": {
+      "method": "GET",
+      "path": "/traffic/events",
+      "query": {
+        "active_only": "true",
+        "page": 1,
+        "page_size": 250
+      },
+      "data_mode": "cache",
+      "bytes": 358345
+    },
+    "get_traffic__events__geojson": {
+      "method": "GET",
+      "path": "/traffic/events/geojson",
+      "query": {},
+      "data_mode": "cache",
+      "bytes": 864181
+    },
+    "get_traffic__events__geojson_active_only=true": {
+      "method": "GET",
+      "path": "/traffic/events/geojson",
+      "query": {
+        "active_only": "true"
+      },
+      "data_mode": "cache",
+      "bytes": 864181
+    },
+    "traffic_events_all": {
+      "method": "GET",
+      "path": "/traffic/events",
+      "query": {
+        "_all": true
+      },
+      "data_mode": null,
+      "bytes": 2300752
+    },
+    "get_weather__latest_lat=50.1109&lon=8.6821": {
+      "method": "GET",
+      "path": "/weather/latest",
+      "query": {
+        "lat": 50.1109,
+        "lon": 8.6821
+      },
+      "data_mode": "cache",
+      "bytes": 719
+    },
+    "get_weather_page=1&page_size=50": {
+      "method": "GET",
+      "path": "/weather",
+      "query": {
+        "page": 1,
+        "page_size": 50
+      },
+      "data_mode": "fixture",
+      "bytes": 7131
+    },
+    "get_routes_page_size=50": {
+      "method": "GET",
+      "path": "/routes",
+      "query": {
+        "page_size": 50
+      },
+      "data_mode": null,
+      "bytes": 1971
+    },
+    "get_vehicles__profiles": {
+      "method": "GET",
+      "path": "/vehicles/profiles",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1941
+    },
+    "post_routes__analyze_min_arrival_soc_percent=15.0&route_slug=frankfurt-stuttgart&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/analyze",
+      "query": {
+        "route_slug": "frankfurt-stuttgart",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 114358
+    },
+    "post_routes__optimize-charging_min_arrival_soc_percent=15.0&route_slug=frankfurt-stuttgart&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/optimize-charging",
+      "query": {
+        "route_slug": "frankfurt-stuttgart",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 114866
+    },
+    "post_routes__analyze_min_arrival_soc_percent=15.0&route_slug=frankfurt-muenchen&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/analyze",
+      "query": {
+        "route_slug": "frankfurt-muenchen",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 160877
+    },
+    "post_routes__optimize-charging_min_arrival_soc_percent=15.0&route_slug=frankfurt-muenchen&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/optimize-charging",
+      "query": {
+        "route_slug": "frankfurt-muenchen",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 162443
+    },
+    "post_routes__analyze_min_arrival_soc_percent=15.0&route_slug=stuttgart-muenchen&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/analyze",
+      "query": {
+        "route_slug": "stuttgart-muenchen",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 118271
+    },
+    "post_routes__optimize-charging_min_arrival_soc_percent=15.0&route_slug=stuttgart-muenchen&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/optimize-charging",
+      "query": {
+        "route_slug": "stuttgart-muenchen",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 118779
+    },
+    "post_routes__analyze_min_arrival_soc_percent=15.0&route_slug=muenchen-ingolstadt&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/analyze",
+      "query": {
+        "route_slug": "muenchen-ingolstadt",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 40631
+    },
+    "post_routes__optimize-charging_min_arrival_soc_percent=15.0&route_slug=muenchen-ingolstadt&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/optimize-charging",
+      "query": {
+        "route_slug": "muenchen-ingolstadt",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 41133
+    },
+    "post_routes__analyze_min_arrival_soc_percent=15.0&route_slug=wolfsburg-berlin&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/analyze",
+      "query": {
+        "route_slug": "wolfsburg-berlin",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 96047
+    },
+    "post_routes__optimize-charging_min_arrival_soc_percent=15.0&route_slug=wolfsburg-berlin&start_soc_percent=70.0&vehicle_code=sedan_ev": {
+      "method": "POST",
+      "path": "/routes/optimize-charging",
+      "query": {
+        "route_slug": "wolfsburg-berlin",
+        "vehicle_code": "sedan_ev",
+        "start_soc_percent": 70.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 96553
+    },
+    "post_routes__analyze_min_arrival_soc_percent=15.0&route_slug=frankfurt-stuttgart&start_soc_percent=40.0&vehicle_code=compact_ev": {
+      "method": "POST",
+      "path": "/routes/analyze",
+      "query": {
+        "route_slug": "frankfurt-stuttgart",
+        "vehicle_code": "compact_ev",
+        "start_soc_percent": 40.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 114260
+    },
+    "post_routes__optimize-charging_min_arrival_soc_percent=15.0&route_slug=frankfurt-stuttgart&start_soc_percent=40.0&vehicle_code=compact_ev": {
+      "method": "POST",
+      "path": "/routes/optimize-charging",
+      "query": {
+        "route_slug": "frankfurt-stuttgart",
+        "vehicle_code": "compact_ev",
+        "start_soc_percent": 40.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 115854
+    },
+    "post_routes__analyze_min_arrival_soc_percent=15.0&route_slug=frankfurt-stuttgart&start_soc_percent=30.0&vehicle_code=van_ev": {
+      "method": "POST",
+      "path": "/routes/analyze",
+      "query": {
+        "route_slug": "frankfurt-stuttgart",
+        "vehicle_code": "van_ev",
+        "start_soc_percent": 30.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 113940
+    },
+    "post_routes__optimize-charging_min_arrival_soc_percent=15.0&route_slug=frankfurt-stuttgart&start_soc_percent=30.0&vehicle_code=van_ev": {
+      "method": "POST",
+      "path": "/routes/optimize-charging",
+      "query": {
+        "route_slug": "frankfurt-stuttgart",
+        "vehicle_code": "van_ev",
+        "start_soc_percent": 30.0,
+        "min_arrival_soc_percent": 15.0
+      },
+      "data_mode": "cache",
+      "bytes": 116522
+    },
+    "get_vehicles__live": {
+      "method": "GET",
+      "path": "/vehicles/live",
+      "query": {},
+      "data_mode": null,
+      "bytes": 23749
+    },
+    "get_vehicles_page=1&page_size=50": {
+      "method": "GET",
+      "path": "/vehicles",
+      "query": {
+        "page": 1,
+        "page_size": 50
+      },
+      "data_mode": null,
+      "bytes": 13828
+    },
+    "get_vehicles__ATW-0001": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1389
+    },
+    "get_vehicles__ATW-0001__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0001/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 29687
+    },
+    "get_vehicles__ATW-0002": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0002",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1373
+    },
+    "get_vehicles__ATW-0002__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0002/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 29492
+    },
+    "get_vehicles__ATW-0003": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0003",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1403
+    },
+    "get_vehicles__ATW-0003__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0003/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 30655
+    },
+    "get_vehicles__ATW-0004": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0004",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1415
+    },
+    "get_vehicles__ATW-0004__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0004/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 30132
+    },
+    "get_vehicles__ATW-0005": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0005",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1390
+    },
+    "get_vehicles__ATW-0005__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0005/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 29717
+    },
+    "get_vehicles__ATW-0006": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0006",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1414
+    },
+    "get_vehicles__ATW-0006__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0006/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 30711
+    },
+    "get_vehicles__ATW-0007": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0007",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1388
+    },
+    "get_vehicles__ATW-0007__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0007/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 29757
+    },
+    "get_vehicles__ATW-0008": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0008",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1408
+    },
+    "get_vehicles__ATW-0008__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0008/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 30809
+    },
+    "get_vehicles__ATW-0009": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0009",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1409
+    },
+    "get_vehicles__ATW-0009__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0009/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20575
+    },
+    "get_vehicles__ATW-0010": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0010",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1430
+    },
+    "get_vehicles__ATW-0010__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0010/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20176
+    },
+    "get_vehicles__ATW-0011": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0011",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1412
+    },
+    "get_vehicles__ATW-0011__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0011/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20257
+    },
+    "get_vehicles__ATW-0012": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0012",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1432
+    },
+    "get_vehicles__ATW-0012__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0012/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20157
+    },
+    "get_vehicles__ATW-0013": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0013",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1412
+    },
+    "get_vehicles__ATW-0013__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0013/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20304
+    },
+    "get_vehicles__ATW-0014": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0014",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1393
+    },
+    "get_vehicles__ATW-0014__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0014/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20318
+    },
+    "get_vehicles__ATW-0015": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0015",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1398
+    },
+    "get_vehicles__ATW-0015__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0015/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20556
+    },
+    "get_vehicles__ATW-0016": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0016",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1394
+    },
+    "get_vehicles__ATW-0016__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0016/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20279
+    },
+    "get_vehicles__ATW-0017": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0017",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1382
+    },
+    "get_vehicles__ATW-0017__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0017/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20362
+    },
+    "get_vehicles__ATW-0018": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0018",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1383
+    },
+    "get_vehicles__ATW-0018__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0018/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20382
+    },
+    "get_vehicles__ATW-0019": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0019",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1384
+    },
+    "get_vehicles__ATW-0019__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0019/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20541
+    },
+    "get_vehicles__ATW-0020": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0020",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1387
+    },
+    "get_vehicles__ATW-0020__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0020/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20593
+    },
+    "get_vehicles__ATW-0021": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0021",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1401
+    },
+    "get_vehicles__ATW-0021__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0021/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20294
+    },
+    "get_vehicles__ATW-0022": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0022",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1382
+    },
+    "get_vehicles__ATW-0022__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0022/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20257
+    },
+    "get_vehicles__ATW-0023": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0023",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1386
+    },
+    "get_vehicles__ATW-0023__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0023/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20267
+    },
+    "get_vehicles__ATW-0024": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0024",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1392
+    },
+    "get_vehicles__ATW-0024__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0024/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20476
+    },
+    "get_vehicles__ATW-0025": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0025",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1393
+    },
+    "get_vehicles__ATW-0025__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0025/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 20564
+    },
+    "get_vehicles__ATW-0026": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0026",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1414
+    },
+    "get_vehicles__ATW-0026__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0026/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15080
+    },
+    "get_vehicles__ATW-0027": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0027",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1413
+    },
+    "get_vehicles__ATW-0027__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0027/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 14973
+    },
+    "get_vehicles__ATW-0028": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0028",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1398
+    },
+    "get_vehicles__ATW-0028__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0028/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15081
+    },
+    "get_vehicles__ATW-0029": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0029",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1404
+    },
+    "get_vehicles__ATW-0029__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0029/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15210
+    },
+    "get_vehicles__ATW-0030": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0030",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1405
+    },
+    "get_vehicles__ATW-0030__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0030/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15368
+    },
+    "get_vehicles__ATW-0031": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0031",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1388
+    },
+    "get_vehicles__ATW-0031__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0031/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15425
+    },
+    "get_vehicles__ATW-0032": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0032",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1336
+    },
+    "get_vehicles__ATW-0032__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0032/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15341
+    },
+    "get_vehicles__ATW-0033": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0033",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1387
+    },
+    "get_vehicles__ATW-0033__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0033/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 14941
+    },
+    "get_vehicles__ATW-0034": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0034",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1373
+    },
+    "get_vehicles__ATW-0034__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0034/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15163
+    },
+    "get_vehicles__ATW-0035": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0035",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1375
+    },
+    "get_vehicles__ATW-0035__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0035/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15073
+    },
+    "get_vehicles__ATW-0036": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0036",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1396
+    },
+    "get_vehicles__ATW-0036__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0036/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15126
+    },
+    "get_vehicles__ATW-0037": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0037",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1398
+    },
+    "get_vehicles__ATW-0037__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0037/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15403
+    },
+    "get_vehicles__ATW-0038": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0038",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1398
+    },
+    "get_vehicles__ATW-0038__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0038/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15436
+    },
+    "get_vehicles__ATW-0039": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0039",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1401
+    },
+    "get_vehicles__ATW-0039__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0039/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 14902
+    },
+    "get_vehicles__ATW-0040": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0040",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1388
+    },
+    "get_vehicles__ATW-0040__telemetry_limit=120": {
+      "method": "GET",
+      "path": "/vehicles/ATW-0040/telemetry",
+      "query": {
+        "limit": 120
+      },
+      "data_mode": null,
+      "bytes": 15308
+    },
+    "get_trips_page=1&page_size=50": {
+      "method": "GET",
+      "path": "/trips",
+      "query": {
+        "page": 1,
+        "page_size": 50
+      },
+      "data_mode": null,
+      "bytes": 17717
+    },
+    "get_trips__ATW-0001-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0001-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 633
+    },
+    "get_trips__ATW-0002-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0002-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 633
+    },
+    "get_trips__ATW-0003-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0003-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 637
+    },
+    "get_trips__ATW-0004-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0004-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 639
+    },
+    "get_trips__ATW-0005-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0005-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 633
+    },
+    "get_trips__ATW-0006-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0006-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 638
+    },
+    "get_trips__ATW-0007-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0007-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 647
+    },
+    "get_trips__ATW-0008-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0008-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 647
+    },
+    "get_trips__ATW-0009-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0009-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 638
+    },
+    "get_trips__ATW-0010-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0010-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 643
+    },
+    "get_trips__ATW-0011-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0011-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 644
+    },
+    "get_trips__ATW-0012-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0012-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 649
+    },
+    "get_trips__ATW-0013-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0013-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 636
+    },
+    "get_trips__ATW-0014-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0014-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 637
+    },
+    "get_trips__ATW-0015-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0015-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 637
+    },
+    "get_trips__ATW-0016-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0016-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 645
+    },
+    "get_trips__ATW-0017-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0017-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 645
+    },
+    "get_trips__ATW-0018-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0018-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 635
+    },
+    "get_trips__ATW-0019-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0019-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 641
+    },
+    "get_trips__ATW-0020-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0020-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 629
+    },
+    "get_trips__ATW-0021-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0021-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 641
+    },
+    "get_trips__ATW-0022-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0022-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 643
+    },
+    "get_trips__ATW-0023-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0023-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 641
+    },
+    "get_trips__ATW-0024-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0024-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 628
+    },
+    "get_trips__ATW-0025-2a-6aa85e83-0001": {
+      "method": "GET",
+      "path": "/trips/ATW-0025-2a-6aa85e83-0001",
+      "query": {},
+      "data_mode": null,
+      "bytes": 633
+    },
+    "get_simulations__status": {
+      "method": "GET",
+      "path": "/simulations/status",
+      "query": {},
+      "data_mode": null,
+      "bytes": 377
+    },
+    "get_simulations_page_size=20": {
+      "method": "GET",
+      "path": "/simulations",
+      "query": {
+        "page_size": 20
+      },
+      "data_mode": null,
+      "bytes": 2815
+    },
+    "get_ml__models": {
+      "method": "GET",
+      "path": "/ml/models",
+      "query": {},
+      "data_mode": null,
+      "bytes": 1650
+    },
+    "get_ml__metrics": {
+      "method": "GET",
+      "path": "/ml/metrics",
+      "query": {},
+      "data_mode": null,
+      "bytes": 40775
+    },
+    "get_ml__explain__global": {
+      "method": "GET",
+      "path": "/ml/explain/global",
+      "query": {},
+      "data_mode": null,
+      "bytes": 4067
+    },
+    "get_data__quality": {
+      "method": "GET",
+      "path": "/data/quality",
+      "query": {},
+      "data_mode": null,
+      "bytes": 2470
+    },
+    "get_data__ingestions_page=1&page_size=50": {
+      "method": "GET",
+      "path": "/data/ingestions",
+      "query": {
+        "page": 1,
+        "page_size": 50
+      },
+      "data_mode": null,
+      "bytes": 5451
+    },
+    "get_data__sources": {
+      "method": "GET",
+      "path": "/data/sources",
+      "query": {},
+      "data_mode": null,
+      "bytes": 2239
+    },
+    "get_analytics__energy_dimension=temperature": {
+      "method": "GET",
+      "path": "/analytics/energy",
+      "query": {
+        "dimension": "temperature"
+      },
+      "data_mode": null,
+      "bytes": 1940
+    },
+    "get_analytics__energy_dimension=speed": {
+      "method": "GET",
+      "path": "/analytics/energy",
+      "query": {
+        "dimension": "speed"
+      },
+      "data_mode": null,
+      "bytes": 2584
+    },
+    "get_analytics__energy_dimension=traffic": {
+      "method": "GET",
+      "path": "/analytics/energy",
+      "query": {
+        "dimension": "traffic"
+      },
+      "data_mode": null,
+      "bytes": 2299
+    },
+    "get_analytics__regions": {
+      "method": "GET",
+      "path": "/analytics/regions",
+      "query": {},
+      "data_mode": "live",
+      "bytes": 7095
+    }
+  },
+  "counts": {
+    "charging_stations_total": 116440,
+    "traffic_events_active": 1308,
+    "charging_stations_rows": 30558,
+    "traffic_events_rows": 1705,
+    "vehicles_live": 40,
+    "charging_stations_rows_note": "snapshot explorer holds the 30,558 sites with max_power_kw >= 50 (is_fast_charger); the full register of 116,440 sites is available with a running backend"
+  },
+  "charging_station_shards": {
+    "BB": 1027,
+    "BE": 678,
+    "BW": 3543,
+    "BY": 5911,
+    "HB": 183,
+    "HE": 2494,
+    "HH": 513,
+    "MV": 701,
+    "NI": 3751,
+    "NW": 5562,
+    "RP": 1725,
+    "SH": 1230,
+    "SL": 248,
+    "SN": 1212,
+    "ST": 849,
+    "TH": 931
+  }
+}

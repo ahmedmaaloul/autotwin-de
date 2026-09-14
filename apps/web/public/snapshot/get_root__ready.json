@@ -1,0 +1,1 @@
+{"status":"degraded","checks":{"database":true,"kafka":false,"model":true}}

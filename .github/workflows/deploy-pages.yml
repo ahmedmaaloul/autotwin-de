@@ -1,0 +1,81 @@
+# AutoTwin DE — publish the static demo to GitHub Pages.
+#
+# The demo is a fully static export of the Next.js app built in snapshot mode: it serves the
+# dated API snapshot committed under apps/web/public/snapshot/ and needs no backend, no
+# database and no secrets. That is why it can live on GitHub Pages at all, and why the same
+# artefact deploys unchanged to Vercel, Cloudflare Pages or Netlify if you ever prefer them.
+#
+# One-time setup in the repository: Settings → Pages → Source: "GitHub Actions".
+#
+# The site is served under /<repository-name>/ (a "project site"), so NEXT_PUBLIC_BASE_PATH is
+# derived from the repository name. If you host it as a user site (a repository named
+# <user>.github.io) set the base path to an empty string instead.
+name: Deploy demo to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build static export
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      - name: Install
+        working-directory: apps/web
+        run: pnpm install --frozen-lockfile
+
+      - name: Build snapshot export
+        working-directory: apps/web
+        env:
+          NEXT_PUBLIC_DEMO_SNAPSHOT: "1"
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+        run: |
+          pnpm build
+          # Pages runs Jekyll by default, which drops every _underscore directory — including
+          # Next.js's own /_next. This file switches Jekyll off.
+          touch out/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/out
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

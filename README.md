@@ -237,6 +237,30 @@ echo 'POSTGRES_IMAGE=imresamu/postgis:16-3.5' >> .env && make reset && make demo
 
 ---
 
+## Hosted demo
+
+The public demo is a **fully static export** of the frontend, built with
+`NEXT_PUBLIC_DEMO_SNAPSHOT=1`. It contains no server: every page reads a **dated snapshot** of
+real API responses, captured from a locally running platform loaded with the live
+Bundesnetzagentur, DWD and Autobahn data, and every page carries a banner stating the capture
+date. Filters and pagination run in the browser over the captured rows; the charging explorer
+holds the fast-charging sites (≥ 50 kW) and says so; actions that need a backend — simulation
+control, free-text routes — return an honest "not available in the snapshot".
+
+It deploys to **GitHub Pages** from `.github/workflows/deploy-pages.yml` (one-time setup:
+*Settings → Pages → Source: GitHub Actions*), and the identical artefact runs on Vercel,
+Cloudflare Pages or Netlify.
+
+```bash
+# regenerate the snapshot from a running local platform (make demo first)
+uv run python scripts/capture_snapshot.py --api http://localhost:8000
+
+# build the export locally and preview it
+cd apps/web && NEXT_PUBLIC_DEMO_SNAPSHOT=1 pnpm build && npx serve out
+```
+
+---
+
 ## The energy model
 
 A **physical baseline** first, because it is inspectable and needs no training data:
@@ -319,6 +343,35 @@ a throttled render loop, which silently emptied every map in a background tab or
 Documented, not promised: EV range prediction from real fleet data · traffic forecasting ·
 charger demand prediction · optimal infrastructure placement · vehicle-to-grid · C-ITS / V2X ·
 fleet optimisation · carbon-aware routing. See [`docs/research/`](docs/research/).
+
+---
+
+## Status, scope and disclaimer
+
+This is a **personal portfolio and research project by one developer**. It exists to
+demonstrate engineering methodology. It is not a product, not a service, and not affiliated
+with, endorsed by, or representative of the Bundesnetzagentur, the Deutscher Wetterdienst, the
+Autobahn GmbH des Bundes, OpenStreetMap, or any vehicle manufacturer, charging-network operator
+or other organisation. Organisation and product names appear only to identify data sources and
+belong to their respective owners.
+
+- **Not for operational use.** Nothing here should be relied on to plan a real journey, size
+  real infrastructure, assess a real vehicle, or support any decision with safety, financial or
+  legal consequences. The energy model is an educational approximation, the vehicle profiles
+  are generic class-level figures, and all vehicle telemetry is simulated.
+- **No warranty.** The code is licensed under Apache 2.0 and provided *as is*, without warranty
+  of any kind, express or implied — see [LICENSE](LICENSE). No claim is made about the accuracy,
+  completeness or currency of any dataset it ingests; those remain the responsibility and
+  property of their publishers — see [DATA_LICENSES.md](DATA_LICENSES.md).
+- **Open data is used as published.** Official datasets are fetched from their public
+  interfaces within their published terms, cached locally, and are **not redistributed** by this
+  repository beyond the small, attributed test fixtures needed to run the parsers offline. If
+  you represent a data publisher and believe any use here is outside your terms, please open an
+  issue: it will be corrected promptly.
+- **No personal data.** The application collects nothing from its users, sets no tracking
+  cookies, and the simulated vehicles correspond to no real vehicle, person or trip.
+- **A hosted demo, where one exists, is a static snapshot** of the platform's output on a
+  stated date, served without a live backend, and labelled as such on every page.
 
 ---
 

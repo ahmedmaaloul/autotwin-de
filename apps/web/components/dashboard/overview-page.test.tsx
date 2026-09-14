@@ -24,7 +24,7 @@ const { OverviewPage } = await import("./overview-page");
 
 function renderPage(): void {
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <LocaleProvider locale="de">
+    <LocaleProvider>
       <TooltipProvider>{children}</TooltipProvider>
     </LocaleProvider>
   );

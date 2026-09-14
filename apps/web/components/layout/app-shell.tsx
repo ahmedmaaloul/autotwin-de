@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AppTopbar } from "@/components/layout/app-topbar";
+import { SnapshotBanner } from "@/components/layout/snapshot-banner";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 /**
@@ -14,6 +15,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <AppSidebar />
       <SidebarInset className="min-w-0">
         <AppTopbar />
+        <SnapshotBanner />
         <main className="min-w-0 flex-1 px-4 py-4 md:px-6 md:py-6">{children}</main>
       </SidebarInset>
     </SidebarProvider>

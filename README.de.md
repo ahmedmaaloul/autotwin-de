@@ -215,6 +215,31 @@ echo 'POSTGRES_IMAGE=imresamu/postgis:16-3.5' >> .env && make reset && make demo
 
 ---
 
+## Gehostete Demo
+
+Die öffentliche Demo ist ein **vollständig statischer Export** des Frontends, gebaut mit
+`NEXT_PUBLIC_DEMO_SNAPSHOT=1`. Sie enthält keinen Server: Jede Seite liest einen **datierten
+Snapshot** echter API-Antworten, aufgezeichnet von einer lokal laufenden Plattform mit den
+Live-Daten von Bundesnetzagentur, DWD und Autobahn GmbH — und jede Seite trägt einen Hinweis mit
+dem Aufnahmedatum. Filter und Seitenwechsel laufen im Browser über die aufgezeichneten
+Datensätze; der Ladeinfrastruktur-Explorer enthält die Schnellladestandorte (≥ 50 kW) und sagt
+das auch; Aktionen, die ein Backend benötigen — Simulationssteuerung, frei gewählte Strecken —
+melden ehrlich „im Snapshot nicht verfügbar".
+
+Die Veröffentlichung auf **GitHub Pages** übernimmt `.github/workflows/deploy-pages.yml`
+(einmalig: *Settings → Pages → Source: GitHub Actions*); dasselbe Artefakt läuft unverändert auf
+Vercel, Cloudflare Pages oder Netlify.
+
+```bash
+# Snapshot aus einer laufenden lokalen Plattform neu erzeugen (vorher: make demo)
+uv run python scripts/capture_snapshot.py --api http://localhost:8000
+
+# Export lokal bauen und ansehen
+cd apps/web && NEXT_PUBLIC_DEMO_SNAPSHOT=1 pnpm build && npx serve out
+```
+
+---
+
 ## Das Energiemodell
 
 Zuerst ein **physikalisches Basismodell**, weil es nachvollziehbar ist und keine Trainingsdaten
@@ -281,6 +306,41 @@ Dokumentiert, nicht zugesagt: Reichweitenprognose auf Basis realer Flottendaten 
 Verkehrsprognose · Prognose des Ladebedarfs · optimale Standortplanung für Ladeinfrastruktur ·
 Vehicle-to-Grid · C-ITS / V2X · Flottenoptimierung · CO₂-optimiertes Routing. Siehe
 [`docs/research/`](docs/research/).
+
+---
+
+## Status, Umfang und Haftungsausschluss
+
+Dies ist ein **persönliches Portfolio- und Forschungsprojekt einer einzelnen Person**. Es dient
+dem Nachweis von Engineering-Methodik. Es ist kein Produkt, kein Dienst und steht in keiner
+Verbindung zur Bundesnetzagentur, zum Deutschen Wetterdienst, zur Autobahn GmbH des Bundes,
+zu OpenStreetMap oder zu einem Fahrzeughersteller, Ladenetzbetreiber oder einer sonstigen
+Organisation; es wird von keiner dieser Stellen unterstützt oder vertreten. Namen von
+Organisationen und Produkten dienen ausschließlich der Bezeichnung von Datenquellen und
+gehören ihren jeweiligen Inhabern.
+
+- **Nicht für den operativen Einsatz.** Nichts in diesem Projekt eignet sich zur Planung einer
+  realen Fahrt, zur Dimensionierung realer Infrastruktur, zur Bewertung eines realen Fahrzeugs
+  oder als Grundlage für Entscheidungen mit sicherheitsrelevanten, finanziellen oder
+  rechtlichen Folgen. Das Energiemodell ist eine didaktische Näherung, die Fahrzeugprofile sind
+  generische Klassenwerte, und sämtliche Fahrzeugtelemetrie ist simuliert.
+- **Keine Gewährleistung.** Der Quellcode steht unter Apache 2.0 und wird *wie besehen* ohne
+  jede ausdrückliche oder stillschweigende Gewährleistung bereitgestellt — siehe
+  [LICENSE](LICENSE). Für Richtigkeit, Vollständigkeit oder Aktualität der eingelesenen
+  Datensätze wird keine Zusicherung gegeben; diese verbleiben in der Verantwortung und im
+  Eigentum ihrer Herausgeber — siehe [DATA_LICENSES.md](DATA_LICENSES.md).
+- **Open Data wird so genutzt, wie es veröffentlicht ist.** Amtliche Datensätze werden über ihre
+  öffentlichen Schnittstellen im Rahmen der veröffentlichten Nutzungsbedingungen abgerufen,
+  lokal zwischengespeichert und von diesem Repository **nicht weiterverbreitet** — abgesehen
+  von den kleinen, mit Quellenangabe versehenen Testdaten, die zum Offline-Betrieb der Parser
+  nötig sind. Sollten Sie einen Datenherausgeber vertreten und eine Nutzung für nicht
+  bedingungskonform halten, eröffnen Sie bitte ein Issue; es wird umgehend korrigiert.
+- **Keine personenbezogenen Daten.** Die Anwendung erhebt nichts von ihren Nutzern, setzt keine
+  Tracking-Cookies, und die simulierten Fahrzeuge entsprechen keinem realen Fahrzeug, keiner
+  Person und keiner Fahrt.
+- **Eine gehostete Demo, sofern vorhanden, ist ein statischer Snapshot** der Plattformausgabe
+  zu einem angegebenen Datum, ohne laufendes Backend, und auf jeder Seite als solcher
+  gekennzeichnet.
 
 ---
 
