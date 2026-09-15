@@ -121,7 +121,7 @@ fan-out, because every other module compiles against it.
 | `pnpm test:run` | **322 passed** |
 | `pnpm lint` / `pnpm typecheck` / `pnpm build` | clean (2 React-Compiler notices on TanStack Table) |
 | `pnpm exec playwright test smoke` | **20 passed** incl. the full Frankfurt→Stuttgart flow; 17 also pass against the static export with no backend |
-| `dbt build` | 9 marts, 1 incremental model, 440+ tests |
+| `dbt build` | 437 tests pass on the fixture dataset. **Not verified on the full register**: with 116 k stations the ephemeral `int_corridor_stations` was re-inlined into each of its ~40 tests (5+ min each); it is now materialised as a table — that fix is pushed but not yet run against full data |
 | Live ingestion | 116 440 charging stations · 219 821 points · 1 703 traffic events |
 
 **Seven defects were found by the test suites and fixed**, each now pinned by the regression
