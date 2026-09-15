@@ -9,7 +9,7 @@
     "start": "next start --port 3000",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
     "e2e": "playwright test",
