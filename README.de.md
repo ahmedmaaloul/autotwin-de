@@ -6,11 +6,11 @@
 
 **Offizielle Infrastrukturdaten · Streaming-Fahrzeugsimulation · Geodatenanalyse · Machine Learning · Ladeoptimierung**
 
-**[Live-Demo](https://ahmedmaaloul.github.io/autotwin-de/)** · [English version](README.md) · [Architektur](ARCHITECTURE.md) · [Entscheidungen](docs/adr/) · [Datenquellen](docs/data/sources.md)
+**[Live-Demo](https://ahmedmaaloul.github.io/autotwin-de/)** · [Architektur](ARCHITECTURE.md) · [Entscheidungen](docs/adr/) · [Datenquellen](docs/data/sources.md)
+
+🇬🇧 **This page in English: [README.md](README.md)**
 
 </div>
-
----
 
 ## Worum es geht
 
@@ -21,9 +21,9 @@ AutoTwin DE beantwortet betriebliche Fragen zur Elektromobilität in Deutschland
 > Ist ein Ladestopp erforderlich, und wo? Und auf welchen deutschen Korridoren ist die
 > Schnellladeinfrastruktur zu dünn, um die Fahrt überhaupt zu ermöglichen?**
 
-Die Antworten entstehen aus der Verbindung **offizieller deutscher Open Data** — dem
+Die Antworten entstehen aus der Verbindung **offizieller deutscher Open Data** (dem
 Ladesäulenregister der Bundesnetzagentur, den Beobachtungsdaten des Deutschen Wetterdienstes und
-den Baustellenmeldungen der Autobahn GmbH — mit einer **physikbasierten Simulation** vernetzter
+den Baustellenmeldungen der Autobahn GmbH) mit einer **physikbasierten Simulation** vernetzter
 Fahrzeuge, einem **PostGIS**-Geodatenkern und einem Energiemodell, das stets gegen ein
 nachvollziehbares physikalisches Basismodell ausgewiesen wird.
 
@@ -33,24 +33,26 @@ Beispieldaten, und simulierte Daten sind überall als solche gekennzeichnet.
 
 ![AutoTwin DE Übersicht](docs/images/dashboard.png)
 
----
+<sub>116 440 Ladestandorte aus dem aktuellen Ladesäulenregister, über 1 300 aktuelle
+Verkehrsstörungen der Autobahn GmbH, simulierte Fahrzeuge auf der Karte, und jede Kachel sagt,
+welches davon sie zeigt.</sub>
 
-## Datenherkunft — ehrlich ausgewiesen
+## Datenherkunft, ehrlich ausgewiesen
 
 Dieser Abschnitt steht bewusst vor der Funktionsliste.
 
 | | Quelle | Lizenz |
 |---|---|---|
-| 🟢 **Echt** | Ladeinfrastruktur — Ladesäulenregister der Bundesnetzagentur (~117 000 Standorte) | CC BY 4.0 |
-| 🟢 **Echt** | Wetter — Deutscher Wetterdienst, 10-Minuten-Stationsbeobachtungen | CC BY 4.0 |
-| 🟢 **Echt** | Baustellen, Sperrungen und Warnmeldungen — öffentliche API der Autobahn GmbH | siehe [Hinweis](DATA_LICENSES.md) |
-| 🟢 **Echt** | Straßennetz, Routing und Geokodierung — OpenStreetMap über OSRM und Nominatim | ODbL 1.0 |
+| 🟢 **Echt** | Ladeinfrastruktur: Ladesäulenregister der Bundesnetzagentur (~117 000 Standorte) | CC BY 4.0 |
+| 🟢 **Echt** | Wetter: Deutscher Wetterdienst, 10-Minuten-Stationsbeobachtungen | CC BY 4.0 |
+| 🟢 **Echt** | Baustellen, Sperrungen und Warnmeldungen: öffentliche API der Autobahn GmbH | siehe [Hinweis](DATA_LICENSES.md) |
+| 🟢 **Echt** | Straßennetz, Routing und Geokodierung: OpenStreetMap über OSRM und Nominatim | ODbL 1.0 |
 | 🟡 **Simuliert** | Fahrzeugtelemetrie: Position, Geschwindigkeit, Ladezustand, Batterietemperatur, Leistung | Apache 2.0 (eigene) |
-| 🟡 **Simuliert** | Fahrten — und damit die Trainingslabels des ML-Modells | Apache 2.0 (eigene) |
+| 🟡 **Simuliert** | Fahrten, und damit die Trainingslabels des ML-Modells | Apache 2.0 (eigene) |
 
 Eine öffentlich zugängliche Quelle für reale Telemetrie vernetzter Fahrzeuge existiert nicht:
-OEM-Telematik ist proprietär und personenbezogen. AutoTwin DE simuliert sie deshalb — auf Basis
-eines Fahrwiderstandsmodells und nicht mit einem Zufallsgenerator — und weist das auf jeder
+OEM-Telematik ist proprietär und personenbezogen. AutoTwin DE simuliert sie deshalb, auf Basis
+eines Fahrwiderstandsmodells und nicht mit einem Zufallsgenerator, und weist das auf jeder
 Ebene aus:
 
 - jeder Datenbankdatensatz führt `data_origin` ∈ `official | simulated | derived`;
@@ -60,8 +62,6 @@ Ebene aus:
   *Methodik* belegt und nicht die Gültigkeit für reale Fahrzeuge.
 
 Siehe [ADR 004](docs/adr/004-simulation-vs-real-vehicle-data.md).
-
----
 
 ## Architektur
 
@@ -103,54 +103,79 @@ flowchart LR
 Vollständige Diagramme, der Ablauf einer Streckenanalyse und der Schichtenvertrag stehen in
 [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
----
-
 ## Funktionsumfang
 
-**Streckenanalyse** — Streckengeometrie aus OSRM, zerlegt in Abschnitte von rund 5 km; Wetter je
+**Streckenanalyse.** Streckengeometrie aus OSRM, zerlegt in Abschnitte von rund 5 km; Wetter je
 Abschnitt von der nächstgelegenen DWD-Station; Verkehrsstörungen dem Korridor zugeordnet;
 Energieverbrauch je Abschnitt sowohl aus dem physikalischen Modell als auch aus einem
 LightGBM-Regressor; ein Ladezustandsverlauf; und eine **deterministische Erklärung** der
-Einflussfaktoren — ohne LLM im Antwortpfad.
+Einflussfaktoren, ohne LLM im Antwortpfad.
 
-**Das Streckenband** — die Darstellungsform, die im deutschen Straßen- und Eisenbahnwesen seit
+**Das Streckenband.** Die Darstellungsform, die im deutschen Straßen- und Eisenbahnwesen seit
 über hundert Jahren verwendet wird, hier als interaktives SVG-Instrument: Energieintensität als
 Farbband, Ladezustand als Linie darüber, Verkehrsstörungen oberhalb, Lademöglichkeiten
-unterhalb — alles auf einer gemeinsamen Streckenachse. Vollständig tastaturbedienbar und für
+unterhalb, alles auf einer gemeinsamen Streckenachse. Vollständig tastaturbedienbar und für
 Screenreader lesbar.
 
-**Ladeoptimierung** — Beam-Suche über die Ladestationen im Korridor, die
+![Streckenanalyse Frankfurt am Main → Stuttgart](docs/images/route-analysis.png)
+
+<sub>Frankfurt am Main → Stuttgart, Limousine mit 70 %: 203 km, 2 h 14, Ankunft mit 32 %,
+28,3 kWh; das physikalische Basismodell (12,9) steht neben dem ML-Modell (13,9 kWh/100 km), und
+die nicht erreichbare Live-Quelle wird ehrlich als nicht verfügbar ausgewiesen.</sub>
+
+**Ladeoptimierung.** Beam-Suche über die Ladestationen im Korridor, die
 `Fahrzeit + Ladezeit + 2 × Umwegzeit + Reichweitenrisiko` minimiert, mit einer vereinfachten
 ladezustandsabhängigen Ladekurve. Jede Empfehlung nennt den Grund, aus dem sie gewonnen hat.
 
-**Geodatenanalyse der Infrastruktur** — Korridorabdeckung und Erkennung **unterversorgter
+**Geodatenanalyse der Infrastruktur.** Korridorabdeckung und Erkennung **unterversorgter
 Korridore** in PostGIS: Ladestationen werden mit `ST_LineLocatePoint` auf die Strecke projiziert,
 Versorgungslücken ergeben sich als Fensterfunktion über den Streckenoffsets. Alle Parameter
 (Mindestladeleistung, maximaler Abstand, Korridorbreite) sind einstellbar, denn eine Aussage wie
 *„größter Abstand 84 km"* ist ohne ihre Annahmen bedeutungslos.
 
-**Live-Zwilling** — mehrere hundert simulierte Fahrzeuge, die über Redpanda nach PostGIS und per
+**Live-Zwilling.** Mehrere hundert simulierte Fahrzeuge, die über Redpanda nach PostGIS und per
 Server-Sent Events in den Browser strömen; Fahrzeugpositionen werden zwischen den Telemetriedaten
 interpoliert.
 
-**Ein MCP-Server statt eines Chatbots** — die Analysen der Plattform als Werkzeuge für jeden
+**Ein MCP-Server statt eines Chatbots.** Die Analysen der Plattform als Werkzeuge für jeden
 Model-Context-Protocol-Client (Claude Desktop, Cursor, Zed): `analyze_route`,
 `plan_charging_stops`, `corridor_coverage`, `underserved_corridors`,
 `search_charging_stations`, `data_quality`. Das Modell bringt der Client mit; jede Zahl stammt
-aus demselben Code, den auch die API ausliefert — nichts wird erfunden, und kein Schlüssel liegt
+aus demselben Code, den auch die API ausliefert. Nichts wird erfunden, und kein Schlüssel liegt
 im Repository. Siehe [`services/mcp/`](services/mcp/README.md).
 
-**Datenqualität als eigenständige Ansicht** — empfangene, übernommene, verworfene und doppelte
-Datensätze je Abruf, die ausgelösten Prüfregeln, Aktualität, Lizenz und Namensnennung.
+**Datenqualität als eigenständige Ansicht.** Empfangene, übernommene, verworfene und doppelte
+Datensätze je Abruf, die ausgelösten Prüfregeln, Aktualität, Lizenz und Namensnennung, alles in
+der Oberfläche nachlesbar.
 
----
+![Datenqualität](docs/images/data-quality.png)
+
+<sub>Je Quelle: Status, Übernahmequote, ob die Antwort aus der Live-Quelle oder aus dem Cache
+stammt, die Lizenz und die daraus folgende Namensnennung. Ein fehlgeschlagener Abruf wird als
+fehlgeschlagen angezeigt.</sub>
+
+<details>
+<summary><b>Weitere Ansichten</b></summary>
+
+| | |
+|---|---|
+| ![Live-Zwilling](docs/images/live-twin.png) | ![Ladeinfrastruktur](docs/images/charging.png) |
+| **Live-Zwilling**: simulierte Fahrzeuge per SSE, eingefärbt nach Ladezustand | **Ladeinfrastruktur**: 116 440 Standorte, geclustert, filterbar, mit vollständiger Herkunft |
+| ![ML-Labor](docs/images/ml-lab.png) | ![Dunkles Design](docs/images/dashboard-dark.png) |
+| **ML-Labor**: LightGBM gegen das physikalische Basismodell, SHAP-Wichtigkeiten | Hell und dunkel, beides gleichwertig |
+
+Jeder Screenshot entsteht durch `apps/web/tests/e2e/screenshots.spec.ts`, das dieselben Abläufe
+wie die Smoke-Tests durchfährt. Ein Screenshot kann also keine Ansicht zeigen, die nicht
+funktioniert.
+
+</details>
 
 ## Technologie
 
 | Schicht | Auswahl | Warum nicht die naheliegende Alternative |
 |---|---|---|
 | Geodaten | PostgreSQL 16 + PostGIS 3.4 | Korridor- und Lückenanalyse gehört in SQL, nicht in Python-Schleifen ([ADR 001](docs/adr/001-postgis-for-geospatial-storage.md)) |
-| Streaming | Redpanda (Kafka-Protokoll) | Kafka-Semantik ohne JVM — und optional ([ADR 002](docs/adr/002-redpanda-for-local-streaming.md)) |
+| Streaming | Redpanda (Kafka-Protokoll) | Kafka-Semantik ohne JVM, und optional ([ADR 002](docs/adr/002-redpanda-for-local-streaming.md)) |
 | Analytik | Polars · DuckDB · Parquet | Spark für 10⁵ Datensätze wäre Technologiewahl fürs Lebenslauf-Stichwort ([ADR 007](docs/adr/007-duckdb-polars-over-spark.md)) |
 | Transformationen | dbt-core | Echte Lineage und über 440 Tests, keine Dekoration |
 | ML | LightGBM + SHAP gegen ein physikalisches Basismodell | Ein Modell ist nur im Vergleich zu einer Baseline belastbar |
@@ -159,23 +184,21 @@ Datensätze je Abruf, die ausgelösten Prüfregeln, Aktualität, Lizenz und Name
 | Orchestrierung | Airflow, optionales Compose-Profil | Für das Öffnen eines Dashboards darf kein Scheduler nötig sein |
 
 Bewusst **nicht** eingesetzt, jeweils mit Begründung: Kubernetes, Service Mesh, Spark, Flink,
-Redis, Elasticsearch, GraphQL, Event Sourcing, CQRS — siehe
+Redis, Elasticsearch, GraphQL, Event Sourcing, CQRS. Siehe
 [ADR 009](docs/adr/009-rejected-technologies.md).
 
 **Kostenfrei.** Kein Cloud-Konto, keine kostenpflichtige API, keine Kreditkarte. Alle externen
 Quellen sind öffentliche deutsche Open Data oder Community-Infrastruktur, genutzt im Rahmen der
 jeweils veröffentlichten Nutzungsbedingungen.
 
----
-
 ## Schnellstart
 
 Voraussetzungen: **Docker**, **[uv](https://docs.astral.sh/uv/)**, **Node 22+** und **pnpm**.
 
 ```bash
-git clone <dieses-repo> && cd autotwin-de
+git clone https://github.com/ahmedmaaloul/autotwin-de.git && cd autotwin-de
 make setup      # uv sync + pnpm install + .env
-make demo       # Datenbank, Migrationen, Demodaten, Simulation — dann http://localhost:3000
+make demo       # Datenbank, Migrationen, Demodaten, Simulation, dann http://localhost:3000
 ```
 
 `make demo` ist idempotent und funktioniert auch **offline**: Ist eine Live-Quelle nicht
@@ -211,7 +234,7 @@ Optionale Compose-Profile: `--profile routing` (lokales OSRM), `--profile observ
 <summary><b>Apple Silicon</b></summary>
 
 Das offizielle Image `postgis/postgis` wird nur für amd64 veröffentlicht und läuft auf Apple
-Silicon unter Emulation — korrekt, aber bei den Korridorabfragen spürbar langsamer. Für einen
+Silicon unter Emulation: korrekt, aber bei den Korridorabfragen spürbar langsamer. Für einen
 nativen Build:
 
 ```bash
@@ -220,17 +243,15 @@ echo 'POSTGRES_IMAGE=imresamu/postgis:16-3.5' >> .env && make reset && make demo
 
 </details>
 
----
-
 ## Gehostete Demo
 
 Die öffentliche Demo ist ein **vollständig statischer Export** des Frontends, gebaut mit
 `NEXT_PUBLIC_DEMO_SNAPSHOT=1`. Sie enthält keinen Server: Jede Seite liest einen **datierten
 Snapshot** echter API-Antworten, aufgezeichnet von einer lokal laufenden Plattform mit den
-Live-Daten von Bundesnetzagentur, DWD und Autobahn GmbH — und jede Seite trägt einen Hinweis mit
+Live-Daten von Bundesnetzagentur, DWD und Autobahn GmbH, und jede Seite trägt einen Hinweis mit
 dem Aufnahmedatum. Filter und Seitenwechsel laufen im Browser über die aufgezeichneten
 Datensätze; der Ladeinfrastruktur-Explorer enthält die Schnellladestandorte (≥ 50 kW) und sagt
-das auch; Aktionen, die ein Backend benötigen — Simulationssteuerung, frei gewählte Strecken —
+das auch; Aktionen, die ein Backend benötigen (Simulationssteuerung, frei gewählte Strecken),
 melden ehrlich „im Snapshot nicht verfügbar".
 
 Die Veröffentlichung auf **GitHub Pages** übernimmt `.github/workflows/deploy-pages.yml`
@@ -244,8 +265,6 @@ uv run python scripts/capture_snapshot.py --api http://localhost:8000
 # Export lokal bauen und ansehen
 cd apps/web && NEXT_PUBLIC_DEMO_SNAPSHOT=1 pnpm build && npx serve out
 ```
-
----
 
 ## Das Energiemodell
 
@@ -269,7 +288,7 @@ Es reproduziert genau das Verhalten, auf das es ankommt:
 | 120 | 23,2 | 17,6 | 18,7 |
 | 180 | 38,6 | 31,1 | 31,0 |
 
-*(Limousine, kWh/100 km)* — Kälte kostet bei 50 km/h **+87 %**, bei 180 km/h aber nur **+24 %**,
+*(Limousine, kWh/100 km)*. Kälte kostet bei 50 km/h **+87 %**, bei 180 km/h aber nur **+24 %**,
 weil bei niedriger Geschwindigkeit die Klimatisierung und bei hoher Geschwindigkeit der
 Luftwiderstand dominiert. Das ist reales Fahrzeugverhalten und ergibt sich aus der Physik, statt
 angepasst zu werden.
@@ -288,24 +307,43 @@ zurückgehaltenen Daten wie das Basismodell, mit SHAP-Attribution.
 Einzelheiten: [`docs/ml/energy-model.md`](docs/ml/energy-model.md),
 [`docs/ml/methodology.md`](docs/ml/methodology.md).
 
----
+## Geprüft
+
+Jede Zahl in dieser Tabelle ist mit `make ci` und `make demo` reproduzierbar; die CI-Auswahl
+läuft bei jedem Push in [GitHub Actions](https://github.com/ahmedmaaloul/autotwin-de/actions).
+
+| | |
+|---|---|
+| Backend-Tests | **1 096 bestanden** (`pytest`), davon 1 032 in der CI-Auswahl ohne Datenbank |
+| Frontend-Tests | **322 bestanden** (Vitest) |
+| End-to-End | **20 bestanden** (Playwright), einschließlich der vollständigen Analyse Frankfurt→Stuttgart |
+| MCP-Server | 14 Werkzeugtests, davon 7 gegen eine laufende PostGIS-Datenbank |
+| dbt | 9 Marts, 1 inkrementelles Modell, **über 440 Tests** gegen das reale Warehouse |
+| Typen | **`mypy --strict` ohne Befund über 114 Quelldateien**; TypeScript strict ohne Befund |
+| Lint | `ruff` ohne Befund über 174 Dateien; `eslint` ohne Befund |
+
+Die Testsuiten wurden gegen unabhängig hergeleitete Werte geschrieben, nicht gegen die aktuelle
+Ausgabe: der Luftwiderstandsterm wird gegen das v³-Gesetz geprüft, Ladezeiten gegen ein
+geschlossen gelöstes Integral der Ladekurve, der Steigungsterm gegen von Hand berechnetes m·g·h.
+**Sie fanden sieben echte Fehler**, die heute jeweils durch den Regressionstest festgehalten
+sind, der sie zuerst dokumentiert hat. Zwei weitere kamen aus der manuellen Prüfung, darunter
+Kartenebenen, die auf ein MapLibre-Ereignis warteten, das in einem gedrosselten Render-Loop nie
+eintritt und deshalb jede Karte in einem Hintergrund-Tab oder einem CI-Browser stumm leer ließ.
 
 ## Grenzen
 
-- Die Fahrzeugtelemetrie ist simuliert. Siehe oben — das ist die zentrale Einschränkung.
+- Die Fahrzeugtelemetrie ist simuliert. Siehe oben; das ist die zentrale Einschränkung.
 - Keine Höhendaten. OSRM liefert kein Höhenprofil, die Steigungen je Abschnitt sind daher
   synthetisch. Ein produktives System würde ein digitales Geländemodell (SRTM/Copernicus)
   verwenden. Die Steigung ist damit die schwächste Eingangsgröße des Energiemodells.
 - Die Ladekurven sind eine vereinfachte dreiteilige Näherung. Reale Kurven sind
   herstellerspezifisch, temperaturabhängig und proprietär.
-- Die **Verfügbarkeit** von Ladepunkten wird nicht modelliert — das Ladesäulenregister führt
+- Die **Verfügbarkeit** von Ladepunkten wird nicht modelliert: das Ladesäulenregister führt
   Standorte, keine Echtzeitbelegung. Eine Fahrtplanung nimmt jede Ladesäule als frei an.
 - Die Autobahn-API deckt nur das Bundesfernstraßennetz ab und veröffentlicht keine
   Lizenzangabe ([warum das relevant ist](DATA_LICENSES.md)).
 - Bewusst als Einzelknoten ausgelegt. Kubernetes ist ein dokumentierter Weg, keine
   Implementierung.
-
----
 
 ## Ausblick
 
@@ -313,8 +351,6 @@ Dokumentiert, nicht zugesagt: Reichweitenprognose auf Basis realer Flottendaten 
 Verkehrsprognose · Prognose des Ladebedarfs · optimale Standortplanung für Ladeinfrastruktur ·
 Vehicle-to-Grid · C-ITS / V2X · Flottenoptimierung · CO₂-optimiertes Routing. Siehe
 [`docs/research/`](docs/research/).
-
----
 
 ## Status, Umfang und Haftungsausschluss
 
@@ -332,13 +368,13 @@ gehören ihren jeweiligen Inhabern.
   rechtlichen Folgen. Das Energiemodell ist eine didaktische Näherung, die Fahrzeugprofile sind
   generische Klassenwerte, und sämtliche Fahrzeugtelemetrie ist simuliert.
 - **Keine Gewährleistung.** Der Quellcode steht unter Apache 2.0 und wird *wie besehen* ohne
-  jede ausdrückliche oder stillschweigende Gewährleistung bereitgestellt — siehe
+  jede ausdrückliche oder stillschweigende Gewährleistung bereitgestellt; siehe
   [LICENSE](LICENSE). Für Richtigkeit, Vollständigkeit oder Aktualität der eingelesenen
   Datensätze wird keine Zusicherung gegeben; diese verbleiben in der Verantwortung und im
-  Eigentum ihrer Herausgeber — siehe [DATA_LICENSES.md](DATA_LICENSES.md).
+  Eigentum ihrer Herausgeber, siehe [DATA_LICENSES.md](DATA_LICENSES.md).
 - **Open Data wird so genutzt, wie es veröffentlicht ist.** Amtliche Datensätze werden über ihre
   öffentlichen Schnittstellen im Rahmen der veröffentlichten Nutzungsbedingungen abgerufen,
-  lokal zwischengespeichert und von diesem Repository **nicht weiterverbreitet** — abgesehen
+  lokal zwischengespeichert und von diesem Repository **nicht weiterverbreitet**, abgesehen
   von den kleinen, mit Quellenangabe versehenen Testdaten, die zum Offline-Betrieb der Parser
   nötig sind. Sollten Sie einen Datenherausgeber vertreten und eine Nutzung für nicht
   bedingungskonform halten, eröffnen Sie bitte ein Issue; es wird umgehend korrigiert.
@@ -349,18 +385,16 @@ gehören ihren jeweiligen Inhabern.
   zu einem angegebenen Datum, ohne laufendes Backend, und auf jeder Seite als solcher
   gekennzeichnet.
 
----
-
 ## Lizenz
 
 Quellcode: **Apache 2.0** ([LICENSE](LICENSE)).
-Die eingelesenen Datensätze behalten ihre eigenen Lizenzen und Namensnennungspflichten — diese
+Die eingelesenen Datensätze behalten ihre eigenen Lizenzen und Namensnennungspflichten; diese
 werden durch dieses Repository **nicht** verändert. Siehe
 [**DATA_LICENSES.md**](DATA_LICENSES.md).
 
 ```
-Ladesäulenregister der Bundesnetzagentur — CC BY 4.0
-Quelle: Deutscher Wetterdienst — CC BY 4.0
+Ladesäulenregister der Bundesnetzagentur, CC BY 4.0
+Quelle: Deutscher Wetterdienst, CC BY 4.0
 Daten: Autobahn GmbH des Bundes
-© OpenStreetMap-Mitwirkende — ODbL 1.0
+© OpenStreetMap-Mitwirkende, ODbL 1.0
 ```
