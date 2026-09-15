@@ -107,7 +107,9 @@ jobs:
         run: pnpm typecheck
 
       - name: Test
-        run: pnpm test --run
+        # `pnpm test --run` does not work: pnpm 9 parses --run as its own option and never
+        # forwards it to vitest. The test:run script is `vitest run`.
+        run: pnpm test:run
 
       # `next build` is a test: it type-checks server components, resolves every route and
       # produces the standalone bundle that infra/docker/web.Dockerfile ships.
