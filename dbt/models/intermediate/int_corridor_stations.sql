@@ -1,3 +1,12 @@
+{{ config(materialized='table') }}
+{#
+    Materialised as a TABLE, deliberately breaking the intermediate layer's ephemeral
+    default. An ephemeral model is inlined into every model and every test that refs it,
+    and this one is the corridor projection: 116 000 stations x 5 routes through
+    ST_DWithin and ST_LineLocatePoint in EPSG:25832. Inlined, each of its ~40 schema
+    tests re-ran that projection from scratch — measured at 5+ minutes per test on the
+    full register, i.e. hours for the suite. Computed once, the tests read a table.
+#}
 /*
     Charging stations that serve a demo corridor, projected onto it.
 

@@ -6,7 +6,7 @@
 
 **Offizielle Infrastrukturdaten · Streaming-Fahrzeugsimulation · Geodatenanalyse · Machine Learning · Ladeoptimierung**
 
-[English version](README.md) · [Architektur](ARCHITECTURE.md) · [Entscheidungen](docs/adr/) · [Datenquellen](docs/data/sources.md)
+**[Live-Demo](https://ahmedmaaloul.github.io/autotwin-de/)** · [English version](README.md) · [Architektur](ARCHITECTURE.md) · [Entscheidungen](docs/adr/) · [Datenquellen](docs/data/sources.md)
 
 </div>
 

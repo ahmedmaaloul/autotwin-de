@@ -6,7 +6,7 @@
 
 **Real German infrastructure data · streaming vehicle simulation · geospatial analytics · machine learning · charging optimisation**
 
-[Deutsche Version](README.de.md) · [Architecture](ARCHITECTURE.md) · [Decisions](docs/adr/) · [Data sources](docs/data/sources.md)
+**[Live demo](https://ahmedmaaloul.github.io/autotwin-de/)** · [Deutsche Version](README.de.md) · [Architecture](ARCHITECTURE.md) · [Decisions](docs/adr/) · [Data sources](docs/data/sources.md)
 
 </div>
 
