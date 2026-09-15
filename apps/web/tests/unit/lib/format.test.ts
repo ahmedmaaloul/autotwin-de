@@ -57,9 +57,12 @@ describe("formatNumber", () => {
     // 1 234 567 charging points would be unreadable in full in a metric tile. German CLDR
     // abbreviates millions as "Mio." after a non-breaking space; English uses a bare "M".
     expect(formatNumber(1_234_567, "de", { compact: true })).toBe(`1${NBSP}Mio.`);
-    expect(formatNumber(1_234_567, "en", { compact: true })).toBe("1M");
+    // Case-tolerant on purpose: ICU formats a million as "1M" in one release and "1m" in the
+    // next for en-GB (Node 24/macOS vs Node 22/Linux runners). The value and the unit
+    // letter are what matter; its case is an ICU data detail, not our behaviour.
+    expect(formatNumber(1_234_567, "en", { compact: true })).toMatch(/^1[mM]$/);
     // `decimals` still applies inside compact notation: 1 234 567 → 1.2M.
-    expect(formatNumber(1_234_567, "en", { compact: true, decimals: 1 })).toBe("1.2M");
+    expect(formatNumber(1_234_567, "en", { compact: true, decimals: 1 })).toMatch(/^1\.2[mM]$/);
   });
 
   it("keeps the two locales genuinely distinct", () => {
